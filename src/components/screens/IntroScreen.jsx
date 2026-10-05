@@ -12,14 +12,12 @@ export default function IntroScreen({ onNext }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.7 }}
         >
-            {/* Gift image */}
             <div className="relative h-44 md:h-52 bg-linear-to-b from-white/80 to-pink-200 w-full rounded-[40px] flex items-end justify-center shadow-inner">
                 <div className="text-7xl mb-5">
                     🎁
                 </div>
             </div>
 
-            {/* Text */}
             <div className="text-center">
                 <h1
                     className="text-2xl md:text-3xl font-semibold text-primary drop-shadow leading-tight"
@@ -37,12 +35,9 @@ export default function IntroScreen({ onNext }) {
                 </p>
             </div>
 
-            {/* Open button */}
             <div className="mt-4">
                 <Button
-                    onClick={() => {
-                        onNext?.()
-                    }}
+                    onClick={() => onNext?.()}
                     className="bg-[#f43f8c] text-white"
                 >
                     <Gift size={20} />
