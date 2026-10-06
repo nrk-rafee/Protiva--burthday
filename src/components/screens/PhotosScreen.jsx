@@ -9,8 +9,11 @@ import "swiper/css/effect-fade"
 import { Mail, Loader2 } from "lucide-react"
 import Button from "../Button"
 
+// =====================================================
+// CORRECT PHOTO FILES
+// =====================================================
+
 const photos = [
-  const photos = [
   "/images/1.png",
   "/images/2.jpg",
   "/images/3.jpg",
@@ -26,84 +29,124 @@ const photos = [
   "/images/13.jpg",
 ]
 
+const SKY_DURATION = 80
+
 export default function PhotosScreen({ onNext }) {
   const [imagesReady, setImagesReady] = useState(false)
   const [loadedCount, setLoadedCount] = useState(0)
 
-  // --------------------------------------------------
-  // PRELOAD ALL PHOTOS
-  // --------------------------------------------------
+  const [butterfliesCaught, setButterfliesCaught] = useState(0)
+
+  const [butterflyPosition, setButterflyPosition] = useState({
+    x: 50,
+    y: 50,
+  })
+
+  // =====================================================
+  // PRELOAD ALL IMAGES
+  // =====================================================
+
   useEffect(() => {
     let mounted = true
     let completed = 0
 
-    const preloadImages = () => {
-      photos.forEach((src) => {
-        const img = new Image()
+    photos.forEach((src) => {
+      const img = new Image()
 
-        const done = () => {
-          completed += 1
+      const done = () => {
+        completed += 1
 
-          if (mounted) {
-            setLoadedCount(completed)
+        if (!mounted) return
 
-            if (completed === photos.length) {
-              setImagesReady(true)
-            }
-          }
+        setLoadedCount(completed)
+
+        if (completed >= photos.length) {
+          setImagesReady(true)
         }
+      }
 
-        img.onload = done
-        img.onerror = done
-        img.src = src
-      })
-    }
-
-    preloadImages()
+      img.onload = done
+      img.onerror = done
+      img.src = src
+    })
 
     return () => {
       mounted = false
     }
   }, [])
 
+  // =====================================================
+  // BUTTERFLY MOVEMENT
+  // =====================================================
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setButterflyPosition({
+        x: 12 + Math.random() * 76,
+        y: 15 + Math.random() * 65,
+      })
+    }, 1700)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // =====================================================
+  // CATCH BUTTERFLY
+  // =====================================================
+
+  const catchButterfly = () => {
+    setButterfliesCaught((count) => count + 1)
+
+    setButterflyPosition({
+      x: 12 + Math.random() * 76,
+      y: 15 + Math.random() * 65,
+    })
+  }
+
   return (
     <motion.div
-      className="fixed inset-0 w-screen min-h-screen overflow-hidden"
+      className="fixed inset-0 z-[50] h-screen w-screen overflow-hidden"
       initial={{
-        backgroundColor: "#070b2b",
+        backgroundColor: "#060a28",
       }}
       animate={{
         backgroundColor: [
-          "#070b2b", // deep night
-          "#172451", // late night
-          "#705b7d", // dawn
-          "#f2b47d", // sunrise
-          "#9ed9e8", // morning
-          "#f5e4b5", // daylight
-          "#f3b47d", // sunset
-          "#8b5270", // evening
-          "#070b2b", // night
+          "#060a28", // deep night
+          "#111c46", // late night
+          "#655477", // dawn
+          "#efa879", // sunrise
+          "#9edbe8", // morning
+          "#f7e8b8", // bright day
+          "#f6c18e", // afternoon
+          "#ed9b75", // sunset
+          "#805070", // evening
+          "#060a28", // night
         ],
       }}
       transition={{
-        duration: 28,
+        duration: SKY_DURATION,
         repeat: Infinity,
         ease: "easeInOut",
       }}
     >
       {/* =================================================
-          FULL SCREEN SKY
+          BACKGROUND SKY
       ================================================= */}
+
       <Sky />
 
       {/* =================================================
           MAIN CONTENT
       ================================================= */}
-      <div className="relative z-30 w-full min-h-screen flex flex-col items-center justify-center px-4 py-8">
 
-        {/* Title */}
+      <div className="relative z-20 flex h-screen w-full flex-col items-center justify-center px-3 py-4 sm:px-5">
+
+        {/* =================================================
+            TITLE
+        ================================================= */}
+
         <motion.div
-          className="text-center mb-5"
+          className="mb-3 text-center"
           initial={{
             opacity: 0,
             y: -20,
@@ -113,22 +156,22 @@ export default function PhotosScreen({ onNext }) {
             y: 0,
           }}
           transition={{
-            duration: 1,
+            duration: 0.8,
           }}
         >
           <motion.h2
-            className="text-2xl md:text-3xl font-semibold"
+            className="text-2xl font-semibold sm:text-3xl"
             animate={{
               color: [
-                "#ffd6e7",
-                "#fff1bd",
+                "#ffd7e8",
+                "#fff0c4",
                 "#ffffff",
-                "#ffe0c4",
-                "#ffd6e7",
+                "#ffe1c8",
+                "#ffd7e8",
               ],
             }}
             transition={{
-              duration: 28,
+              duration: SKY_DURATION,
               repeat: Infinity,
               ease: "easeInOut",
             }}
@@ -137,17 +180,17 @@ export default function PhotosScreen({ onNext }) {
           </motion.h2>
 
           <motion.p
-            className="text-sm mt-1"
+            className="mt-1 text-xs sm:text-sm"
             animate={{
               color: [
-                "rgba(255,255,255,0.65)",
-                "rgba(60,60,60,0.65)",
-                "rgba(60,60,60,0.65)",
-                "rgba(255,255,255,0.65)",
+                "rgba(255,255,255,0.70)",
+                "rgba(70,60,70,0.70)",
+                "rgba(70,60,70,0.70)",
+                "rgba(255,255,255,0.70)",
               ],
             }}
             transition={{
-              duration: 28,
+              duration: SKY_DURATION,
               repeat: Infinity,
               ease: "easeInOut",
             }}
@@ -157,184 +200,340 @@ export default function PhotosScreen({ onNext }) {
         </motion.div>
 
         {/* =================================================
-            PHOTO CARD
+            DECORATED ALBUM
         ================================================= */}
+
         <motion.div
           className="
             relative
             w-full
             max-w-[430px]
-            p-5
-            md:p-7
-            rounded-[40px]
-            overflow-hidden
+            rounded-[38px]
+            border
+            border-white/30
+            p-4
+            shadow-2xl
+            backdrop-blur-md
+            sm:p-5
           "
           animate={{
             backgroundColor: [
-              "rgba(18,25,70,0.72)",
-              "rgba(255,255,255,0.50)",
-              "rgba(255,255,255,0.65)",
-              "rgba(25,25,65,0.70)",
+              "rgba(13,20,60,0.72)",
+              "rgba(255,255,255,0.46)",
+              "rgba(255,255,255,0.64)",
+              "rgba(35,20,70,0.68)",
+              "rgba(13,20,60,0.72)",
             ],
-
             boxShadow: [
-              "0 0 40px rgba(80,100,255,0.22)",
-              "0 0 40px rgba(255,200,120,0.22)",
-              "0 0 35px rgba(255,255,255,0.25)",
-              "0 0 45px rgba(80,70,180,0.28)",
+              "0 0 45px rgba(100,120,255,0.25)",
+              "0 0 45px rgba(255,190,100,0.24)",
+              "0 0 45px rgba(255,255,255,0.30)",
+              "0 0 50px rgba(160,80,180,0.28)",
+              "0 0 45px rgba(100,120,255,0.25)",
             ],
           }}
           transition={{
-            duration: 28,
+            duration: SKY_DURATION,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         >
+          {/* Top decorative tape */}
 
-          {/* Inner glow */}
-          <div className="absolute inset-0 rounded-[40px] pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.22),transparent_60%)]" />
+          <div className="absolute -top-2 left-8 z-30 h-8 w-20 rotate-[-5deg] rounded-sm bg-white/35 shadow-sm backdrop-blur-sm" />
+
+          <div className="absolute -top-2 right-8 z-30 h-8 w-20 rotate-[5deg] rounded-sm bg-pink-200/35 shadow-sm backdrop-blur-sm" />
+
+          {/* Small decorative dots */}
+
+          <div className="absolute left-4 top-12 text-lg text-pink-200">
+            ✦
+          </div>
+
+          <div className="absolute right-4 top-12 text-lg text-yellow-200">
+            ✦
+          </div>
+
+          <div className="absolute bottom-4 left-4 text-lg text-pink-200/80">
+            ♡
+          </div>
+
+          <div className="absolute bottom-4 right-4 text-lg text-yellow-100/80">
+            ♡
+          </div>
+
+          {/* Album heading */}
+
+          <div className="relative z-10 mb-3 flex items-center justify-between px-2">
+            <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-white/60">
+              Little Memories
+            </span>
+
+            <span className="text-xs text-white/60">
+              01 — 13
+            </span>
+          </div>
 
           {/* =================================================
-              IMAGE LOADING
+              PHOTO AREA
           ================================================= */}
-          <AnimatePresence mode="wait">
 
-            {!imagesReady ? (
-              <motion.div
-                key="loader"
-                className="
-                  relative
-                  z-10
-                  h-[350px]
-                  w-full
-                  rounded-[30px]
-                  flex
-                  flex-col
-                  items-center
-                  justify-center
-                  bg-black/10
-                  backdrop-blur-sm
-                "
-                initial={{
-                  opacity: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                }}
-                exit={{
-                  opacity: 0,
-                  scale: 0.95,
-                }}
-              >
-                <Loader2
-                  size={32}
-                  className="animate-spin text-white"
-                />
+          <div className="relative z-10 rounded-[30px] bg-white/15 p-3 shadow-inner">
 
-                <p className="mt-4 text-white text-sm">
-                  Preparing your memories...
-                </p>
-
-                <p className="mt-1 text-white/60 text-xs">
-                  {loadedCount} / {photos.length}
-                </p>
-              </motion.div>
-            ) : (
-
-              /* =================================================
-                  SWIPER
-              ================================================= */
-              <motion.div
-                key="gallery"
-                className="relative z-10"
-                initial={{
-                  opacity: 0,
-                  scale: 0.96,
-                }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                }}
-                transition={{
-                  duration: 0.8,
-                }}
-              >
-                <Swiper
-                  modules={[EffectFade, Autoplay]}
-                  effect="fade"
-                  fadeEffect={{
-                    crossFade: true,
+            <AnimatePresence mode="wait">
+              {!imagesReady ? (
+                <motion.div
+                  key="loader"
+                  className="
+                    flex
+                    h-[330px]
+                    w-full
+                    flex-col
+                    items-center
+                    justify-center
+                    rounded-[24px]
+                    bg-black/10
+                    backdrop-blur-sm
+                  "
+                  initial={{
+                    opacity: 0,
                   }}
-                  autoplay={{
-                    delay: 3500,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: false,
+                  animate={{
+                    opacity: 1,
                   }}
-                  speed={1200}
-                  loop={true}
-                  allowTouchMove={true}
-                  className="w-[250px] h-[330px] md:w-[285px] md:h-[375px] rounded-[28px]"
+                  exit={{
+                    opacity: 0,
+                    scale: 0.96,
+                  }}
                 >
-                  {photos.map((src, i) => (
-                    <SwiperSlide key={src}>
-                      <motion.div
-                        className="
-                          relative
-                          h-full
-                          w-full
-                          overflow-hidden
-                          rounded-[28px]
-                          bg-black/10
-                        "
-                      >
-                        <img
-                          src={src}
-                          alt={`Memory ${i + 1}`}
-                          draggable="false"
-                          decoding="async"
-                          fetchPriority={i === 0 ? "high" : "auto"}
+                  <Loader2
+                    size={30}
+                    className="animate-spin text-white"
+                  />
+
+                  <p className="mt-3 text-sm text-white">
+                    Preparing your memories...
+                  </p>
+
+                  <p className="mt-1 text-xs text-white/60">
+                    {loadedCount} / {photos.length}
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="gallery"
+                  initial={{
+                    opacity: 0,
+                    scale: 0.96,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                  }}
+                  transition={{
+                    duration: 0.8,
+                  }}
+                >
+                  <Swiper
+                    modules={[EffectFade, Autoplay]}
+                    effect="fade"
+                    fadeEffect={{
+                      crossFade: true,
+                    }}
+                    autoplay={{
+                      delay: 3600,
+                      disableOnInteraction: false,
+                      pauseOnMouseEnter: false,
+                    }}
+                    speed={1400}
+                    loop={true}
+                    allowTouchMove={true}
+                    className="
+                      h-[330px]
+                      w-[245px]
+                      rounded-[24px]
+                      sm:h-[360px]
+                      sm:w-[270px]
+                    "
+                  >
+                    {photos.map((src, index) => (
+                      <SwiperSlide key={src}>
+                        <motion.div
                           className="
+                            relative
                             h-full
                             w-full
-                            object-contain
-                            rounded-[28px]
-                            select-none
+                            overflow-hidden
+                            rounded-[24px]
+                            bg-white/10
+                            p-2
+                            shadow-xl
                           "
-                        />
+                        >
+                          {/* Inner photo frame */}
 
-                        {/* Soft image overlay */}
-                        <div className="absolute inset-0 pointer-events-none rounded-[28px] shadow-[inset_0_0_35px_rgba(0,0,0,0.12)]" />
-                      </motion.div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </motion.div>
-            )}
+                          <div className="relative h-full w-full overflow-hidden rounded-[18px] bg-white">
 
-          </AnimatePresence>
+                            <img
+                              src={src}
+                              alt={`Memory ${index + 1}`}
+                              draggable="false"
+                              decoding="async"
+                              fetchPriority={
+                                index === 0 ? "high" : "auto"
+                              }
+                              className="
+                                h-full
+                                w-full
+                                select-none
+                                object-contain
+                              "
+                            />
+
+                            {/* soft image glow */}
+
+                            <div
+                              className="
+                                pointer-events-none
+                                absolute
+                                inset-0
+                                rounded-[18px]
+                                shadow-[inset_0_0_35px_rgba(0,0,0,0.16)]
+                              "
+                            />
+
+                            {/* Photo number */}
+
+                            <div
+                              className="
+                                absolute
+                                bottom-2
+                                right-2
+                                rounded-full
+                                bg-black/35
+                                px-2
+                                py-1
+                                text-[9px]
+                                text-white
+                                backdrop-blur-sm
+                              "
+                            >
+                              {String(index + 1).padStart(2, "0")}
+                            </div>
+                          </div>
+                        </motion.div>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </motion.div>
 
         {/* =================================================
-            OPEN MESSAGE BUTTON
+            BUTTERFLY GAME
         ================================================= */}
+
         <motion.div
-          className="relative z-40 mt-6"
+          className="
+            relative
+            mt-3
+            h-[82px]
+            w-full
+            max-w-[430px]
+            overflow-hidden
+            rounded-2xl
+            border
+            border-white/20
+            bg-black/10
+            px-3
+            py-2
+            backdrop-blur-sm
+          "
           initial={{
             opacity: 0,
-            y: 20,
+            y: 15,
           }}
           animate={{
             opacity: 1,
             y: 0,
           }}
           transition={{
-            delay: 1,
-            duration: 0.8,
+            delay: 0.5,
+          }}
+        >
+          {/* Game title */}
+
+          <div className="pointer-events-none absolute left-3 top-2 z-10">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">
+              Catch the Butterfly 🦋
+            </p>
+
+            <p className="text-[9px] text-white/55">
+              Caught: {butterfliesCaught}
+            </p>
+          </div>
+
+          {/* Moving butterfly */}
+
+          <motion.button
+            type="button"
+            aria-label="Catch the butterfly"
+            onClick={catchButterfly}
+            className="
+              absolute
+              z-20
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-full
+              text-2xl
+              drop-shadow-lg
+              select-none
+              touch-manipulation
+            "
+            animate={{
+              left: `${butterflyPosition.x}%`,
+              top: `${butterflyPosition.y}%`,
+            }}
+            transition={{
+              duration: 0.7,
+              ease: "easeInOut",
+            }}
+            whileTap={{
+              scale: 0.75,
+              rotate: 15,
+            }}
+          >
+            🦋
+          </motion.button>
+        </motion.div>
+
+        {/* =================================================
+            OPEN MESSAGE BUTTON
+        ================================================= */}
+
+        <motion.div
+          className="relative z-40 mt-3"
+          initial={{
+            opacity: 0,
+            y: 15,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.8,
+            duration: 0.7,
           }}
         >
           <motion.div
             animate={{
-              scale: [1, 1.03, 1],
+              scale: [1, 1.035, 1],
             }}
             transition={{
               duration: 2.5,
@@ -359,19 +558,29 @@ export default function PhotosScreen({ onNext }) {
         </motion.div>
       </div>
 
-      {/* Signature */}
+      {/* =================================================
+          SIGNATURE
+      ================================================= */}
+
       <motion.div
-        className="fixed bottom-3 right-4 z-[100] text-sm pointer-events-none"
+        className="
+          pointer-events-none
+          fixed
+          bottom-2
+          right-3
+          z-[100]
+          text-xs
+        "
         animate={{
           color: [
             "rgba(255,255,255,0.45)",
-            "rgba(80,80,80,0.45)",
-            "rgba(80,80,80,0.45)",
+            "rgba(70,70,70,0.40)",
+            "rgba(70,70,70,0.40)",
             "rgba(255,255,255,0.45)",
           ],
         }}
         transition={{
-          duration: 28,
+          duration: SKY_DURATION,
           repeat: Infinity,
           ease: "easeInOut",
         }}
@@ -382,234 +591,266 @@ export default function PhotosScreen({ onNext }) {
   )
 }
 
-
-/* =========================================================
-   SKY / DAY-NIGHT ANIMATION
-========================================================= */
+// =====================================================
+// SKY
+// =====================================================
 
 function Sky() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
 
-      {/* -------------------------------------------------
-          MOON
-      ------------------------------------------------- */}
+      {/* =================================================
+          FULL ROUND WHITE MOON
+      ================================================= */}
+
       <motion.div
         className="
           absolute
-          w-20
           h-20
-          md:w-28
-          md:h-28
+          w-20
           rounded-full
           bg-white
-          shadow-[0_0_45px_rgba(255,255,255,0.75)]
+          shadow-[0_0_55px_rgba(255,255,255,0.80)]
+          sm:h-28
+          sm:w-28
         "
         animate={{
           left: [
-            "70%",
-            "58%",
-            "48%",
+            "72%",
+            "62%",
+            "50%",
             "38%",
-            "28%",
-            "18%",
-            "8%",
+            "26%",
+            "14%",
+            "7%",
+            "7%",
+            "72%",
           ],
           top: [
-            "10%",
-            "12%",
-            "15%",
-            "18%",
+            "9%",
+            "11%",
+            "13%",
+            "17%",
             "20%",
             "18%",
             "12%",
+            "12%",
+            "9%",
           ],
           opacity: [
             1,
-            0.9,
-            0.55,
-            0.1,
+            1,
+            0.85,
+            0.45,
+            0.05,
             0,
             0,
             0,
+            1,
           ],
           scale: [
             1,
-            1.05,
+            1.04,
+            1.02,
             1,
             0.95,
-            0.8,
-            0.6,
-            0.5,
+            0.85,
+            0.75,
+            0.75,
+            1,
           ],
         }}
         transition={{
-          duration: 14,
+          duration: SKY_DURATION,
           repeat: Infinity,
-          repeatType: "reverse",
           ease: "easeInOut",
         }}
       />
 
-      {/* -------------------------------------------------
+      {/* =================================================
           SUN
-      ------------------------------------------------- */}
+      ================================================= */}
+
       <motion.div
         className="
           absolute
-          w-20
           h-20
-          md:w-28
-          md:h-28
+          w-20
           rounded-full
           bg-[#fff3a6]
-          shadow-[0_0_70px_rgba(255,210,90,0.75)]
+          shadow-[0_0_80px_rgba(255,215,100,0.85)]
+          sm:h-28
+          sm:w-28
         "
         animate={{
           left: [
-            "8%",
-            "18%",
-            "30%",
-            "45%",
-            "60%",
-            "72%",
-            "84%",
+            "5%",
+            "15%",
+            "28%",
+            "42%",
+            "55%",
+            "68%",
+            "82%",
+            "92%",
+            "5%",
           ],
           top: [
-            "15%",
-            "18%",
+            "25%",
+            "20%",
             "14%",
             "9%",
-            "12%",
-            "18%",
+            "8%",
+            "11%",
+            "17%",
+            "25%",
             "25%",
           ],
           opacity: [
             0,
             0,
-            0.1,
-            0.65,
+            0.12,
+            0.6,
             1,
-            0.7,
+            1,
+            0.65,
+            0.05,
             0,
           ],
           scale: [
-            0.5,
             0.65,
-            0.85,
+            0.75,
+            0.9,
             1,
-            1.05,
-            1,
-            0.7,
+            1.06,
+            1.04,
+            0.95,
+            0.75,
+            0.65,
           ],
         }}
         transition={{
-          duration: 14,
+          duration: SKY_DURATION,
           repeat: Infinity,
-          repeatType: "reverse",
           ease: "easeInOut",
         }}
       />
 
-      {/* -------------------------------------------------
-          SUNLIGHT
-      ------------------------------------------------- */}
+      {/* =================================================
+          ATMOSPHERIC LIGHT
+      ================================================= */}
+
       <motion.div
         className="absolute inset-0"
         animate={{
           background: [
-            "radial-gradient(circle at 70% 15%, rgba(80,100,255,0.12), transparent 45%)",
-            "radial-gradient(circle at 50% 10%, rgba(255,210,120,0.22), transparent 55%)",
-            "radial-gradient(circle at 50% 30%, rgba(255,245,180,0.32), transparent 60%)",
-            "radial-gradient(circle at 70% 20%, rgba(255,130,100,0.20), transparent 55%)",
-            "radial-gradient(circle at 50% 10%, rgba(80,60,180,0.18), transparent 60%)",
+            "radial-gradient(circle at 70% 10%, rgba(90,110,255,0.16), transparent 45%)",
+            "radial-gradient(circle at 55% 10%, rgba(255,190,120,0.20), transparent 50%)",
+            "radial-gradient(circle at 50% 25%, rgba(255,240,180,0.28), transparent 60%)",
+            "radial-gradient(circle at 65% 15%, rgba(255,150,100,0.24), transparent 55%)",
+            "radial-gradient(circle at 50% 10%, rgba(80,50,160,0.18), transparent 60%)",
+            "radial-gradient(circle at 70% 10%, rgba(90,110,255,0.16), transparent 45%)",
           ],
         }}
         transition={{
-          duration: 28,
+          duration: SKY_DURATION,
           repeat: Infinity,
           ease: "easeInOut",
         }}
       />
 
-      {/* -------------------------------------------------
+      {/* =================================================
           STARS
-      ------------------------------------------------- */}
-      {Array.from({ length: 35 }).map((_, index) => (
+      ================================================= */}
+
+      {Array.from({ length: 38 }).map((_, index) => (
         <motion.span
           key={index}
-          className="absolute w-1 h-1 rounded-full bg-white"
+          className="absolute h-1 w-1 rounded-full bg-white"
           style={{
-            left: `${(index * 31) % 100}%`,
-            top: `${(index * 17) % 70}%`,
+            left: `${(index * 37) % 100}%`,
+            top: `${(index * 19) % 72}%`,
           }}
           animate={{
             opacity: [
-              0.8,
-              0.2,
+              0.85,
+              0.65,
+              0.05,
               0,
-              0,
-              0.2,
-              0.8,
+              0.05,
+              0.65,
+              0.85,
+            ],
+            scale: [
+              1,
+              1.2,
+              0.7,
+              0.5,
+              0.7,
+              1.2,
+              1,
             ],
           }}
           transition={{
-            duration: 14,
-            delay: (index % 7) * 0.3,
+            duration: SKY_DURATION,
+            delay: (index % 8) * 0.35,
             repeat: Infinity,
-            repeatType: "reverse",
             ease: "easeInOut",
           }}
         />
       ))}
 
-      {/* -------------------------------------------------
-          BIG DECORATIVE STARS
-      ------------------------------------------------- */}
+      {/* =================================================
+          BIG STARS
+      ================================================= */}
+
       <motion.div
-        className="absolute left-[12%] top-[25%] text-yellow-200 text-2xl"
+        className="absolute left-[12%] top-[24%] text-2xl text-yellow-100"
         animate={{
-          opacity: [1, 0.2, 0, 0, 0.2, 1],
-          scale: [1, 0.8, 0.5, 0.5, 0.8, 1],
+          opacity: [1, 0.7, 0, 0, 0.7, 1],
+          scale: [1, 1.15, 0.5, 0.5, 1.15, 1],
         }}
         transition={{
-          duration: 14,
+          duration: SKY_DURATION,
           repeat: Infinity,
-          repeatType: "reverse",
+          ease: "easeInOut",
         }}
       >
         ✦
       </motion.div>
 
       <motion.div
-        className="absolute right-[15%] top-[32%] text-yellow-100 text-xl"
+        className="absolute right-[13%] top-[30%] text-xl text-yellow-100"
         animate={{
-          opacity: [1, 0.2, 0, 0, 0.2, 1],
-          scale: [1, 0.8, 0.5, 0.5, 0.8, 1],
+          opacity: [1, 0.5, 0, 0, 0.5, 1],
+          scale: [1, 1.2, 0.5, 0.5, 1.2, 1],
         }}
         transition={{
-          duration: 14,
-          delay: 0.5,
+          duration: SKY_DURATION,
+          delay: 1,
           repeat: Infinity,
-          repeatType: "reverse",
+          ease: "easeInOut",
         }}
       >
         ✦
       </motion.div>
 
-      {/* Bottom atmospheric glow */}
+      {/* =================================================
+          BOTTOM ATMOSPHERIC GLOW
+      ================================================= */}
+
       <motion.div
         className="absolute bottom-0 left-0 right-0 h-48"
         animate={{
           background: [
             "linear-gradient(to top, rgba(20,25,80,0.55), transparent)",
             "linear-gradient(to top, rgba(255,180,100,0.18), transparent)",
-            "linear-gradient(to top, rgba(255,235,170,0.12), transparent)",
-            "linear-gradient(to top, rgba(60,30,100,0.5), transparent)",
+            "linear-gradient(to top, rgba(255,235,170,0.15), transparent)",
+            "linear-gradient(to top, rgba(100,40,100,0.45), transparent)",
+            "linear-gradient(to top, rgba(20,25,80,0.55), transparent)",
           ],
         }}
         transition={{
-          duration: 28,
+          duration: SKY_DURATION,
           repeat: Infinity,
           ease: "easeInOut",
         }}
