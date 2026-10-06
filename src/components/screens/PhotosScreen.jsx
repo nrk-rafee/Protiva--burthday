@@ -10,7 +10,8 @@ import { Mail, Loader2 } from "lucide-react"
 import Button from "../Button"
 
 const photos = [
-  "/images/1.jpg",
+  const photos = [
+  "/images/1.png",
   "/images/2.jpg",
   "/images/3.jpg",
   "/images/4.jpg",
@@ -20,8 +21,8 @@ const photos = [
   "/images/8.jpg",
   "/images/9.jpg",
   "/images/10.jpg",
-  "/images/11.jpg",
-  "/images/12.jpg",
+  "/images/11.png",
+  "/images/12.png",
   "/images/13.jpg",
 ]
 
