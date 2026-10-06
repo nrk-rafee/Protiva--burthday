@@ -34,7 +34,7 @@ export default function LoaderScreen({ onDone }) {
                 // Party animation er por main website open hobe
                 setTimeout(() => {
                     onDone?.()
-                }, 1900)
+                }, 550)
             } else {
                 setError(true)
 
