@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
 import LoaderScreen from "@/components/screens/LoaderScreen"
@@ -14,53 +14,65 @@ import MessageScreen from "@/components/screens/MessageScreen"
 export default function HomePage() {
   const [currentScreen, setCurrentScreen] = useState(0)
 
-  const screens = [
-    // 0 - Loader
-    <LoaderScreen
-      key="loader"
-      onDone={() => setCurrentScreen(1)}
-    />,
+  const goToScreen = useCallback((screen) => {
+    setCurrentScreen(screen)
+  }, [])
 
-    // 1 - Intro
-    <IntroScreen
-      key="intro"
-      onNext={() => setCurrentScreen(2)}
-    />,
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 0:
+        return (
+          <LoaderScreen
+            onDone={() => goToScreen(1)}
+          />
+        )
 
-    // 2 - Cake
-    <CakeScreen
-      key="cake"
-      onNext={() => setCurrentScreen(3)}
-    />,
+      case 1:
+        return (
+          <IntroScreen
+            onNext={() => goToScreen(2)}
+          />
+        )
 
-    // 3 - Balloon Game
-    <BalloonGameScreen
-      key="balloons"
-      onNext={() => setCurrentScreen(4)}
-    />,
+      case 2:
+        return (
+          <CakeScreen
+            onNext={() => goToScreen(3)}
+          />
+        )
 
-    // 4 - Photos
-    <PhotosScreen
-      key="photos"
-      onNext={() => setCurrentScreen(5)}
-    />,
+      case 3:
+        return (
+          <BalloonGameScreen
+            onNext={() => goToScreen(4)}
+          />
+        )
 
-    // 5 - Puzzle
-    <PuzzleScreen
-      key="puzzle"
-      onNext={() => setCurrentScreen(6)}
-    />,
+      case 4:
+        return (
+          <PhotosScreen
+            onNext={() => goToScreen(5)}
+          />
+        )
 
-    // 6 - Final Message
-    <MessageScreen
-      key="message"
-    />,
-  ]
+      case 5:
+        return (
+          <PuzzleScreen
+            onNext={() => goToScreen(6)}
+          />
+        )
+
+      case 6:
+        return <MessageScreen />
+
+      default:
+        return <MessageScreen />
+    }
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden">
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-6">
-
         <AnimatePresence mode="wait">
           <motion.div
             key={currentScreen}
@@ -82,10 +94,9 @@ export default function HomePage() {
             }}
             className="flex w-full items-center justify-center"
           >
-            {screens[currentScreen]}
+            {renderScreen()}
           </motion.div>
         </AnimatePresence>
-
       </div>
     </main>
   )
