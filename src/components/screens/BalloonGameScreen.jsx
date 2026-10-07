@@ -15,8 +15,8 @@ const balloonData = [
         word: "You are ",
         color1: "#ff8fb8",
         color2: "#e93478",
-        left: "8%",
-        top: "16%",
+        left: "12.5%",
+        top: 95,
         rotate: -5,
         delay: 0,
     },
@@ -25,35 +25,35 @@ const balloonData = [
         word: "my",
         color1: "#ffd1df",
         color2: "#f28cae",
-        left: "32%",
-        top: "21%",
+        left: "37.5%",
+        top: 125,
         rotate: 4,
-        delay: 0.25,
+        delay: 0.2,
     },
     {
         id: 3,
         word: "future",
         color1: "#ffb6bd",
         color2: "#ef6f7c",
-        left: "56%",
-        top: "19%",
+        left: "62.5%",
+        top: 115,
         rotate: -4,
-        delay: 0.5,
+        delay: 0.4,
     },
     {
         id: 4,
         word: "wife 🫶",
         color1: "#d8a0ff",
         color2: "#a950df",
-        left: "80%",
-        top: "15%",
+        left: "87.5%",
+        top: 90,
         rotate: 5,
-        delay: 0.75,
+        delay: 0.6,
     },
 ]
 
 // ======================================================
-// CONFETTI DATA
+// CONFETTI COLORS
 // ======================================================
 
 const confettiColors = [
@@ -62,6 +62,7 @@ const confettiColors = [
     "#c084fc",
     "#8be9fd",
     "#ffb3c6",
+    "#f472b6",
     "#ffffff",
 ]
 
@@ -72,19 +73,20 @@ const confettiColors = [
 function BalloonBackground() {
     return (
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
+
             {/* Main background */}
             <div className="absolute inset-0 bg-[#fff9fc]" />
 
-            {/* Soft pink glow */}
+            {/* Pink glow */}
             <div
                 className="
                     absolute
                     inset-0
-                    bg-[radial-gradient(circle_at_50%_35%,rgba(255,190,215,0.42),transparent_58%)]
+                    bg-[radial-gradient(circle_at_50%_35%,rgba(255,190,215,0.45),transparent_60%)]
                 "
             />
 
-            {/* Top soft glow */}
+            {/* Top glow */}
             <div
                 className="
                     absolute
@@ -93,16 +95,22 @@ function BalloonBackground() {
                     right-0
                     h-72
                     bg-gradient-to-b
-                    from-pink-100/70
+                    from-pink-100/75
                     to-transparent
                 "
             />
 
-            {/* Decorative stars */}
+            {/* Left star */}
             <motion.div
-                className="absolute left-8 top-28 text-5xl text-pink-200"
+                className="
+                    absolute
+                    left-8
+                    top-28
+                    text-5xl
+                    text-pink-200
+                "
                 animate={{
-                    scale: [1, 1.1, 1],
+                    scale: [1, 1.12, 1],
                     rotate: [-5, 5, -5],
                     opacity: [0.4, 0.75, 0.4],
                 }}
@@ -115,8 +123,15 @@ function BalloonBackground() {
                 ✦
             </motion.div>
 
+            {/* Right star */}
             <motion.div
-                className="absolute right-8 top-40 text-4xl text-purple-200"
+                className="
+                    absolute
+                    right-8
+                    top-40
+                    text-4xl
+                    text-purple-200
+                "
                 animate={{
                     scale: [1, 1.12, 1],
                     rotate: [5, -5, 5],
@@ -131,6 +146,7 @@ function BalloonBackground() {
                 ✦
             </motion.div>
 
+            {/* Bottom decorations */}
             <div className="absolute left-[-25px] bottom-28 text-7xl text-pink-100">
                 ★
             </div>
@@ -162,12 +178,13 @@ function TopBunting() {
 
     return (
         <div className="fixed left-0 right-0 top-0 z-10 pointer-events-none">
-            {/* Curved rope */}
+
             <svg
                 className="h-28 w-full"
                 viewBox="0 0 400 100"
                 preserveAspectRatio="none"
             >
+                {/* Rope */}
                 <path
                     d="M0 8 Q100 75 200 8 Q300 75 400 8"
                     fill="none"
@@ -175,8 +192,10 @@ function TopBunting() {
                     strokeWidth="2"
                 />
 
+                {/* Flags */}
                 {colors.map((color, index) => {
                     const x = index * 40 + 4
+
                     const y =
                         index < 5
                             ? 20 + index * 9
@@ -196,14 +215,95 @@ function TopBunting() {
 }
 
 // ======================================================
+// POP PARTICLES
+// ======================================================
+
+function PopParticles({ color1, color2 }) {
+    const particles = Array.from({ length: 20 })
+
+    return (
+        <div className="absolute inset-0 pointer-events-none">
+
+            {particles.map((_, index) => {
+                const angle =
+                    (360 / particles.length) * index
+
+                const distance =
+                    35 + (index % 5) * 10
+
+                const x =
+                    Math.cos(
+                        (angle * Math.PI) / 180
+                    ) * distance
+
+                const y =
+                    Math.sin(
+                        (angle * Math.PI) / 180
+                    ) * distance
+
+                return (
+                    <motion.span
+                        key={index}
+                        className="
+                            absolute
+                            left-1/2
+                            top-1/2
+                            h-2
+                            w-2
+                            rounded-full
+                        "
+                        style={{
+                            backgroundColor:
+                                index % 2 === 0
+                                    ? color1
+                                    : color2,
+
+                            boxShadow: `0 0 8px ${
+                                index % 2 === 0
+                                    ? color1
+                                    : color2
+                            }`,
+                        }}
+                        initial={{
+                            x: 0,
+                            y: 0,
+                            scale: 0,
+                            opacity: 1,
+                        }}
+                        animate={{
+                            x,
+                            y,
+                            scale: [0, 1.5, 0],
+                            opacity: [1, 1, 0],
+                        }}
+                        transition={{
+                            duration: 0.7,
+                            ease: "easeOut",
+                        }}
+                    />
+                )
+            })}
+        </div>
+    )
+}
+
+// ======================================================
 // CONFETTI
 // ======================================================
 
 function CelebrationConfetti() {
-    const pieces = Array.from({ length: 85 })
+    const pieces = Array.from({ length: 90 })
 
     return (
-        <div className="fixed inset-0 z-[100] pointer-events-none overflow-hidden">
+        <div
+            className="
+                fixed
+                inset-0
+                z-[200]
+                pointer-events-none
+                overflow-hidden
+            "
+        >
             {pieces.map((_, index) => {
                 const left =
                     (index * 47 + 7) % 100
@@ -238,20 +338,27 @@ function CelebrationConfetti() {
                         animate={{
                             y: [
                                 -30,
-                                window.innerHeight * 0.35,
-                                window.innerHeight + 100,
+                                "35vh",
+                                "75vh",
+                                "110vh",
                             ],
                             x: [
                                 0,
-                                (index % 2 === 0 ? 1 : -1) *
-                                    (20 + (index % 5) * 12),
-                                (index % 2 === 0 ? -1 : 1) *
-                                    (30 + (index % 4) * 14),
+                                index % 2 === 0
+                                    ? 25
+                                    : -25,
+                                index % 2 === 0
+                                    ? -35
+                                    : 35,
+                                index % 2 === 0
+                                    ? 20
+                                    : -20,
                             ],
                             rotate: [
                                 rotation,
                                 rotation + 180,
-                                rotation + 420,
+                                rotation + 360,
+                                rotation + 540,
                             ],
                             opacity: [
                                 0,
@@ -262,73 +369,14 @@ function CelebrationConfetti() {
                         }}
                         transition={{
                             duration:
-                                3.5 + (index % 5) * 0.35,
+                                3.5 +
+                                (index % 5) *
+                                    0.35,
+
                             delay:
-                                (index % 18) * 0.04,
-                            ease: "easeOut",
-                        }}
-                    />
-                )
-            })}
-        </div>
-    )
-}
+                                (index % 20) *
+                                0.04,
 
-// ======================================================
-// POP PARTICLES
-// ======================================================
-
-function PopParticles({ color1, color2 }) {
-    const particles = Array.from({ length: 18 })
-
-    return (
-        <div className="absolute inset-0 pointer-events-none z-30">
-            {particles.map((_, index) => {
-                const angle =
-                    (360 / particles.length) * index
-
-                const distance =
-                    35 + (index % 5) * 10
-
-                const x =
-                    Math.cos(
-                        (angle * Math.PI) / 180
-                    ) * distance
-
-                const y =
-                    Math.sin(
-                        (angle * Math.PI) / 180
-                    ) * distance
-
-                return (
-                    <motion.span
-                        key={index}
-                        className="absolute left-1/2 top-1/2 h-2 w-2 rounded-full"
-                        style={{
-                            backgroundColor:
-                                index % 2 === 0
-                                    ? color1
-                                    : color2,
-                            boxShadow: `0 0 8px ${
-                                index % 2 === 0
-                                    ? color1
-                                    : color2
-                            }`,
-                        }}
-                        initial={{
-                            x: 0,
-                            y: 0,
-                            scale: 0,
-                            opacity: 1,
-                        }}
-                        animate={{
-                            x,
-                            y,
-                            scale: [0, 1.4, 0],
-                            opacity: [1, 1, 0],
-                        }}
-                        transition={{
-                            duration: 0.7,
                             ease: "easeOut",
                         }}
                     />
@@ -347,161 +395,246 @@ function Balloon({
     popped,
     onPop,
 }) {
-    if (popped) {
-        return (
-            <div
-                className="absolute"
-                style={{
-                    left: item.left,
-                    top: item.top,
-                    width: 75,
-                    height: 170,
-                    transform: "translateX(-50%)",
-                }}
-            >
-                <PopParticles
-                    color1={item.color1}
-                    color2={item.color2}
-                />
-            </div>
-        )
-    }
-
     return (
         <motion.div
-            className="absolute z-20"
+            className="
+                absolute
+                z-20
+                flex
+                flex-col
+                items-center
+            "
             style={{
                 left: item.left,
                 top: item.top,
-                width: 78,
-                height: 180,
+                width: 90,
+                height: 390,
                 transform: "translateX(-50%)",
             }}
             initial={{
                 opacity: 0,
-                y: 25,
-                scale: 0.75,
+                y: 20,
+                scale: 0.8,
             }}
             animate={{
                 opacity: 1,
-                y: [25, 0, -5, 0],
+                y: 0,
                 scale: 1,
-                rotate: [
-                    item.rotate,
-                    item.rotate + 3,
-                    item.rotate - 3,
-                    item.rotate,
-                ],
             }}
             transition={{
-                opacity: {
-                    duration: 0.5,
-                    delay: item.delay,
-                },
-                y: {
-                    duration: 4.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: item.delay,
-                },
-                rotate: {
-                    duration: 4.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: item.delay,
-                },
-                scale: {
-                    duration: 0.5,
-                    delay: item.delay,
-                },
+                duration: 0.55,
+                delay: item.delay,
             }}
         >
-            {/* Balloon */}
-            <motion.button
-                type="button"
-                onClick={() => onPop(item.id)}
-                aria-label={`Pop balloon ${item.id}`}
+
+            {/* ==================================================
+                BALLOON / WORD
+            ================================================== */}
+
+            <div
                 className="
-                    absolute
-                    left-1/2
-                    top-0
-                    -translate-x-1/2
-                    cursor-pointer
-                    touch-manipulation
-                    focus:outline-none
+                    relative
+                    flex
+                    h-[100px]
+                    w-[90px]
+                    items-center
+                    justify-center
                 "
-                whileTap={{
-                    scale: 0.9,
-                }}
             >
-                <div
-                    className="relative rounded-[50%]"
-                    style={{
-                        width: 74,
-                        height: 88,
-                        background: `
-                            radial-gradient(
-                                circle at 28% 20%,
-                                rgba(255,255,255,0.72),
-                                transparent 16%
-                            ),
-                            linear-gradient(
-                                145deg,
-                                ${item.color1},
-                                ${item.color2}
-                            )
-                        `,
-                        boxShadow: `
-                            inset -12px -15px 22px rgba(0,0,0,0.12),
-                            0 12px 24px rgba(80,40,80,0.15)
-                        `,
-                    }}
-                >
-                    {/* Shine */}
-                    <div
-                        className="
-                            absolute
-                            left-[18px]
-                            top-[14px]
-                            h-7
-                            w-4
-                            rotate-[-25deg]
-                            rounded-full
-                            bg-white/45
-                            blur-[1px]
-                        "
-                    />
 
-                    {/* Knot */}
-                    <div
-                        className="absolute left-1/2 -bottom-[7px] -translate-x-1/2"
-                        style={{
-                            width: 13,
-                            height: 12,
-                            background: item.color2,
-                            clipPath:
-                                "polygon(0 0, 100% 0, 70% 100%, 30% 100%)",
-                        }}
-                    />
-                </div>
-            </motion.button>
+                <AnimatePresence mode="wait">
 
-            {/* String */}
+                    {!popped ? (
+                        <motion.button
+                            key="balloon"
+                            type="button"
+                            onClick={() =>
+                                onPop(item.id)
+                            }
+                            aria-label={`Pop balloon ${item.id}`}
+                            className="
+                                absolute
+                                left-1/2
+                                top-0
+                                -translate-x-1/2
+                                cursor-pointer
+                                touch-manipulation
+                                focus:outline-none
+                            "
+                            initial={{
+                                opacity: 0,
+                                scale: 0.8,
+                            }}
+                            animate={{
+                                opacity: 1,
+                                scale: 1,
+                                rotate: [
+                                    item.rotate,
+                                    item.rotate + 3,
+                                    item.rotate - 3,
+                                    item.rotate,
+                                ],
+                            }}
+                            exit={{
+                                opacity: 0,
+                                scale: 1.35,
+                            }}
+                            transition={{
+                                duration: 0.45,
+                                rotate: {
+                                    duration: 4,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                },
+                            }}
+                            whileTap={{
+                                scale: 0.88,
+                            }}
+                        >
+
+                            {/* Balloon body */}
+                            <div
+                                className="
+                                    relative
+                                    h-[88px]
+                                    w-[74px]
+                                    rounded-[50%]
+                                "
+                                style={{
+                                    background: `
+                                        radial-gradient(
+                                            circle at 28% 20%,
+                                            rgba(255,255,255,0.8),
+                                            transparent 16%
+                                        ),
+                                        linear-gradient(
+                                            145deg,
+                                            ${item.color1},
+                                            ${item.color2}
+                                        )
+                                    `,
+
+                                    boxShadow: `
+                                        inset -12px -15px 22px rgba(0,0,0,0.12),
+                                        0 12px 24px rgba(80,40,80,0.15)
+                                    `,
+                                }}
+                            >
+
+                                {/* Shine */}
+                                <div
+                                    className="
+                                        absolute
+                                        left-[18px]
+                                        top-[14px]
+                                        h-7
+                                        w-4
+                                        rotate-[-25deg]
+                                        rounded-full
+                                        bg-white/45
+                                        blur-[1px]
+                                    "
+                                />
+
+                                {/* Knot */}
+                                <div
+                                    className="
+                                        absolute
+                                        left-1/2
+                                        -bottom-[7px]
+                                        -translate-x-1/2
+                                    "
+                                    style={{
+                                        width: 13,
+                                        height: 12,
+                                        background:
+                                            item.color2,
+
+                                        clipPath:
+                                            "polygon(0 0, 100% 0, 70% 100%, 30% 100%)",
+                                    }}
+                                />
+                            </div>
+                        </motion.button>
+                    ) : (
+                        <motion.div
+                            key="word"
+                            className="
+                                absolute
+                                left-1/2
+                                top-0
+                                -translate-x-1/2
+                                flex
+                                h-[88px]
+                                w-[150px]
+                                items-center
+                                justify-center
+                                whitespace-nowrap
+                            "
+                            initial={{
+                                opacity: 0,
+                                scale: 0.3,
+                                y: 10,
+                            }}
+                            animate={{
+                                opacity: 1,
+                                scale: 1,
+                                y: 0,
+                            }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 250,
+                                damping: 15,
+                            }}
+                        >
+
+                            {/* Pop particles */}
+                            <PopParticles
+                                color1={item.color1}
+                                color2={item.color2}
+                            />
+
+                            {/* Revealed word */}
+                            <span
+                                className="
+                                    relative
+                                    z-10
+                                    text-xl
+                                    font-bold
+                                    text-[#963d75]
+                                    drop-shadow-sm
+                                "
+                            >
+                                {item.word}
+                            </span>
+                        </motion.div>
+                    )}
+
+                </AnimatePresence>
+            </div>
+
+            {/* ==================================================
+                STRING
+            ================================================== */}
+
             <motion.div
                 className="
                     absolute
                     left-1/2
                     top-[88px]
-                    h-[90px]
+                    -translate-x-1/2
                     w-[1.5px]
-                    origin-top
-                    bg-gray-400/70
+                    rounded-full
+                    bg-gray-400/60
                 "
+                style={{
+                    height: 315,
+                }}
                 animate={{
                     rotate: [
-                        -3,
-                        3,
-                        -3,
+                        -2,
+                        2,
+                        -2,
                     ],
                 }}
                 transition={{
@@ -511,50 +644,24 @@ function Balloon({
                 }}
             />
 
-            {/* Hidden/revealed word */}
-            <AnimatePresence>
-                {popped && (
-                    <motion.div
-                        initial={{
-                            opacity: 0,
-                            y: 10,
-                            scale: 0.7,
-                        }}
-                        animate={{
-                            opacity: 1,
-                            y: 0,
-                            scale: 1,
-                        }}
-                        transition={{
-                            duration: 0.45,
-                        }}
-                        className="
-                            absolute
-                            left-1/2
-                            top-[188px]
-                            -translate-x-1/2
-                            whitespace-nowrap
-                            text-center
-                            text-xl
-                            font-semibold
-                            text-[#963d75]
-                        "
-                    >
-                        {item.word}
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </motion.div>
     )
 }
 
 // ======================================================
-// MAIN BALLOON GAME
+// MAIN SCREEN
 // ======================================================
 
-export default function BalloonGameScreen({ onNext }) {
+export default function BalloonGameScreen({
+    onNext,
+}) {
     const [popped, setPopped] = useState([])
-    const [celebration, setCelebration] = useState(false)
+    const [celebration, setCelebration] =
+        useState(false)
+
+    // ==================================================
+    // POP BALLOON
+    // ==================================================
 
     const handlePop = (id) => {
         if (popped.includes(id)) return
@@ -565,14 +672,19 @@ export default function BalloonGameScreen({ onNext }) {
         ])
     }
 
-    useEffect(() => {
-        if (popped.length === 4) {
-            const timer = setTimeout(() => {
-                setCelebration(true)
-            }, 250)
+    // ==================================================
+    // START CELEBRATION
+    // ==================================================
 
-            return () => clearTimeout(timer)
-        }
+    useEffect(() => {
+        if (popped.length !== 4) return
+
+        const timer = setTimeout(() => {
+            setCelebration(true)
+        }, 300)
+
+        return () =>
+            clearTimeout(timer)
     }, [popped])
 
     return (
@@ -590,10 +702,17 @@ export default function BalloonGameScreen({ onNext }) {
                 bg-[#fff9fc]
             "
         >
+
+            {/* Background */}
             <BalloonBackground />
+
+            {/* Top decoration */}
             <TopBunting />
 
-            {/* Main content */}
+            {/* ==================================================
+                MAIN CONTENT
+            ================================================== */}
+
             <div
                 className="
                     relative
@@ -608,7 +727,11 @@ export default function BalloonGameScreen({ onNext }) {
                     pb-20
                 "
             >
-                {/* Heading */}
+
+                {/* ==================================================
+                    HEADING
+                ================================================== */}
+
                 <motion.h1
                     initial={{
                         opacity: 0,
@@ -634,7 +757,10 @@ export default function BalloonGameScreen({ onNext }) {
                         : "You found them all! 💗"}
                 </motion.h1>
 
-                {/* Balloon card */}
+                {/* ==================================================
+                    BALLOON CARD
+                ================================================== */}
+
                 <motion.div
                     initial={{
                         opacity: 0,
@@ -665,88 +791,59 @@ export default function BalloonGameScreen({ onNext }) {
                         backdrop-blur-sm
                     "
                 >
-                    {/* Soft inner glow */}
-                    <div className="absolute inset-0 rounded-[48px] bg-gradient-to-b from-white/70 via-transparent to-pink-50/60" />
 
-                    {/* Balloon game area */}
-                    <div className="absolute inset-x-0 top-0 h-[430px]">
-                        {balloonData.map((item) => (
-                            <Balloon
-                                key={item.id}
-                                item={item}
-                                popped={popped.includes(item.id)}
-                                onPop={handlePop}
-                            />
-                        ))}
+                    {/* Inner glow */}
+                    <div
+                        className="
+                            pointer-events-none
+                            absolute
+                            inset-0
+                            rounded-[48px]
+                            bg-gradient-to-b
+                            from-white/75
+                            via-transparent
+                            to-pink-50/60
+                        "
+                    />
+
+                    {/* ==================================================
+                        BALLOON AREA
+
+                        IMPORTANT:
+                        Every balloon owns its own:
+                        balloon + string + word.
+                    ================================================== */}
+
+                    <div
+                        className="
+                            absolute
+                            inset-x-0
+                            top-0
+                            h-[470px]
+                        "
+                    >
+
+                        {balloonData.map(
+                            (item) => (
+                                <Balloon
+                                    key={item.id}
+                                    item={item}
+                                    popped={popped.includes(
+                                        item.id
+                                    )}
+                                    onPop={
+                                        handlePop
+                                    }
+                                />
+                            )
+                        )}
+
                     </div>
 
-                    {/* Words appear here based on balloon position */}
-                    {balloonData.map((item) => {
-                        if (!popped.includes(item.id)) {
-                            return null
-                        }
+                    {/* ==================================================
+                        HINT
+                    ================================================== */}
 
-                        return (
-                            <motion.div
-                                key={`word-${item.id}`}
-                                initial={{
-                                    opacity: 0,
-                                    y: 8,
-                                    scale: 0.8,
-                                }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                    scale: 1,
-                                }}
-                                className="absolute z-40"
-                                style={{
-                                    left: item.left,
-                                    top:
-                                        "calc(" +
-                                        item.top +
-                                        " + 188px)",
-                                    transform:
-                                        "translateX(-50%)",
-                                }}
-                            >
-                                <span className="
-                                    whitespace-nowrap
-                                    text-xl
-                                    font-semibold
-                                    text-[#963d75]
-                                ">
-                                    {item.word}
-                                </span>
-                            </motion.div>
-                        )
-                    })}
-
-                    {/* Strings stay visible */}
-                    {balloonData.map((item) => (
-                        <div
-                            key={`string-${item.id}`}
-                            className="absolute z-10"
-                            style={{
-                                left: item.left,
-                                top:
-                                    "calc(" +
-                                    item.top +
-                                    " + 88px)",
-                                height: 300,
-                            }}
-                        >
-                            <div
-                                className="
-                                    h-full
-                                    w-[1.5px]
-                                    bg-gray-400/55
-                                "
-                            />
-                        </div>
-                    ))}
-
-                    {/* Bottom hint */}
                     {popped.length < 4 && (
                         <motion.p
                             initial={{
@@ -768,9 +865,13 @@ export default function BalloonGameScreen({ onNext }) {
                             Tap the balloons one by one 🎈
                         </motion.p>
                     )}
+
                 </motion.div>
 
-                {/* Next button */}
+                {/* ==================================================
+                    NEXT BUTTON
+                ================================================== */}
+
                 <AnimatePresence>
                     {popped.length === 4 && (
                         <motion.div
@@ -786,9 +887,15 @@ export default function BalloonGameScreen({ onNext }) {
                             }}
                             transition={{
                                 duration: 0.55,
+                                delay: 0.7,
                             }}
-                            className="relative z-[120] mt-7"
+                            className="
+                                relative
+                                z-[250]
+                                mt-7
+                            "
                         >
+
                             <Button
                                 onClick={onNext}
                                 className="
@@ -801,32 +908,45 @@ export default function BalloonGameScreen({ onNext }) {
                                 "
                             >
                                 Next
-                                <MoveRight size={18} />
+                                <MoveRight
+                                    size={18}
+                                />
                             </Button>
+
                         </motion.div>
                     )}
                 </AnimatePresence>
+
             </div>
 
-            {/* Final celebration */}
+            {/* ==================================================
+                CELEBRATION
+            ================================================== */}
+
             <AnimatePresence>
                 {celebration && (
                     <CelebrationConfetti />
                 )}
             </AnimatePresence>
 
-            {/* Signature */}
-            <div className="
-                fixed
-                bottom-3
-                right-4
-                z-[150]
-                text-sm
-                text-gray-400/70
-                pointer-events-none
-            ">
+            {/* ==================================================
+                SIGNATURE
+            ================================================== */}
+
+            <div
+                className="
+                    fixed
+                    bottom-3
+                    right-4
+                    z-[300]
+                    pointer-events-none
+                    text-sm
+                    text-gray-400/70
+                "
+            >
                 @Rafee🫶protiva
             </div>
+
         </motion.div>
     )
 }
