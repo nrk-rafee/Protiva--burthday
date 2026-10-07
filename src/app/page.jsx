@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
 
 import LoaderScreen from "@/components/screens/LoaderScreen"
 import IntroScreen from "@/components/screens/IntroScreen"
@@ -18,86 +17,73 @@ export default function HomePage() {
     setCurrentScreen(screen)
   }, [])
 
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 0:
-        return (
+  switch (currentScreen) {
+    case 0:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
           <LoaderScreen
             onDone={() => goToScreen(1)}
           />
-        )
+        </main>
+      )
 
-      case 1:
-        return (
+    case 1:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
           <IntroScreen
             onNext={() => goToScreen(2)}
           />
-        )
+        </main>
+      )
 
-      case 2:
-        return (
+    case 2:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
           <CakeScreen
             onNext={() => goToScreen(3)}
           />
-        )
+        </main>
+      )
 
-      case 3:
-        return (
+    case 3:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
           <BalloonGameScreen
             onNext={() => goToScreen(4)}
           />
-        )
+        </main>
+      )
 
-      case 4:
-        return (
+    case 4:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
           <PhotosScreen
             onNext={() => goToScreen(5)}
           />
-        )
+        </main>
+      )
 
-      case 5:
-        return (
+    case 5:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
           <PuzzleScreen
             onNext={() => goToScreen(6)}
           />
-        )
+        </main>
+      )
 
-      case 6:
-        return <MessageScreen />
+    case 6:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
+          <MessageScreen />
+        </main>
+      )
 
-      default:
-        return <MessageScreen />
-    }
+    default:
+      return (
+        <main className="relative min-h-screen overflow-hidden">
+          <MessageScreen />
+        </main>
+      )
   }
-
-  return (
-    <main className="relative min-h-screen overflow-hidden">
-      <div className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentScreen}
-            initial={{
-              opacity: 0,
-              scale: 0.985,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-            }}
-            exit={{
-              opacity: 0,
-              scale: 1.01,
-            }}
-            transition={{
-              duration: 0.45,
-              ease: "easeOut",
-            }}
-            className="flex w-full items-center justify-center"
-          >
-            {renderScreen()}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </main>
-  )
 }
