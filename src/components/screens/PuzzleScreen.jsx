@@ -1,18 +1,20 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { Mail, Puzzle, MoveRight } from "lucide-react"
+import { Mail, MoveRight } from "lucide-react"
 import Button from "../Button"
 
-const PUZZLE_IMAGE = "/images/Screenshot_20261004-114337~2.jpg"
+const PUZZLES = [
+  "/images/Screenshot_20261004-114337~2.jpg",
+  "/images/puzzle.jpeg",
+]
 
 const createShuffledPuzzle = () => {
   const pieces = Array.from({ length: 9 }, (_, index) => index)
 
   let shuffled = [...pieces]
 
-  // Shuffle until it is different from the solved image
   do {
     shuffled = [...pieces].sort(() => Math.random() - 0.5)
   } while (shuffled.every((value, index) => value === index))
@@ -71,7 +73,13 @@ function Confetti() {
   )
 }
 
-function PuzzlePiece({ piece, index, selected, onClick }) {
+function PuzzlePiece({
+  puzzleImage,
+  piece,
+  index,
+  selected,
+  onClick,
+}) {
   const correctPosition = piece
 
   const row = Math.floor(correctPosition / 3)
@@ -116,7 +124,7 @@ function PuzzlePiece({ piece, index, selected, onClick }) {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: `url("${PUZZLE_IMAGE}")`,
+          backgroundImage: `url("${puzzleImage}")`,
           backgroundSize: "300% 300%",
           backgroundPosition: `${column * 50}% ${row * 50}%`,
           backgroundRepeat: "no-repeat",
@@ -131,22 +139,81 @@ function PuzzlePiece({ piece, index, selected, onClick }) {
 }
 
 export default function PuzzleScreen({ onNext }) {
+  const puzzleInitRef = useRef(false)
+
+  const [puzzleImage, setPuzzleImage] = useState(null)
+
   const [preview, setPreview] = useState(true)
+
   const [pieces, setPieces] = useState(
     Array.from({ length: 9 }, (_, index) => index)
   )
+
   const [selected, setSelected] = useState(null)
+
   const [solved, setSolved] = useState(false)
+
   const [moves, setMoves] = useState(0)
 
+  // =====================================================
+  // CHOOSE PUZZLE
+  // Every NEW website entry alternates the puzzle.
+  //
+  // 1st = cake
+  // 2nd = puzzle.jpeg
+  // 3rd = cake
+  // 4th = puzzle.jpeg
+  // =====================================================
+
   useEffect(() => {
+    if (puzzleInitRef.current) return
+
+    puzzleInitRef.current = true
+
+    try {
+      const storedTurn =
+        localStorage.getItem("protiva-puzzle-turn")
+
+      const currentTurn =
+        storedTurn === null
+          ? 0
+          : Number(storedTurn) === 1
+          ? 1
+          : 0
+
+      setPuzzleImage(PUZZLES[currentTurn])
+
+      const nextTurn = currentTurn === 0 ? 1 : 0
+
+      localStorage.setItem(
+        "protiva-puzzle-turn",
+        String(nextTurn)
+      )
+    } catch {
+      // If localStorage is unavailable,
+      // use the first puzzle.
+      setPuzzleImage(PUZZLES[0])
+    }
+  }, [])
+
+  // =====================================================
+  // PREVIEW
+  // =====================================================
+
+  useEffect(() => {
+    if (!puzzleImage) return
+
     const timer = setTimeout(() => {
       setPieces(createShuffledPuzzle())
       setPreview(false)
     }, 1800)
 
     return () => clearTimeout(timer)
-  }, [])
+  }, [puzzleImage])
+
+  // =====================================================
+  // CHECK SOLVED
+  // =====================================================
 
   const isSolved = (currentPieces) => {
     return currentPieces.every(
@@ -154,22 +221,26 @@ export default function PuzzleScreen({ onNext }) {
     )
   }
 
-  const handlePieceClick = (index) => {
-    if (preview || solved) return
+  // =====================================================
+  // PIECE CLICK
+  // =====================================================
 
-    // First piece selected
+  const handlePieceClick = (index) => {
+    if (preview || solved || !puzzleImage) return
+
+    // First piece
     if (selected === null) {
       setSelected(index)
       return
     }
 
-    // Tapping the same piece cancels selection
+    // Same piece = cancel
     if (selected === index) {
       setSelected(null)
       return
     }
 
-    // Swap two pieces
+    // Swap
     const newPieces = [...pieces]
 
     ;[newPieces[selected], newPieces[index]] = [
@@ -179,14 +250,40 @@ export default function PuzzleScreen({ onNext }) {
 
     setPieces(newPieces)
     setSelected(null)
+
     setMoves((value) => value + 1)
 
-    // Check solved
+    // Solved
     if (isSolved(newPieces)) {
       setTimeout(() => {
         setSolved(true)
       }, 250)
     }
+  }
+
+  // =====================================================
+  // LOADING
+  // =====================================================
+
+  if (!puzzleImage) {
+    return (
+      <motion.div
+        className="
+          fixed
+          inset-0
+          flex
+          items-center
+          justify-center
+          bg-[#fff7fa]
+        "
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <div className="rounded-full bg-white px-6 py-3 text-sm font-medium text-pink-500 shadow-lg">
+          Preparing your puzzle... 🧩
+        </div>
+      </motion.div>
+    )
   }
 
   return (
@@ -205,7 +302,6 @@ export default function PuzzleScreen({ onNext }) {
       ================================================== */}
 
       <div className="absolute inset-0 pointer-events-none">
-
         <div
           className="
             absolute
@@ -227,8 +323,15 @@ export default function PuzzleScreen({ onNext }) {
         />
 
         {/* Floating hearts */}
+
         <motion.div
-          className="absolute left-[8%] top-[24%] text-2xl text-pink-200"
+          className="
+            absolute
+            left-[8%]
+            top-[24%]
+            text-2xl
+            text-pink-200
+          "
           animate={{
             y: [0, -12, 0],
             opacity: [0.35, 0.8, 0.35],
@@ -242,7 +345,13 @@ export default function PuzzleScreen({ onNext }) {
         </motion.div>
 
         <motion.div
-          className="absolute right-[10%] top-[30%] text-3xl text-pink-200"
+          className="
+            absolute
+            right-[10%]
+            top-[30%]
+            text-3xl
+            text-pink-200
+          "
           animate={{
             y: [0, -15, 0],
             opacity: [0.3, 0.75, 0.3],
@@ -350,8 +459,8 @@ export default function PuzzleScreen({ onNext }) {
           pb-8
         "
       >
-
         {/* Heading */}
+
         <motion.h1
           className="
             text-center
@@ -373,6 +482,7 @@ export default function PuzzleScreen({ onNext }) {
         </motion.h1>
 
         {/* Instruction */}
+
         <motion.div
           className="
             mt-4
@@ -432,13 +542,7 @@ export default function PuzzleScreen({ onNext }) {
             y: 0,
           }}
         >
-
-          {/* ==================================================
-              PREVIEW
-          ================================================== */}
-
           <AnimatePresence mode="wait">
-
             {preview ? (
               <motion.div
                 key="preview"
@@ -464,8 +568,8 @@ export default function PuzzleScreen({ onNext }) {
                 "
               >
                 <img
-                  src={PUZZLE_IMAGE}
-                  alt="Birthday puzzle"
+                  src={puzzleImage}
+                  alt="Birthday puzzle preview"
                   className="
                     h-full
                     w-full
@@ -473,20 +577,9 @@ export default function PuzzleScreen({ onNext }) {
                   "
                 />
 
-                {/* Preview overlay */}
-                <div
-                  className="
-                    absolute
-                    inset-0
-                    bg-white/5
-                  "
-                />
+                <div className="absolute inset-0 bg-white/5" />
               </motion.div>
             ) : (
-              /* ==================================================
-                  PUZZLE
-              ================================================== */
-
               <motion.div
                 key="puzzle"
                 initial={{
@@ -511,6 +604,7 @@ export default function PuzzleScreen({ onNext }) {
                 {pieces.map((piece, index) => (
                   <PuzzlePiece
                     key={`${piece}-${index}`}
+                    puzzleImage={puzzleImage}
                     piece={piece}
                     index={index}
                     selected={selected === index}
@@ -519,10 +613,10 @@ export default function PuzzleScreen({ onNext }) {
                 ))}
               </motion.div>
             )}
-
           </AnimatePresence>
 
           {/* Solved glow */}
+
           {solved && (
             <motion.div
               className="
@@ -549,6 +643,7 @@ export default function PuzzleScreen({ onNext }) {
         </motion.div>
 
         {/* Moves */}
+
         {!preview && !solved && (
           <motion.p
             className="
@@ -589,7 +684,12 @@ export default function PuzzleScreen({ onNext }) {
               }}
             >
               <Button
-                onClick={onNext}
+                type="button"
+                onClick={() => {
+                  if (typeof onNext === "function") {
+                    onNext()
+                  }
+                }}
                 className="
                   flex
                   items-center
@@ -612,6 +712,7 @@ export default function PuzzleScreen({ onNext }) {
         </AnimatePresence>
 
         {/* Footer */}
+
         <div
           className="
             fixed
@@ -625,9 +726,7 @@ export default function PuzzleScreen({ onNext }) {
         </div>
       </div>
 
-      {/* ==================================================
-          CELEBRATION
-      ================================================== */}
+      {/* Celebration */}
 
       <AnimatePresence>
         {solved && <Confetti />}
