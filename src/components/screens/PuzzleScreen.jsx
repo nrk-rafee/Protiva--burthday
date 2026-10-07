@@ -14,7 +14,7 @@ const PUZZLES = [
 ]
 
 // ======================================================
-// SHUFFLE PUZZLE
+// SHUFFLE
 // ======================================================
 
 function createShuffledPuzzle() {
@@ -23,7 +23,7 @@ function createShuffledPuzzle() {
     (_, index) => index
   )
 
-  let shuffled
+  let shuffled = [...original]
 
   do {
     shuffled = [...original].sort(
@@ -61,7 +61,7 @@ function Confetti() {
       className="
         fixed
         inset-0
-        z-[500]
+        z-[8000]
         pointer-events-none
         overflow-hidden
       "
@@ -124,7 +124,15 @@ function PuzzlePiece({
   return (
     <motion.button
       type="button"
-      onClick={() => onSelect(index)}
+      onPointerUp={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        onSelect(index)
+      }}
+      onClick={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+      }}
       className={`
         relative
         aspect-square
@@ -135,6 +143,7 @@ function PuzzlePiece({
         outline-none
         touch-manipulation
         select-none
+        cursor-pointer
 
         ${
           selected
@@ -165,6 +174,7 @@ function PuzzlePiece({
         className="
           absolute
           inset-0
+          pointer-events-none
         "
         style={{
           backgroundImage: `url("${puzzleImage}")`,
@@ -179,8 +189,8 @@ function PuzzlePiece({
           className="
             absolute
             inset-0
-            bg-pink-400/10
             pointer-events-none
+            bg-pink-400/10
           "
         />
       )}
@@ -189,11 +199,14 @@ function PuzzlePiece({
 }
 
 // ======================================================
-// MAIN PUZZLE SCREEN
+// MAIN
 // ======================================================
 
 export default function PuzzleScreen({ onNext }) {
   const puzzleInitRef = useRef(false)
+
+  // Prevent the message screen from being triggered twice
+  const navigatingRef = useRef(false)
 
   const [puzzleImage, setPuzzleImage] =
     useState(null)
@@ -218,12 +231,12 @@ export default function PuzzleScreen({ onNext }) {
     useState(0)
 
   // ====================================================
-  // SELECT ALTERNATING PUZZLE
+  // ALTERNATING PUZZLE
   //
-  // 1st = cake
-  // 2nd = puzzle.jpeg
-  // 3rd = cake
-  // 4th = puzzle.jpeg
+  // 1 = cake
+  // 2 = puzzle.jpeg
+  // 3 = cake
+  // 4 = puzzle.jpeg
   // ====================================================
 
   useEffect(() => {
@@ -261,7 +274,7 @@ export default function PuzzleScreen({ onNext }) {
   }, [])
 
   // ====================================================
-  // PREVIEW TIMER
+  // PREVIEW
   // ====================================================
 
   useEffect(() => {
@@ -283,7 +296,7 @@ export default function PuzzleScreen({ onNext }) {
   }, [puzzleImage])
 
   // ====================================================
-  // CHECK SOLUTION
+  // CHECK SOLVED
   // ====================================================
 
   function checkSolved(currentPieces) {
@@ -341,30 +354,48 @@ export default function PuzzleScreen({ onNext }) {
       (value) => value + 1
     )
 
-    // Check solved
+    // Solved
     if (
       checkSolved(newPieces)
     ) {
       setTimeout(() => {
         setSolved(true)
-      }, 350)
+      }, 300)
     }
   }
 
   // ====================================================
-  // OPEN MESSAGE
+  // GO TO MESSAGE
   // ====================================================
 
-  function handleOpenMessage(event) {
-    event.preventDefault()
-    event.stopPropagation()
-
-    if (
-      typeof onNext ===
-      "function"
-    ) {
-      onNext()
+  function goToMessage(event) {
+    if (event) {
+      event.preventDefault()
+      event.stopPropagation()
     }
+
+    // Already navigating
+    if (navigatingRef.current) {
+      return
+    }
+
+    navigatingRef.current = true
+
+    // Make sure callback exists
+    if (typeof onNext !== "function") {
+      console.error(
+        "PuzzleScreen: onNext is not a function"
+      )
+
+      navigatingRef.current = false
+      return
+    }
+
+    // Small delay makes the transition reliable
+    // after the button press animation.
+    setTimeout(() => {
+      onNext()
+    }, 50)
   }
 
   // ====================================================
@@ -377,7 +408,7 @@ export default function PuzzleScreen({ onNext }) {
         className="
           fixed
           inset-0
-          z-[9999]
+          z-[99999]
           flex
           items-center
           justify-center
@@ -403,7 +434,7 @@ export default function PuzzleScreen({ onNext }) {
   }
 
   // ====================================================
-  // MAIN
+  // SCREEN
   // ====================================================
 
   return (
@@ -422,7 +453,6 @@ export default function PuzzleScreen({ onNext }) {
         bg-[#fff7fa]
       "
     >
-
       {/* ==================================================
           BACKGROUND
       ================================================== */}
@@ -434,7 +464,6 @@ export default function PuzzleScreen({ onNext }) {
           pointer-events-none
         "
       >
-
         <div
           className="
             absolute
@@ -454,6 +483,8 @@ export default function PuzzleScreen({ onNext }) {
             to-transparent
           "
         />
+
+        {/* LEFT HEART */}
 
         <motion.div
           className="
@@ -478,6 +509,8 @@ export default function PuzzleScreen({ onNext }) {
         >
           ♡
         </motion.div>
+
+        {/* RIGHT HEART */}
 
         <motion.div
           className="
@@ -607,7 +640,7 @@ export default function PuzzleScreen({ onNext }) {
       </div>
 
       {/* ==================================================
-          CONTENT
+          MAIN CONTENT
       ================================================== */}
 
       <div
@@ -620,10 +653,9 @@ export default function PuzzleScreen({ onNext }) {
           items-center
           px-4
           pt-28
-          pb-24
+          pb-28
         "
       >
-
         {/* TITLE */}
 
         <motion.h1
@@ -707,12 +739,12 @@ export default function PuzzleScreen({ onNext }) {
             y: 0,
           }}
         >
-
           <AnimatePresence mode="wait">
-
-            {/* PREVIEW */}
-
             {preview ? (
+              /* ==================================================
+                 PREVIEW
+              ================================================== */
+
               <motion.div
                 key="preview"
                 initial={{
@@ -759,8 +791,9 @@ export default function PuzzleScreen({ onNext }) {
                 />
               </motion.div>
             ) : (
-
-              /* PUZZLE */
+              /* ==================================================
+                 PUZZLE
+              ================================================== */
 
               <motion.div
                 key="puzzle"
@@ -793,8 +826,7 @@ export default function PuzzleScreen({ onNext }) {
                       piece={piece}
                       index={index}
                       selected={
-                        selected ===
-                        index
+                        selected === index
                       }
                       onSelect={
                         handlePieceClick
@@ -804,7 +836,6 @@ export default function PuzzleScreen({ onNext }) {
                 )}
               </motion.div>
             )}
-
           </AnimatePresence>
 
           {/* SOLVED GLOW */}
@@ -840,7 +871,6 @@ export default function PuzzleScreen({ onNext }) {
               }}
             />
           )}
-
         </motion.div>
 
         {/* MOVES */}
@@ -864,14 +894,13 @@ export default function PuzzleScreen({ onNext }) {
               Swaps: {moves}
             </motion.p>
           )}
-
       </div>
 
       {/* ==================================================
-          IMPORTANT:
-          MESSAGE BUTTON IS OUTSIDE MAIN CONTENT
+          MESSAGE BUTTON
           
-          This is the actual fix.
+          Completely separate fixed layer.
+          Nothing inside puzzle can cover this.
       ================================================== */}
 
       {solved && (
@@ -880,16 +909,15 @@ export default function PuzzleScreen({ onNext }) {
             fixed
             inset-x-0
             bottom-20
-            z-[9999]
+            z-[99999]
             flex
             justify-center
-            pointer-events-none
             px-4
+            pointer-events-none
           "
         >
           <motion.button
             type="button"
-            onClick={handleOpenMessage}
             initial={{
               opacity: 0,
               y: 30,
@@ -905,10 +933,12 @@ export default function PuzzleScreen({ onNext }) {
               stiffness: 220,
               damping: 16,
             }}
+            onPointerUp={goToMessage}
+            onClick={goToMessage}
             className="
               pointer-events-auto
               relative
-              z-[9999]
+              z-[99999]
               flex
               min-h-[54px]
               min-w-[250px]
@@ -934,26 +964,22 @@ export default function PuzzleScreen({ onNext }) {
               active:scale-95
             "
           >
-            <Mail
-              size={18}
-            />
+            <Mail size={18} />
 
             <span>
               Open My Message Cutie
             </span>
 
-            <MoveRight
-              size={18}
-            />
+            <MoveRight size={18} />
           </motion.button>
         </div>
       )}
 
-      {/* CONFETTI */}
+      {/* ==================================================
+          CONFETTI
+      ================================================== */}
 
-      {solved && (
-        <Confetti />
-      )}
+      {solved && <Confetti />}
 
       {/* ==================================================
           FOOTER
@@ -964,14 +990,13 @@ export default function PuzzleScreen({ onNext }) {
           fixed
           bottom-3
           right-4
-          z-[800]
+          z-[9000]
           text-sm
           text-gray-400/70
         "
       >
         @Rafee🫶protiva
       </div>
-
     </motion.div>
   )
 }
