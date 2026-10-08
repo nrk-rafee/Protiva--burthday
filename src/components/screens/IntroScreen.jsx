@@ -1,6 +1,11 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import {
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Gift, Heart } from "lucide-react"
 import Button from "../Button"
@@ -570,6 +575,36 @@ function BirthdayFireworkShow({
         []
     )
 
+    /*
+      IMPORTANT FIX:
+
+      The parent IntroScreen re-renders when
+      showSecondGif changes.
+
+      If we directly put onFinished / onAllLettersShown
+      inside the timer effect dependency array,
+      the entire firework timer can restart.
+
+      So we keep the latest callbacks inside refs.
+
+      This means:
+      - GIF can change
+      - parent can re-render
+      - BirthdayFireworkShow does NOT restart
+      - visibleCount stays unchanged
+      - balloonPhase stays unchanged
+    */
+
+    const onFinishedRef = useRef(onFinished)
+    const onAllLettersShownRef =
+        useRef(onAllLettersShown)
+
+    useEffect(() => {
+        onFinishedRef.current = onFinished
+        onAllLettersShownRef.current =
+            onAllLettersShown
+    }, [onFinished, onAllLettersShown])
+
     useEffect(() => {
         const revealTimers = []
 
@@ -583,21 +618,16 @@ function BirthdayFireworkShow({
 
                 /*
                   IMPORTANT:
-                  Only tell the parent that the GIF
-                  should change.
 
-                  We DO NOT reset:
-                  - visibleCount
-                  - balloonPhase
-                  - letters
-                  - this component
+                  Only after the FINAL letter E
+                  becomes visible, tell the parent
+                  to change the GIF.
 
-                  Therefore the birthday animation
-                  continues exactly where it is.
+                  This does NOT restart this component.
                 */
 
                 if (index === letters.length - 1) {
-                    onAllLettersShown?.()
+                    onAllLettersShownRef.current?.()
                 }
             }, 700 + index * 650)
 
@@ -626,7 +656,7 @@ function BirthdayFireworkShow({
 
         const finishTimer = setTimeout(
             () => {
-                onFinished?.()
+                onFinishedRef.current?.()
             },
             700 +
                 letters.length * 650 +
@@ -639,11 +669,7 @@ function BirthdayFireworkShow({
             clearTimeout(balloonTimer)
             clearTimeout(finishTimer)
         }
-    }, [
-        letters,
-        onFinished,
-        onAllLettersShown,
-    ])
+    }, [letters])
 
     return (
         <div className="absolute inset-x-0 bottom-0 top-[38%] z-10 overflow-hidden">
@@ -746,16 +772,16 @@ export default function IntroScreen({ onNext }) {
         useState(false)
 
     /*
-      IMPORTANT:
-
       false = first GIF
               /gifs/121.webp
 
       true = second GIF
              /gifs/5.webp
 
+      IMPORTANT:
       This state ONLY controls the GIF.
-      It does NOT control the birthday animation.
+      It does NOT control or restart
+      the birthday firework animation.
     */
 
     const [showSecondGif, setShowSecondGif] =
@@ -972,19 +998,7 @@ export default function IntroScreen({ onNext }) {
 
                             <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
-                            {/* ==================================================
-                                ONLY GIF AREA IS CHANGED
-                                
-                                1st:
-                                /gifs/121.webp
-
-                                After ALL letters are visible:
-                                /gifs/5.webp
-
-                                IMPORTANT:
-                                The BirthdayFireworkShow itself is NOT
-                                recreated/remounted here.
-                            ================================================== */}
+                            {/* GIF */}
 
                             <div
                                 className="
@@ -1049,9 +1063,6 @@ export default function IntroScreen({ onNext }) {
                                     Today is all about you ✨
                                 </p>
                             </div>
-
-                            {/* Old card button is intentionally
-                                hidden until fireworks finish */}
                         </motion.div>
                     </div>
 
@@ -1060,20 +1071,9 @@ export default function IntroScreen({ onNext }) {
                     ================================================== */}
 
                     <BirthdayFireworkShow
-                        /*
-                          This only changes the GIF.
-
-                          It does NOT restart the firework animation.
-                        */
                         onAllLettersShown={() =>
                             setShowSecondGif(true)
                         }
-
-                        /*
-                          This remains exactly responsible
-                          for the button appearing after
-                          balloons finish.
-                        */
                         onFinished={() =>
                             setShowStartButton(true)
                         }
