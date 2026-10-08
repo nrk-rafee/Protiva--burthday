@@ -154,7 +154,7 @@ function BottomBalloons() {
 }
 
 /* ======================================================
-   FIREWORK BACKGROUND
+   BACKGROUND FIREWORKS
 ====================================================== */
 
 const backgroundFireworks = [
@@ -273,7 +273,88 @@ function createLetters() {
 }
 
 /* ======================================================
-   ONE FIREWORK LETTER
+   FIREWORK SPARK
+====================================================== */
+
+function FireworkBurst({ color }) {
+    return (
+        <motion.div
+            className="pointer-events-none absolute left-1/2 top-1/2"
+            initial={{
+                scale: 0,
+                opacity: 1,
+            }}
+            animate={{
+                scale: [0, 1, 1.7, 0],
+                opacity: [1, 1, 0.7, 0],
+            }}
+            transition={{
+                duration: 0.75,
+                ease: "easeOut",
+            }}
+        >
+            {Array.from({ length: 18 }).map((_, index) => {
+                const angle = (360 / 18) * index
+                const radians = (angle * Math.PI) / 180
+
+                const distance = 30 + (index % 4) * 10
+
+                const x = Math.cos(radians) * distance
+                const y = Math.sin(radians) * distance
+
+                return (
+                    <motion.span
+                        key={index}
+                        className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
+                        style={{
+                            background: color,
+                            boxShadow: `0 0 10px ${color}`,
+                        }}
+                        initial={{
+                            x: 0,
+                            y: 0,
+                            opacity: 1,
+                            scale: 1,
+                        }}
+                        animate={{
+                            x,
+                            y,
+                            opacity: 0,
+                            scale: 0,
+                        }}
+                        transition={{
+                            duration: 0.7,
+                            ease: "easeOut",
+                        }}
+                    />
+                )
+            })}
+
+            {/* Bright center */}
+            <motion.div
+                className="h-3 w-3 rounded-full"
+                style={{
+                    background: "#fff",
+                    boxShadow: `
+                        0 0 8px #fff,
+                        0 0 20px ${color},
+                        0 0 35px ${color}
+                    `,
+                }}
+                animate={{
+                    scale: [0, 1.5, 0],
+                    opacity: [0, 1, 0],
+                }}
+                transition={{
+                    duration: 0.65,
+                }}
+            />
+        </motion.div>
+    )
+}
+
+/* ======================================================
+   ONE LETTER
 ====================================================== */
 
 function FireworkLetter({
@@ -281,165 +362,113 @@ function FireworkLetter({
     visible,
     balloonPhase,
 }) {
-    const totalLetters = 17
-
-    /*
-      Position letters in three lines.
-      They stay below the birthday card.
-    */
-
-    const wordPositions = {
-        0: {
-            top: "8%",
-            left: "50%",
-        },
-        1: {
-            top: "42%",
-            left: "50%",
-        },
-        2: {
-            top: "76%",
-            left: "50%",
-        },
-    }
-
-    const position = wordPositions[item.wordIndex]
-
-    /*
-      Spread letters horizontally according
-      to their position inside each word.
-    */
-
     const wordLengths = {
         0: 5,
         1: 8,
         2: 4,
     }
 
+    const wordPositions = {
+        0: "13%",
+        1: "47%",
+        2: "81%",
+    }
+
     const wordLength = wordLengths[item.wordIndex]
 
-    const spacing = 42
+    /*
+      Mobile-friendly spacing.
+      The width is smaller on phones so
+      the letters don't go outside the screen.
+    */
+    const spacing =
+        item.wordIndex === 1
+            ? 30
+            : 36
 
     const offset =
         (item.letterIndex - (wordLength - 1) / 2) *
         spacing
 
+    const topPosition = wordPositions[item.wordIndex]
+
     return (
         <div
             className="absolute"
             style={{
-                top: position.top,
+                top: topPosition,
                 left: `calc(50% + ${offset}px)`,
                 transform: "translate(-50%, -50%)",
             }}
         >
-            {/* Launching spark */}
+            {/* ==================================================
+                ROCKET / RISING SPARK
+            ================================================== */}
+
             {visible && (
                 <motion.div
-                    className="pointer-events-none absolute left-1/2 top-1/2"
+                    className="pointer-events-none absolute left-1/2 top-1/2 z-20"
                     initial={{
-                        y: 230,
-                        opacity: 1,
+                        y: 250,
+                        opacity: 0,
                     }}
                     animate={{
-                        y: 0,
-                        opacity: [1, 1, 0],
+                        y: [250, 120, 0],
+                        opacity: [0, 1, 1],
                     }}
                     transition={{
-                        duration: 0.62,
+                        duration: 0.65,
                         ease: "easeOut",
                     }}
                 >
-                    <div
-                        className="h-2 w-2 rounded-full"
+                    <motion.div
+                        className="rounded-full"
                         style={{
+                            width: 7,
+                            height: 7,
                             background: item.color,
                             boxShadow: `
                                 0 0 8px ${item.color},
-                                0 0 20px ${item.color}
+                                0 0 20px ${item.color},
+                                0 0 35px ${item.color}
                             `,
+                        }}
+                    />
+
+                    {/* Rocket trail */}
+                    <motion.div
+                        className="absolute left-1/2 top-2 -translate-x-1/2"
+                        style={{
+                            width: 2,
+                            height: 55,
+                            background: `linear-gradient(
+                                to bottom,
+                                ${item.color},
+                                transparent
+                            )`,
                         }}
                     />
                 </motion.div>
             )}
 
-            {/* Firework explosion */}
+            {/* ==================================================
+                EXPLOSION
+            ================================================== */}
+
             {visible && (
-                <motion.div
-                    className="pointer-events-none absolute left-1/2 top-1/2"
-                    initial={{
-                        scale: 0,
-                        opacity: 1,
-                    }}
-                    animate={{
-                        scale: [0, 1.2, 1.8, 0],
-                        opacity: [1, 1, 0.5, 0],
-                    }}
-                    transition={{
-                        duration: 0.7,
-                        delay: 0.55,
-                        ease: "easeOut",
-                    }}
-                >
-                    {Array.from({ length: 16 }).map(
-                        (_, rayIndex) => {
-                            const angle =
-                                (360 / 16) * rayIndex
-
-                            const radians =
-                                (angle * Math.PI) /
-                                180
-
-                            const distance =
-                                25 +
-                                (rayIndex % 4) * 9
-
-                            const x =
-                                Math.cos(radians) *
-                                distance
-
-                            const y =
-                                Math.sin(radians) *
-                                distance
-
-                            return (
-                                <motion.span
-                                    key={rayIndex}
-                                    className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
-                                    style={{
-                                        background:
-                                            item.color,
-                                        boxShadow:
-                                            `0 0 8px ${item.color}`,
-                                    }}
-                                    initial={{
-                                        x: 0,
-                                        y: 0,
-                                        opacity: 1,
-                                        scale: 1,
-                                    }}
-                                    animate={{
-                                        x,
-                                        y,
-                                        opacity: 0,
-                                        scale: 0,
-                                    }}
-                                    transition={{
-                                        duration: 0.65,
-                                        delay: 0.55,
-                                        ease: "easeOut",
-                                    }}
-                                />
-                            )
-                        }
-                    )}
-                </motion.div>
+                <div className="pointer-events-none absolute left-1/2 top-1/2 z-30">
+                    <FireworkBurst color={item.color} />
+                </div>
             )}
 
-            {/* Letter + balloon */}
+            {/* ==================================================
+                LETTER
+            ================================================== */}
+
             <AnimatePresence>
                 {visible && (
                     <motion.div
+                        className="relative z-40"
                         initial={{
                             opacity: 0,
                             scale: 0,
@@ -448,16 +477,15 @@ function FireworkLetter({
                             balloonPhase
                                 ? {
                                       opacity: 0,
-                                      y: -230,
-                                      scale: 0.85,
+                                      y: -330,
+                                      scale: 0.7,
                                   }
                                 : {
                                       opacity: 1,
-                                      y: 0,
                                       scale: [
                                           0,
-                                          1.25,
-                                          0.92,
+                                          1.35,
+                                          0.9,
                                           1,
                                       ],
                                   }
@@ -467,48 +495,48 @@ function FireworkLetter({
                                 ? {
                                       duration: 1.8,
                                       delay:
-                                          item.index *
-                                          0.12,
+                                          item.index * 0.13,
                                       ease: "easeInOut",
                                   }
                                 : {
-                                      duration: 0.6,
+                                      duration: 0.55,
                                       delay: 0.6,
                                       ease: "backOut",
                                   }
                         }
-                        className="relative"
                     >
-                        {/* Balloon */}
+                        {/* ==================================================
+                            BALLOON
+                        ================================================== */}
+
                         {balloonPhase && (
                             <motion.div
-                                className="absolute bottom-full left-1/2 -translate-x-1/2"
+                                className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2"
                                 initial={{
                                     opacity: 0,
-                                    scale: 0,
+                                    scale: 0.2,
                                     y: 20,
                                 }}
                                 animate={{
-                                    opacity: 1,
-                                    scale: 1,
-                                    y: 0,
+                                    opacity: [0, 1, 1, 0],
+                                    scale: [0.2, 1, 1, 0.8],
+                                    y: [20, 0, -20, -60],
                                 }}
                                 transition={{
-                                    duration: 0.45,
+                                    duration: 1.8,
                                     delay:
-                                        item.index *
-                                        0.12,
-                                    ease: "backOut",
+                                        item.index * 0.13,
+                                    ease: "easeInOut",
                                 }}
                             >
                                 <div
-                                    className="relative h-11 w-9 rounded-[50%]"
+                                    className="relative h-12 w-10 rounded-[50%]"
                                     style={{
                                         background: `
                                             radial-gradient(
-                                                circle at 30% 25%,
-                                                rgba(255,255,255,0.9),
-                                                transparent 18%
+                                                circle at 30% 22%,
+                                                rgba(255,255,255,0.95),
+                                                transparent 17%
                                             ),
                                             linear-gradient(
                                                 145deg,
@@ -517,34 +545,45 @@ function FireworkLetter({
                                             )
                                         `,
                                         boxShadow: `
-                                            0 0 18px ${item.color}
+                                            0 0 12px ${item.color},
+                                            0 0 25px ${item.color}
                                         `,
                                     }}
                                 >
+                                    {/* Balloon knot */}
                                     <div
-                                        className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/45"
-                                    />
-
-                                    <div
-                                        className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 bg-white/50"
+                                        className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2"
                                         style={{
+                                            background:
+                                                item.color,
                                             clipPath:
                                                 "polygon(0 0,100% 0,50% 100%)",
                                         }}
+                                    />
+
+                                    {/* Balloon string */}
+                                    <div
+                                        className="absolute left-1/2 top-full h-28 w-px -translate-x-1/2 bg-white/50"
                                     />
                                 </div>
                             </motion.div>
                         )}
 
-                        {/* Actual letter */}
+                        {/* Letter */}
                         <span
-                            className="block text-3xl font-black uppercase md:text-4xl"
+                            className="
+                                block
+                                text-3xl
+                                font-black
+                                uppercase
+                                md:text-4xl
+                            "
                             style={{
                                 color: item.color,
                                 textShadow: `
                                     0 0 8px ${item.color},
-                                    0 0 20px ${item.color},
-                                    0 0 35px ${item.color}
+                                    0 0 18px ${item.color},
+                                    0 0 32px ${item.color}
                                 `,
                             }}
                         >
@@ -574,61 +613,63 @@ function BirthdayFireworkShow({ onFinished }) {
     )
 
     useEffect(() => {
-        const revealTimers = []
+        const timers = []
 
         /*
-          One letter every 650ms.
+          First letter appears after 1 second.
+          Then each next letter every 650ms.
         */
-
         letters.forEach((_, index) => {
-            const timer = setTimeout(() => {
-                setVisibleCount(index + 1)
-            }, 700 + index * 650)
+            const timer = setTimeout(
+                () => {
+                    setVisibleCount(index + 1)
+                },
+                1000 + index * 650
+            )
 
-            revealTimers.push(timer)
+            timers.push(timer)
         })
 
         /*
-          After last letter:
-          wait 1.5 seconds,
-          then balloons start.
+          Last letter timing
+          + 1.5 seconds waiting time
         */
-
         const balloonTimer = setTimeout(
             () => {
                 setBalloonPhase(true)
             },
-            700 +
+            1000 +
                 letters.length * 650 +
                 1500
         )
 
         /*
-          After balloons fly away:
-          show Start the surprise button.
+          Balloons take about 3.5 seconds.
         */
-
         const finishTimer = setTimeout(
             () => {
                 onFinished?.()
             },
-            700 +
+            1000 +
                 letters.length * 650 +
                 1500 +
-                3000
+                3600
         )
 
         return () => {
-            revealTimers.forEach(clearTimeout)
+            timers.forEach(clearTimeout)
             clearTimeout(balloonTimer)
             clearTimeout(finishTimer)
         }
     }, [letters, onFinished])
 
     return (
-        <div className="absolute inset-x-0 bottom-0 top-[38%] z-10 overflow-hidden">
-            {/* Tiny stars */}
-            {Array.from({ length: 35 }).map(
+        <div className="absolute inset-x-0 bottom-0 top-[36%] z-10 overflow-hidden">
+            {/* ==================================================
+                SMALL STARS
+            ================================================== */}
+
+            {Array.from({ length: 40 }).map(
                 (_, index) => (
                     <motion.span
                         key={index}
@@ -639,11 +680,15 @@ function BirthdayFireworkShow({ onFinished }) {
                         }}
                         animate={{
                             opacity: [
-                                0.15,
+                                0.1,
                                 0.8,
-                                0.15,
+                                0.1,
                             ],
-                            scale: [0.6, 1.4, 0.6],
+                            scale: [
+                                0.6,
+                                1.4,
+                                0.6,
+                            ],
                         }}
                         transition={{
                             duration:
@@ -658,45 +703,64 @@ function BirthdayFireworkShow({ onFinished }) {
                 )
             )}
 
+            {/* ==================================================
+                LETTERS
+            ================================================== */}
+
             {letters.map((item, index) => (
                 <FireworkLetter
                     key={item.id}
                     item={item}
-                    visible={index < visibleCount}
-                    balloonPhase={balloonPhase}
+                    visible={
+                        index < visibleCount
+                    }
+                    balloonPhase={
+                        balloonPhase
+                    }
                 />
             ))}
 
-            {/* Continuous small launch sparks */}
+            {/* ==================================================
+                EXTRA RANDOM LAUNCH SPARKS
+            ================================================== */}
+
             {!balloonPhase &&
-                Array.from({ length: 12 }).map(
+                Array.from({ length: 14 }).map(
                     (_, index) => (
                         <motion.span
                             key={`launch-${index}`}
-                            className="absolute bottom-0 h-1 w-1 rounded-full bg-white"
+                            className="absolute bottom-0 h-1.5 w-1.5 rounded-full"
                             style={{
                                 left: `${
-                                    5 +
-                                    (index * 19) %
-                                        90
+                                    4 +
+                                    (index * 17) %
+                                        92
                                 }%`,
+                                background:
+                                    index % 2 === 0
+                                        ? "#ff6fae"
+                                        : "#ffd166",
+                                boxShadow:
+                                    "0 0 10px rgba(255,255,255,0.8)",
                             }}
                             animate={{
                                 y: [
                                     0,
-                                    -80,
+                                    -90,
                                     -180,
+                                    -250,
                                 ],
                                 opacity: [
                                     0,
+                                    1,
                                     1,
                                     0,
                                 ],
                             }}
                             transition={{
-                                duration: 2,
+                                duration: 2.1,
                                 delay:
-                                    index * 0.3,
+                                    index * 0.25,
                                 repeat: Infinity,
                                 ease: "easeOut",
                             }}
@@ -720,7 +784,7 @@ export default function IntroScreen({ onNext }) {
     return (
         <AnimatePresence mode="wait">
             {/* ==================================================
-                STEP 0 — SOMETHING SPECIAL
+                STEP 0
             ================================================== */}
 
             {step === 0 && (
@@ -846,6 +910,7 @@ export default function IntroScreen({ onNext }) {
                                     "
                                 >
                                     <Gift size={21} />
+
                                     <span>
                                         Open It!
                                     </span>
@@ -863,7 +928,7 @@ export default function IntroScreen({ onNext }) {
             )}
 
             {/* ==================================================
-                STEP 1 — OLD BIRTHDAY CARD + NEW FIREWORK SHOW
+                STEP 1 — FIREWORK BIRTHDAY SHOW
             ================================================== */}
 
             {step === 1 && (
@@ -872,7 +937,9 @@ export default function IntroScreen({ onNext }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{
+                        duration: 0.5,
+                    }}
                     className="
                         fixed
                         inset-0
@@ -885,15 +952,15 @@ export default function IntroScreen({ onNext }) {
 
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(80,50,180,0.27),transparent_62%)]" />
 
-                    <div className="absolute inset-x-0 bottom-0 h-[55%] bg-[radial-gradient(circle_at_50%_100%,rgba(255,70,180,0.15),transparent_65%)]" />
+                    <div className="absolute inset-x-0 bottom-0 h-[60%] bg-[radial-gradient(circle_at_50%_100%,rgba(255,70,180,0.15),transparent_65%)]" />
 
                     <BackgroundFireworks />
 
                     {/* ==================================================
-                        OLD BIRTHDAY CARD
+                        BIRTHDAY CARD
                     ================================================== */}
 
-                    <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
+                    <div className="absolute inset-x-0 top-[4%] z-30 flex justify-center px-4">
                         <motion.div
                             initial={{
                                 opacity: 0,
@@ -911,6 +978,7 @@ export default function IntroScreen({ onNext }) {
                             }}
                             className="
                                 relative
+                                mx-auto
                                 w-full
                                 max-w-[420px]
                                 rounded-[42px]
@@ -922,10 +990,9 @@ export default function IntroScreen({ onNext }) {
                                 backdrop-blur-xl
                             "
                         >
-                            {/* Card glow */}
                             <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
-                            {/* Cake area */}
+                            {/* Cake */}
                             <div
                                 className="
                                     relative
@@ -963,7 +1030,6 @@ export default function IntroScreen({ onNext }) {
                                 </motion.div>
                             </div>
 
-                            {/* Old title */}
                             <div className="relative z-10 mt-5 text-center">
                                 <h1
                                     className="
@@ -983,31 +1049,18 @@ export default function IntroScreen({ onNext }) {
                                     Today is all about you ✨
                                 </p>
                             </div>
-
-                            {/* Old card button is intentionally
-                                hidden until fireworks finish */}
                         </motion.div>
                     </div>
 
                     {/* ==================================================
-                        FIREWORK + LETTER AREA
-                    ================================================== */}
-
-                    <BirthdayFireworkShow
-                        onFinished={() =>
-                            setShowStartButton(true)
-                        }
-                    />
-
-                    {/* ==================================================
-                        A LITTLE SURPRISE
+                        LITTLE SURPRISE
                     ================================================== */}
 
                     <motion.div
                         className="
                             absolute
                             left-1/2
-                            top-[27%]
+                            top-[29%]
                             z-30
                             -translate-x-1/2
                             whitespace-nowrap
@@ -1022,6 +1075,7 @@ export default function IntroScreen({ onNext }) {
                         }}
                         transition={{
                             duration: 0.7,
+                            delay: 0.4,
                         }}
                     >
                         <p className="text-[10px] uppercase tracking-[0.32em] text-white/45">
@@ -1030,7 +1084,17 @@ export default function IntroScreen({ onNext }) {
                     </motion.div>
 
                     {/* ==================================================
-                        START THE SURPRISE BUTTON
+                        FIREWORK SHOW
+                    ================================================== */}
+
+                    <BirthdayFireworkShow
+                        onFinished={() =>
+                            setShowStartButton(true)
+                        }
+                    />
+
+                    {/* ==================================================
+                        START BUTTON
                     ================================================== */}
 
                     <AnimatePresence>
@@ -1058,7 +1122,7 @@ export default function IntroScreen({ onNext }) {
                                     fixed
                                     bottom-8
                                     left-1/2
-                                    z-[200]
+                                    z-[500]
                                     -translate-x-1/2
                                     px-4
                                 "
@@ -1093,7 +1157,7 @@ export default function IntroScreen({ onNext }) {
             )}
 
             {/* ==================================================
-                STEP 2 — ORIGINAL CUTIEPIE SCREEN
+                STEP 2 — CUTIEPIE SCREEN
             ================================================== */}
 
             {step === 2 && (
@@ -1120,6 +1184,7 @@ export default function IntroScreen({ onNext }) {
                     className="
                         fixed
                         inset-0
+                        z-50
                         flex
                         min-h-screen
                         items-center
@@ -1127,10 +1192,17 @@ export default function IntroScreen({ onNext }) {
                         overflow-y-auto
                         px-4
                         py-6
+                        bg-[#070d2b]
                     "
                 >
+                    {/* Background */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,100,190,0.12),transparent_60%)]" />
+
+                    {/* Centered card */}
                     <div
                         className="
+                            relative
+                            z-10
                             mx-auto
                             flex
                             w-full
