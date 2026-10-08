@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { RotateCcw, ArrowRight, Trophy, X, Circle } from "lucide-react"
+import { RotateCcw, ArrowRight } from "lucide-react"
 import Button from "../Button"
 
 /* ======================================================
@@ -49,20 +49,18 @@ function getWinner(board) {
 }
 
 /* ======================================================
-   SIMPLE COMPUTER MOVE
-   Smart but beatable
+   COMPUTER MOVE
 ====================================================== */
 
 function getComputerMove(board, computer) {
     const player = computer === "X" ? "O" : "X"
 
-    // 1. Try to win
+    // 1. Computer tries to win
     for (const [a, b, c] of WINNING_LINES) {
         const values = [board[a], board[b], board[c]]
 
         if (
-            values.filter((value) => value === computer)
-                .length === 2 &&
+            values.filter((value) => value === computer).length === 2 &&
             values.includes(null)
         ) {
             if (!board[a]) return a
@@ -71,13 +69,12 @@ function getComputerMove(board, computer) {
         }
     }
 
-    // 2. Block player
+    // 2. Computer blocks player
     for (const [a, b, c] of WINNING_LINES) {
         const values = [board[a], board[b], board[c]]
 
         if (
-            values.filter((value) => value === player)
-                .length === 2 &&
+            values.filter((value) => value === player).length === 2 &&
             values.includes(null)
         ) {
             if (!board[a]) return a
@@ -86,12 +83,12 @@ function getComputerMove(board, computer) {
         }
     }
 
-    // 3. Prefer center
+    // 3. Center
     if (!board[4]) {
         return 4
     }
 
-    // 4. Prefer corners
+    // 4. Corners
     const corners = [0, 2, 6, 8].filter(
         (index) => !board[index]
     )
@@ -102,11 +99,9 @@ function getComputerMove(board, computer) {
         ]
     }
 
-    // 5. Any empty space
+    // 5. Any empty cell
     const empty = board
-        .map((value, index) =>
-            value ? null : index
-        )
+        .map((value, index) => (value ? null : index))
         .filter((value) => value !== null)
 
     if (empty.length === 0) {
@@ -131,14 +126,9 @@ function CelebrationConfetti() {
     return (
         <div className="pointer-events-none fixed inset-0 z-[500] overflow-hidden">
             {pieces.map((_, index) => {
-                const left =
-                    (index * 37 + 5) % 100
-
-                const rotation =
-                    (index * 43) % 360
-
-                const size =
-                    5 + (index % 5)
+                const left = (index * 37 + 5) % 100
+                const rotation = (index * 43) % 360
+                const size = 5 + (index % 5)
 
                 return (
                     <motion.span
@@ -157,25 +147,19 @@ function CelebrationConfetti() {
                                     "#c7a0ff",
                                     "#ff8fab",
                                     "#ffffff",
-                                ][
-                                    index % 6
-                                ],
+                                ][index % 6],
                             rotate: rotation,
                         }}
                         animate={{
                             y: [
                                 -20,
                                 250,
-                                window.innerHeight + 100,
+                                "110vh",
                             ],
                             x: [
                                 0,
-                                index % 2 === 0
-                                    ? 35
-                                    : -35,
-                                index % 3 === 0
-                                    ? -25
-                                    : 25,
+                                index % 2 === 0 ? 35 : -35,
+                                index % 3 === 0 ? -25 : 25,
                             ],
                             rotate: [
                                 rotation,
@@ -192,11 +176,9 @@ function CelebrationConfetti() {
                         transition={{
                             duration:
                                 3.2 +
-                                (index % 5) *
-                                    0.25,
+                                (index % 5) * 0.25,
                             delay:
-                                (index % 15) *
-                                0.04,
+                                (index % 15) * 0.04,
                             ease: "easeOut",
                         }}
                     />
@@ -274,7 +256,6 @@ function GameBoard({
                                 from-[#f0dfc5]
                                 to-[#cdb08c]
                                 shadow-[inset_0_3px_8px_rgba(255,255,255,0.55),inset_0_-5px_10px_rgba(70,40,20,0.18)]
-                                transition
                                 ${
                                     isWinning
                                         ? "ring-4 ring-pink-400 shadow-[0_0_25px_rgba(244,114,182,0.75)]"
@@ -328,7 +309,6 @@ function GameBoard({
                                         font-black
                                         leading-none
                                         text-black
-                                        drop-shadow-[0_3px_2px_rgba(255,255,255,0.2)]
                                         md:text-[62px]
                                     "
                                 >
@@ -344,7 +324,7 @@ function GameBoard({
 }
 
 /* ======================================================
-   CHOOSE X / O
+   CHOOSE SIDE
 ====================================================== */
 
 function ChooseSide({ onChoose }) {
@@ -392,9 +372,7 @@ function ChooseSide({ onChoose }) {
                 <motion.button
                     type="button"
                     onClick={() => onChoose("X")}
-                    whileTap={{
-                        scale: 0.94,
-                    }}
+                    whileTap={{ scale: 0.94 }}
                     className="
                         flex
                         flex-col
@@ -422,9 +400,7 @@ function ChooseSide({ onChoose }) {
                 <motion.button
                     type="button"
                     onClick={() => onChoose("O")}
-                    whileTap={{
-                        scale: 0.94,
-                    }}
+                    whileTap={{ scale: 0.94 }}
                     className="
                         flex
                         flex-col
@@ -462,8 +438,7 @@ function ChooseSide({ onChoose }) {
 ====================================================== */
 
 export default function CrossGameScreen({ onNext }) {
-    const [playerSide, setPlayerSide] =
-        useState(null)
+    const [playerSide, setPlayerSide] = useState(null)
 
     const [board, setBoard] = useState(
         Array(9).fill(null)
@@ -471,11 +446,9 @@ export default function CrossGameScreen({ onNext }) {
 
     const [turn, setTurn] = useState(null)
 
-    const [result, setResult] =
-        useState(null)
+    const [result, setResult] = useState(null)
 
-    const [winningLine, setWinningLine] =
-        useState([])
+    const [winningLine, setWinningLine] = useState([])
 
     const [computerThinking, setComputerThinking] =
         useState(false)
@@ -483,11 +456,13 @@ export default function CrossGameScreen({ onNext }) {
     const [celebrating, setCelebrating] =
         useState(false)
 
+    const [gameVersion, setGameVersion] = useState(0)
+
     const computerSide =
         playerSide === "X" ? "O" : "X"
 
     /* ==================================================
-       RESET GAME
+       START / RESET GAME
     ================================================== */
 
     const startGame = (side) => {
@@ -499,27 +474,28 @@ export default function CrossGameScreen({ onNext }) {
 
         setWinningLine([])
 
+        setComputerThinking(false)
+
         setCelebrating(false)
 
+        setGameVersion((value) => value + 1)
+
         /*
-          X always gets the first move.
+          X starts.
 
-          If player chooses X:
-          player starts.
-
-          If player chooses O:
-          computer starts automatically.
+          Player X  -> player starts
+          Player O  -> computer starts
         */
 
         if (side === "X") {
             setTurn("X")
         } else {
-            setTurn("O")
+            setTurn("X")
         }
     }
 
     /* ==================================================
-       CHECK RESULT AFTER EVERY MOVE
+       CHECK RESULT
     ================================================== */
 
     useEffect(() => {
@@ -530,27 +506,25 @@ export default function CrossGameScreen({ onNext }) {
         if (!gameResult) return
 
         setResult(gameResult.winner)
-
         setWinningLine(gameResult.line)
+        setComputerThinking(false)
+        setTurn(null)
 
         if (gameResult.winner === playerSide) {
             setCelebrating(true)
         }
-
-        setComputerThinking(false)
-        setTurn(null)
     }, [board, playerSide])
 
     /* ==================================================
-       COMPUTER AUTO MOVE
+       COMPUTER MOVE
     ================================================== */
 
     useEffect(() => {
         if (!playerSide) return
-
-        if (result) return
-
+        if (!turn) return
         if (turn !== computerSide) return
+        if (result) return
+        if (computerThinking) return
 
         setComputerThinking(true)
 
@@ -569,22 +543,56 @@ export default function CrossGameScreen({ onNext }) {
                     ...currentBoard,
                 ]
 
-                nextBoard[move] =
-                    computerSide
+                nextBoard[move] = computerSide
 
                 return nextBoard
             })
 
-            setTurn(playerSide)
             setComputerThinking(false)
         }, 700)
 
-        return () =>
-            clearTimeout(timer)
+        return () => clearTimeout(timer)
     }, [
         turn,
         computerSide,
         playerSide,
+        result,
+        gameVersion,
+    ])
+
+    /* ==================================================
+       AFTER COMPUTER MOVE
+       Give turn back to player
+    ================================================== */
+
+    useEffect(() => {
+        if (!playerSide) return
+        if (!computerSide) return
+        if (computerThinking) return
+        if (result) return
+
+        const winner = getWinner(board)
+
+        if (winner) return
+
+        const lastMove =
+            board.filter(Boolean).length
+
+        if (lastMove === 0) {
+            return
+        }
+
+        const lastValue =
+            board.findLast?.((value) => value !== null)
+
+        if (lastValue === computerSide) {
+            setTurn(playerSide)
+        }
+    }, [
+        board,
+        playerSide,
+        computerSide,
+        computerThinking,
         result,
     ])
 
@@ -625,12 +633,8 @@ export default function CrossGameScreen({ onNext }) {
 
     return (
         <motion.div
-            initial={{
-                opacity: 0,
-            }}
-            animate={{
-                opacity: 1,
-            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             className="
                 fixed
                 inset-0
@@ -652,7 +656,9 @@ export default function CrossGameScreen({ onNext }) {
             </div>
 
             <div className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center px-4 py-8">
+
                 <AnimatePresence mode="wait">
+
                     {/* ==================================================
                         CHOOSE SIDE
                     ================================================== */}
@@ -670,7 +676,7 @@ export default function CrossGameScreen({ onNext }) {
 
                     {playerSide && !result && (
                         <motion.div
-                            key="game"
+                            key={`game-${gameVersion}`}
                             initial={{
                                 opacity: 0,
                                 scale: 0.94,
@@ -693,6 +699,7 @@ export default function CrossGameScreen({ onNext }) {
                             "
                         >
                             <div className="text-center">
+
                                 <div className="flex items-center justify-center gap-2">
                                     <span className="text-sm text-gray-500">
                                         You are
@@ -706,15 +713,13 @@ export default function CrossGameScreen({ onNext }) {
                                             text-xl
                                             font-black
                                             ${
-                                                playerSide ===
-                                                "X"
+                                                playerSide === "X"
                                                     ? "bg-orange-100 text-orange-500"
                                                     : "bg-gray-100 text-black"
                                             }
                                         `}
                                     >
-                                        {playerSide ===
-                                        "X"
+                                        {playerSide === "X"
                                             ? "×"
                                             : "○"}
                                     </span>
@@ -739,8 +744,7 @@ export default function CrossGameScreen({ onNext }) {
                                     }
                                     disabled={
                                         computerThinking ||
-                                        turn !==
-                                            playerSide
+                                        turn !== playerSide
                                     }
                                     winningLine={
                                         winningLine
@@ -752,8 +756,7 @@ export default function CrossGameScreen({ onNext }) {
                                 <span>
                                     You:{" "}
                                     <b>
-                                        {playerSide ===
-                                        "X"
+                                        {playerSide === "X"
                                             ? "×"
                                             : "○"}
                                     </b>
@@ -764,8 +767,7 @@ export default function CrossGameScreen({ onNext }) {
                                 <span>
                                     Me:{" "}
                                     <b>
-                                        {computerSide ===
-                                        "X"
+                                        {computerSide === "X"
                                             ? "×"
                                             : "○"}
                                     </b>
@@ -780,7 +782,7 @@ export default function CrossGameScreen({ onNext }) {
 
                     {playerSide && result && (
                         <motion.div
-                            key="result"
+                            key={`result-${gameVersion}`}
                             initial={{
                                 opacity: 0,
                                 scale: 0.85,
@@ -805,6 +807,11 @@ export default function CrossGameScreen({ onNext }) {
                                 backdrop-blur-xl
                             "
                         >
+
+                            {/* =========================
+                                WIN
+                            ========================= */}
+
                             {result === playerSide ? (
                                 <>
                                     <motion.div
@@ -834,8 +841,8 @@ export default function CrossGameScreen({ onNext }) {
                                     </h1>
 
                                     <p className="mt-2 text-sm text-gray-500">
-                                        I knew you could do
-                                        it, Cutie! 💗
+                                        I knew you could do it,
+                                        Cutie! 💗
                                     </p>
 
                                     <div className="mt-5 overflow-hidden rounded-[28px] border border-pink-100 bg-pink-50 p-3 shadow-inner">
@@ -848,9 +855,7 @@ export default function CrossGameScreen({ onNext }) {
 
                                     <div className="mt-6">
                                         <Button
-                                            onClick={
-                                                onNext
-                                            }
+                                            onClick={onNext}
                                             className="
                                                 min-w-[210px]
                                                 justify-center
@@ -863,17 +868,21 @@ export default function CrossGameScreen({ onNext }) {
                                         >
                                             Continue
                                             <ArrowRight
-                                                size={
-                                                    19
-                                                }
+                                                size={19}
                                             />
                                         </Button>
                                     </div>
                                 </>
                             ) : (
+                                /* =========================
+                                   LOSS / DRAW
+                                ========================= */
+
                                 <>
                                     <div className="text-6xl">
-                                        😭
+                                        {result === "draw"
+                                            ? "🤍"
+                                            : "😭"}
                                     </div>
 
                                     <h1 className="mt-3 text-3xl font-bold text-[#713b50]">
@@ -881,8 +890,7 @@ export default function CrossGameScreen({ onNext }) {
                                     </h1>
 
                                     <p className="mt-2 text-sm text-gray-500">
-                                        Don't worry... try
-                                        again 💗
+                                        Don't worry... try again 💗
                                     </p>
 
                                     <div className="mt-5 overflow-hidden rounded-[28px] border border-gray-100 bg-gray-50 p-3 shadow-inner">
@@ -911,9 +919,7 @@ export default function CrossGameScreen({ onNext }) {
                                             "
                                         >
                                             <RotateCcw
-                                                size={
-                                                    18
-                                                }
+                                                size={18}
                                             />
                                             Try Again
                                         </Button>
@@ -922,10 +928,11 @@ export default function CrossGameScreen({ onNext }) {
                             )}
                         </motion.div>
                     )}
+
                 </AnimatePresence>
             </div>
 
-            {/* Celebration only when player wins */}
+            {/* Celebration */}
 
             <AnimatePresence>
                 {celebrating && (
