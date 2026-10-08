@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowRight, RotateCcw } from "lucide-react"
 import Button from "../Button"
@@ -21,7 +21,7 @@ const WINNING_LINES = [
 ]
 
 /* ======================================================
-   CHECK GAME RESULT
+   CHECK RESULT
 ====================================================== */
 
 function getGameResult(board) {
@@ -56,9 +56,7 @@ function getComputerMove(board, computerSide) {
     const playerSide =
         computerSide === "X" ? "O" : "X"
 
-    /* ---------------------------------------------
-       1. Try to WIN
-    --------------------------------------------- */
+    /* 1. Computer tries to win */
 
     for (const [a, b, c] of WINNING_LINES) {
         const values = [
@@ -79,9 +77,7 @@ function getComputerMove(board, computerSide) {
         }
     }
 
-    /* ---------------------------------------------
-       2. Block PLAYER
-    --------------------------------------------- */
+    /* 2. Computer blocks player */
 
     for (const [a, b, c] of WINNING_LINES) {
         const values = [
@@ -102,17 +98,13 @@ function getComputerMove(board, computerSide) {
         }
     }
 
-    /* ---------------------------------------------
-       3. Take CENTER
-    --------------------------------------------- */
+    /* 3. Center */
 
     if (!board[4]) {
         return 4
     }
 
-    /* ---------------------------------------------
-       4. Take CORNER
-    --------------------------------------------- */
+    /* 4. Corner */
 
     const corners = [0, 2, 6, 8].filter(
         (index) => !board[index]
@@ -126,9 +118,7 @@ function getComputerMove(board, computerSide) {
         ]
     }
 
-    /* ---------------------------------------------
-       5. Any remaining square
-    --------------------------------------------- */
+    /* 5. Any empty cell */
 
     const emptySquares = board
         .map((value, index) =>
@@ -145,6 +135,78 @@ function getComputerMove(board, computerSide) {
             Math.random() * emptySquares.length
         )
     ]
+}
+
+/* ======================================================
+   MOVE SOUND
+
+   No external file.
+   Works locally, so slow internet doesn't affect it.
+====================================================== */
+
+function playMoveSound(type = "player") {
+    try {
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext
+
+        if (!AudioContext) return
+
+        const context =
+            CrossGameScreen.audioContext ||
+            new AudioContext()
+
+        CrossGameScreen.audioContext =
+            context
+
+        if (context.state === "suspended") {
+            context.resume().catch(() => {})
+        }
+
+        const oscillator =
+            context.createOscillator()
+
+        const gain =
+            context.createGain()
+
+        oscillator.type = "sine"
+
+        /*
+          Slightly different tone for
+          player and computer.
+        */
+
+        oscillator.frequency.value =
+            type === "computer"
+                ? 520
+                : 680
+
+        gain.gain.setValueAtTime(
+            0.0001,
+            context.currentTime
+        )
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.09,
+            context.currentTime + 0.015
+        )
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            context.currentTime + 0.13
+        )
+
+        oscillator.connect(gain)
+        gain.connect(context.destination)
+
+        oscillator.start()
+
+        oscillator.stop(
+            context.currentTime + 0.14
+        )
+    } catch {
+        /* Sound failure should NEVER stop the game */
+    }
 }
 
 /* ======================================================
@@ -166,7 +228,7 @@ function CelebrationConfetti() {
                 const size =
                     5 + (index % 5)
 
-                const rotate =
+                const rotation =
                     (index * 37) % 360
 
                 return (
@@ -187,7 +249,7 @@ function CelebrationConfetti() {
                                     "#ff8fab",
                                     "#ffffff",
                                 ][index % 6],
-                            rotate,
+                            rotate: rotation,
                         }}
                         animate={{
                             y: [
@@ -205,9 +267,9 @@ function CelebrationConfetti() {
                                     : -25,
                             ],
                             rotate: [
-                                rotate,
-                                rotate + 180,
-                                rotate + 500,
+                                rotation,
+                                rotation + 180,
+                                rotation + 500,
                             ],
                             opacity: [
                                 0,
@@ -232,7 +294,7 @@ function CelebrationConfetti() {
 }
 
 /* ======================================================
-   SIDE SELECTION
+   CHOOSE SIDE
 ====================================================== */
 
 function ChooseSide({ onChoose }) {
@@ -266,8 +328,6 @@ function ChooseSide({ onChoose }) {
                 backdrop-blur-xl
             "
         >
-            {/* Decorative hearts */}
-
             <div className="pointer-events-none absolute -left-3 top-5 text-4xl opacity-30">
                 💕
             </div>
@@ -390,14 +450,14 @@ function ChooseSide({ onChoose }) {
             </div>
 
             <p className="mt-6 text-xs text-gray-400">
-                One move yours • One move mine 🤭
+                কে আগে শুরু করবে সেটা প্রতি game-এ বদলাবে 🤭
             </p>
         </motion.div>
     )
 }
 
 /* ======================================================
-   BOARD
+   GAME BOARD
 ====================================================== */
 
 function GameBoard({
@@ -540,7 +600,7 @@ function GameBoard({
 }
 
 /* ======================================================
-   MAIN
+   MAIN GAME
 ====================================================== */
 
 export default function CrossGameScreen({
@@ -566,11 +626,27 @@ export default function CrossGameScreen({
     const [celebrating, setCelebrating] =
         useState(false)
 
+    /*
+      IMPORTANT:
+
+      false = Computer starts
+      true  = Player starts
+
+      This value is changed after EVERY game.
+    */
+
+    const [playerStarts, setPlayerStarts] =
+        useState(false)
+
+    /*
+      Used to prevent an old computer timer
+      from affecting a newly restarted game.
+    */
+
+    const gameIdRef = useRef(0)
+
     /* ==================================================
        PRELOAD GIFS
-
-       Slow net হলেও result screen-এর GIF আগে থেকেই
-       browser cache-এ রাখার চেষ্টা করবে।
     ================================================== */
 
     useEffect(() => {
@@ -582,20 +658,23 @@ export default function CrossGameScreen({
     }, [])
 
     /* ==================================================
-       START NEW GAME
-
-       Every Try Again gets a completely fresh board.
+       START / RESTART GAME
     ================================================== */
 
     const startGame = (side) => {
+        /*
+          Every call starts a completely fresh game.
+        */
+
+        gameIdRef.current += 1
+
+        const newGameId =
+            gameIdRef.current
+
         setPlayerSide(side)
 
-        setBoard(Array(9).fill(null))
-
-        setTurn(
-            side === "X"
-                ? "X"
-                : "X"
+        setBoard(
+            Array(9).fill(null)
         )
 
         setResult(null)
@@ -605,6 +684,92 @@ export default function CrossGameScreen({
         setComputerThinking(false)
 
         setCelebrating(false)
+
+        /*
+          FIRST GAME:
+          Computer starts.
+
+          NEXT GAME:
+          Player starts.
+
+          Then computer again...
+        */
+
+        const shouldPlayerStart =
+            playerStarts
+
+        const computerSide =
+            side === "X"
+                ? "O"
+                : "X"
+
+        if (shouldPlayerStart) {
+            setTurn(side)
+        } else {
+            setTurn(computerSide)
+        }
+
+        /*
+          Flip starter for NEXT game.
+        */
+
+        setPlayerStarts(
+            (previous) => !previous
+        )
+
+        /*
+          Unlock audio after user has interacted
+          with the Choose X/O button.
+        */
+
+        try {
+            const AudioContext =
+                window.AudioContext ||
+                window.webkitAudioContext
+
+            if (AudioContext) {
+                if (
+                    !CrossGameScreen.audioContext
+                ) {
+                    CrossGameScreen.audioContext =
+                        new AudioContext()
+                }
+
+                const audio =
+                    CrossGameScreen.audioContext
+
+                if (
+                    audio.state ===
+                    "suspended"
+                ) {
+                    audio.resume().catch(
+                        () => {}
+                    )
+                }
+            }
+        } catch {}
+
+        /*
+          If website is starting this game,
+          play its move after a small delay.
+        */
+
+        if (!shouldPlayerStart) {
+            setTimeout(() => {
+                /*
+                  This timeout is only a small visual
+                  delay. Actual computer logic is handled
+                  by the effect below.
+                */
+
+                if (
+                    gameIdRef.current !==
+                    newGameId
+                ) {
+                    return
+                }
+            }, 0)
+        }
     }
 
     /* ==================================================
@@ -622,9 +787,20 @@ export default function CrossGameScreen({
 
         if (board[index]) return
 
+        /*
+          New array.
+          We never mutate React state directly.
+        */
+
         const nextBoard = [...board]
 
         nextBoard[index] = playerSide
+
+        /*
+          Sound for PLAYER move.
+        */
+
+        playMoveSound("player")
 
         const gameResult =
             getGameResult(nextBoard)
@@ -652,19 +828,20 @@ export default function CrossGameScreen({
             return
         }
 
-        setTurn(
+        /*
+          Computer's turn.
+        */
+
+        const computerSide =
             playerSide === "X"
                 ? "O"
                 : "X"
-        )
+
+        setTurn(computerSide)
     }
 
     /* ==================================================
-       COMPUTER MOVE
-
-       IMPORTANT:
-       No second effect is used to restore player turn.
-       Computer itself decides what happens next.
+       COMPUTER TURN
     ================================================== */
 
     useEffect(() => {
@@ -679,13 +856,40 @@ export default function CrossGameScreen({
                 ? "O"
                 : "X"
 
+        /*
+          Not computer's turn.
+        */
+
         if (turn !== computerSide) {
             return
         }
 
+        /*
+          Prevent duplicate computer timers.
+        */
+
+        let cancelled = false
+
         setComputerThinking(true)
 
+        const currentGameId =
+            gameIdRef.current
+
         const timer = setTimeout(() => {
+            if (cancelled) return
+
+            /*
+              If user already started a new game,
+              this old timer does nothing.
+            */
+
+            if (
+                currentGameId !==
+                gameIdRef.current
+            ) {
+                return
+            }
+
             const move =
                 getComputerMove(
                     board,
@@ -699,7 +903,14 @@ export default function CrossGameScreen({
 
             const nextBoard = [...board]
 
-            nextBoard[move] = computerSide
+            nextBoard[move] =
+                computerSide
+
+            /*
+              Sound for COMPUTER move.
+            */
+
+            playMoveSound("computer")
 
             const gameResult =
                 getGameResult(nextBoard)
@@ -729,24 +940,25 @@ export default function CrossGameScreen({
                 return
             }
 
-            /* -----------------------------------------
-               COMPUTER FINISHED
+            /*
+              COMPUTER FINISHED.
 
-               DIRECTLY GIVE TURN BACK TO PLAYER
-            ----------------------------------------- */
+              Now it is ALWAYS player's turn.
+            */
 
             setComputerThinking(false)
 
             setTurn(playerSide)
-        }, 600)
+        }, 650)
 
         return () => {
+            cancelled = true
             clearTimeout(timer)
         }
     }, [
         turn,
-        result,
         playerSide,
+        result,
         board,
     ])
 
@@ -760,6 +972,10 @@ export default function CrossGameScreen({
             : result === "draw"
               ? "It's a Draw! 🤍"
               : "Oops... You Lost 😭"
+
+    /* ==================================================
+       RENDER
+    ================================================== */
 
     return (
         <motion.div
@@ -782,12 +998,12 @@ export default function CrossGameScreen({
         >
 
             {/* ==================================================
-                BEAUTIFUL BACKGROUND
+                BACKGROUND
             ================================================== */}
 
             <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,185,215,0.45),transparent_48%),radial-gradient(circle_at_15%_80%,rgba(210,190,255,0.22),transparent_35%),radial-gradient(circle_at_90%_75%,rgba(255,210,180,0.22),transparent_35%)]" />
 
-            {/* floating decorations */}
+            {/* Floating decoration */}
 
             <motion.div
                 animate={{
@@ -848,7 +1064,7 @@ export default function CrossGameScreen({
                 <AnimatePresence mode="wait">
 
                     {/* ==================================================
-                        CHOOSE X / O
+                        CHOOSE SIDE
                     ================================================== */}
 
                     {!playerSide && (
@@ -859,7 +1075,7 @@ export default function CrossGameScreen({
                     )}
 
                     {/* ==================================================
-                        GAME SCREEN
+                        GAME
                     ================================================== */}
 
                     {playerSide &&
@@ -894,7 +1110,7 @@ export default function CrossGameScreen({
                                 "
                             >
 
-                                {/* card decorations */}
+                                {/* Card decoration */}
 
                                 <div className="pointer-events-none absolute -right-7 -top-7 h-24 w-24 rounded-full bg-pink-100/50 blur-2xl" />
 
@@ -950,6 +1166,7 @@ export default function CrossGameScreen({
                                     </h1>
 
                                     <div className="mt-1 flex items-center justify-center gap-1 text-xs text-gray-400">
+
                                         {computerThinking ? (
                                             <>
                                                 <span>
@@ -965,8 +1182,7 @@ export default function CrossGameScreen({
                                                         ],
                                                     }}
                                                     transition={{
-                                                        duration:
-                                                            1,
+                                                        duration: 1,
                                                         repeat: Infinity,
                                                     }}
                                                 >
@@ -984,6 +1200,7 @@ export default function CrossGameScreen({
                                                 </span>
                                             </>
                                         )}
+
                                     </div>
                                 </div>
 
@@ -1043,11 +1260,10 @@ export default function CrossGameScreen({
 
                                 </div>
 
-                                {/* Small bottom text */}
-
                                 <p className="relative z-10 mt-3 text-center text-[10px] text-gray-300">
                                     Take your best move 😌
                                 </p>
+
                             </motion.div>
                         )}
 
@@ -1080,7 +1296,7 @@ export default function CrossGameScreen({
                                     rounded-[44px]
                                     border
                                     border-white/70
-                                    bg-white/92
+                                    bg-white/95
                                     p-7
                                     text-center
                                     shadow-[0_25px_80px_rgba(70,40,30,0.22)]
@@ -1233,7 +1449,7 @@ export default function CrossGameScreen({
             </div>
 
             {/* ==================================================
-                WIN CONFETTI
+                CONFETTI
             ================================================== */}
 
             <AnimatePresence>
@@ -1242,13 +1458,12 @@ export default function CrossGameScreen({
                 )}
             </AnimatePresence>
 
-            {/* ==================================================
-                SIGNATURE
-            ================================================== */}
+            {/* Signature */}
 
             <div className="pointer-events-none fixed bottom-3 right-4 z-[600] text-xs text-gray-400/70">
                 @Rafee🫶protiva
             </div>
+
         </motion.div>
     )
 }
