@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { RotateCcw, ArrowRight } from "lucide-react"
+import { ArrowRight, RotateCcw } from "lucide-react"
 import Button from "../Button"
 
 /* ======================================================
-   WINNING COMBINATIONS
+   WINNING LINES
 ====================================================== */
 
 const WINNING_LINES = [
@@ -21,10 +21,10 @@ const WINNING_LINES = [
 ]
 
 /* ======================================================
-   CHECK WINNER
+   CHECK GAME RESULT
 ====================================================== */
 
-function getWinner(board) {
+function getGameResult(board) {
     for (const [a, b, c] of WINNING_LINES) {
         if (
             board[a] &&
@@ -49,18 +49,28 @@ function getWinner(board) {
 }
 
 /* ======================================================
-   COMPUTER MOVE
+   COMPUTER AI
 ====================================================== */
 
-function getComputerMove(board, computer) {
-    const player = computer === "X" ? "O" : "X"
+function getComputerMove(board, computerSide) {
+    const playerSide =
+        computerSide === "X" ? "O" : "X"
 
-    // 1. Computer tries to win
+    /* ---------------------------------------------
+       1. Try to WIN
+    --------------------------------------------- */
+
     for (const [a, b, c] of WINNING_LINES) {
-        const values = [board[a], board[b], board[c]]
+        const values = [
+            board[a],
+            board[b],
+            board[c],
+        ]
 
         if (
-            values.filter((value) => value === computer).length === 2 &&
+            values.filter(
+                (value) => value === computerSide
+            ).length === 2 &&
             values.includes(null)
         ) {
             if (!board[a]) return a
@@ -69,12 +79,21 @@ function getComputerMove(board, computer) {
         }
     }
 
-    // 2. Computer blocks player
+    /* ---------------------------------------------
+       2. Block PLAYER
+    --------------------------------------------- */
+
     for (const [a, b, c] of WINNING_LINES) {
-        const values = [board[a], board[b], board[c]]
+        const values = [
+            board[a],
+            board[b],
+            board[c],
+        ]
 
         if (
-            values.filter((value) => value === player).length === 2 &&
+            values.filter(
+                (value) => value === playerSide
+            ).length === 2 &&
             values.includes(null)
         ) {
             if (!board[a]) return a
@@ -83,33 +102,48 @@ function getComputerMove(board, computer) {
         }
     }
 
-    // 3. Center
+    /* ---------------------------------------------
+       3. Take CENTER
+    --------------------------------------------- */
+
     if (!board[4]) {
         return 4
     }
 
-    // 4. Corners
+    /* ---------------------------------------------
+       4. Take CORNER
+    --------------------------------------------- */
+
     const corners = [0, 2, 6, 8].filter(
         (index) => !board[index]
     )
 
     if (corners.length > 0) {
         return corners[
-            Math.floor(Math.random() * corners.length)
+            Math.floor(
+                Math.random() * corners.length
+            )
         ]
     }
 
-    // 5. Any empty cell
-    const empty = board
-        .map((value, index) => (value ? null : index))
+    /* ---------------------------------------------
+       5. Any remaining square
+    --------------------------------------------- */
+
+    const emptySquares = board
+        .map((value, index) =>
+            value ? null : index
+        )
         .filter((value) => value !== null)
 
-    if (empty.length === 0) {
+    if (emptySquares.length === 0) {
         return null
     }
 
-    return empty[
-        Math.floor(Math.random() * empty.length)
+    return emptySquares[
+        Math.floor(
+            Math.random() * emptySquares.length
+        )
     ]
 }
 
@@ -119,16 +153,21 @@ function getComputerMove(board, computer) {
 
 function CelebrationConfetti() {
     const pieces = useMemo(
-        () => Array.from({ length: 90 }),
+        () => Array.from({ length: 80 }),
         []
     )
 
     return (
         <div className="pointer-events-none fixed inset-0 z-[500] overflow-hidden">
             {pieces.map((_, index) => {
-                const left = (index * 37 + 5) % 100
-                const rotation = (index * 43) % 360
-                const size = 5 + (index % 5)
+                const left =
+                    (index * 41 + 7) % 100
+
+                const size =
+                    5 + (index % 5)
+
+                const rotate =
+                    (index * 37) % 360
 
                 return (
                     <motion.span
@@ -148,23 +187,27 @@ function CelebrationConfetti() {
                                     "#ff8fab",
                                     "#ffffff",
                                 ][index % 6],
-                            rotate: rotation,
+                            rotate,
                         }}
                         animate={{
                             y: [
                                 -20,
-                                250,
+                                300,
                                 "110vh",
                             ],
                             x: [
                                 0,
-                                index % 2 === 0 ? 35 : -35,
-                                index % 3 === 0 ? -25 : 25,
+                                index % 2
+                                    ? -35
+                                    : 35,
+                                index % 3
+                                    ? 25
+                                    : -25,
                             ],
                             rotate: [
-                                rotation,
-                                rotation + 180,
-                                rotation + 500,
+                                rotate,
+                                rotate + 180,
+                                rotate + 500,
                             ],
                             opacity: [
                                 0,
@@ -175,10 +218,10 @@ function CelebrationConfetti() {
                         }}
                         transition={{
                             duration:
-                                3.2 +
-                                (index % 5) * 0.25,
+                                3 +
+                                (index % 5) * 0.2,
                             delay:
-                                (index % 15) * 0.04,
+                                (index % 12) * 0.035,
                             ease: "easeOut",
                         }}
                     />
@@ -189,7 +232,172 @@ function CelebrationConfetti() {
 }
 
 /* ======================================================
-   GAME BOARD
+   SIDE SELECTION
+====================================================== */
+
+function ChooseSide({ onChoose }) {
+    return (
+        <motion.div
+            initial={{
+                opacity: 0,
+                scale: 0.92,
+                y: 25,
+            }}
+            animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
+            }}
+            transition={{
+                duration: 0.45,
+            }}
+            className="
+                relative
+                w-full
+                max-w-[420px]
+                overflow-hidden
+                rounded-[42px]
+                border
+                border-white/70
+                bg-white/90
+                p-7
+                text-center
+                shadow-[0_25px_80px_rgba(80,40,60,0.20)]
+                backdrop-blur-xl
+            "
+        >
+            {/* Decorative hearts */}
+
+            <div className="pointer-events-none absolute -left-3 top-5 text-4xl opacity-30">
+                💕
+            </div>
+
+            <div className="pointer-events-none absolute -right-2 bottom-8 text-3xl opacity-30">
+                ✨
+            </div>
+
+            <motion.div
+                animate={{
+                    y: [0, -5, 0],
+                    rotate: [-3, 3, -3],
+                }}
+                transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                }}
+                className="
+                    mx-auto
+                    flex
+                    h-16
+                    w-16
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-gradient-to-br
+                    from-pink-100
+                    to-purple-100
+                    text-3xl
+                    shadow-inner
+                "
+            >
+                🎮
+            </motion.div>
+
+            <h1 className="mt-4 text-3xl font-bold text-[#713b50]">
+                Choose Your Side
+            </h1>
+
+            <p className="mt-2 text-sm text-gray-500">
+                তুমি কোনটা নিয়ে খেলবে? 💗
+            </p>
+
+            <div className="mt-7 grid grid-cols-2 gap-4">
+
+                {/* X */}
+
+                <motion.button
+                    type="button"
+                    onClick={() => onChoose("X")}
+                    whileHover={{
+                        y: -4,
+                    }}
+                    whileTap={{
+                        scale: 0.94,
+                    }}
+                    className="
+                        flex
+                        flex-col
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-[28px]
+                        border-2
+                        border-orange-200
+                        bg-gradient-to-br
+                        from-orange-50
+                        to-yellow-50
+                        py-6
+                        text-orange-500
+                        shadow-[0_12px_30px_rgba(255,150,50,0.15)]
+                    "
+                >
+                    <span className="text-6xl font-black">
+                        ×
+                    </span>
+
+                    <span className="font-semibold">
+                        Play as X
+                    </span>
+                </motion.button>
+
+                {/* O */}
+
+                <motion.button
+                    type="button"
+                    onClick={() => onChoose("O")}
+                    whileHover={{
+                        y: -4,
+                    }}
+                    whileTap={{
+                        scale: 0.94,
+                    }}
+                    className="
+                        flex
+                        flex-col
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-[28px]
+                        border-2
+                        border-gray-200
+                        bg-gradient-to-br
+                        from-gray-50
+                        to-white
+                        py-6
+                        text-black
+                        shadow-[0_12px_30px_rgba(50,50,50,0.12)]
+                    "
+                >
+                    <span className="text-6xl font-black">
+                        ○
+                    </span>
+
+                    <span className="font-semibold">
+                        Play as O
+                    </span>
+                </motion.button>
+
+            </div>
+
+            <p className="mt-6 text-xs text-gray-400">
+                One move yours • One move mine 🤭
+            </p>
+        </motion.div>
+    )
+}
+
+/* ======================================================
+   BOARD
 ====================================================== */
 
 function GameBoard({
@@ -201,11 +409,10 @@ function GameBoard({
     return (
         <div
             className="
-                relative
                 mx-auto
                 w-full
-                max-w-[330px]
-                rounded-[32px]
+                max-w-[335px]
+                rounded-[34px]
                 border-[8px]
                 border-[#d8b995]
                 bg-[#ead5b8]
@@ -218,7 +425,7 @@ function GameBoard({
                     grid
                     grid-cols-3
                     gap-2
-                    rounded-[22px]
+                    rounded-[24px]
                     bg-[#c9aa85]
                     p-2
                 "
@@ -241,7 +448,7 @@ function GameBoard({
                             whileTap={
                                 !disabled && !value
                                     ? {
-                                          scale: 0.92,
+                                          scale: 0.93,
                                       }
                                     : undefined
                             }
@@ -249,13 +456,14 @@ function GameBoard({
                                 relative
                                 aspect-square
                                 overflow-hidden
-                                rounded-[12px]
+                                rounded-[13px]
                                 border
                                 border-[#9f7d59]
                                 bg-gradient-to-br
-                                from-[#f0dfc5]
+                                from-[#f3e2c8]
+                                via-[#e7d1ae]
                                 to-[#cdb08c]
-                                shadow-[inset_0_3px_8px_rgba(255,255,255,0.55),inset_0_-5px_10px_rgba(70,40,20,0.18)]
+                                shadow-[inset_0_3px_8px_rgba(255,255,255,0.55),inset_0_-5px_10px_rgba(70,40,20,0.16)]
                                 ${
                                     isWinning
                                         ? "ring-4 ring-pink-400 shadow-[0_0_25px_rgba(244,114,182,0.75)]"
@@ -267,11 +475,16 @@ function GameBoard({
                                 <motion.div
                                     initial={{
                                         scale: 0,
-                                        rotate: -20,
+                                        rotate: -25,
                                     }}
                                     animate={{
                                         scale: 1,
                                         rotate: 0,
+                                    }}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 400,
+                                        damping: 18,
                                     }}
                                     className="
                                         absolute
@@ -279,12 +492,11 @@ function GameBoard({
                                         flex
                                         items-center
                                         justify-center
-                                        text-[58px]
+                                        text-[60px]
                                         font-black
                                         leading-none
                                         text-orange-500
-                                        drop-shadow-[0_3px_2px_rgba(0,0,0,0.2)]
-                                        md:text-[64px]
+                                        drop-shadow-[0_3px_2px_rgba(0,0,0,0.18)]
                                     "
                                 >
                                     ×
@@ -299,17 +511,21 @@ function GameBoard({
                                     animate={{
                                         scale: 1,
                                     }}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 400,
+                                        damping: 20,
+                                    }}
                                     className="
                                         absolute
                                         inset-0
                                         flex
                                         items-center
                                         justify-center
-                                        text-[55px]
+                                        text-[56px]
                                         font-black
                                         leading-none
                                         text-black
-                                        md:text-[62px]
                                     "
                                 >
                                     ○
@@ -324,121 +540,14 @@ function GameBoard({
 }
 
 /* ======================================================
-   CHOOSE SIDE
+   MAIN
 ====================================================== */
 
-function ChooseSide({ onChoose }) {
-    return (
-        <motion.div
-            initial={{
-                opacity: 0,
-                scale: 0.9,
-                y: 20,
-            }}
-            animate={{
-                opacity: 1,
-                scale: 1,
-                y: 0,
-            }}
-            className="
-                relative
-                z-20
-                mx-auto
-                w-full
-                max-w-[420px]
-                rounded-[42px]
-                border
-                border-white/40
-                bg-white/90
-                p-7
-                text-center
-                shadow-[0_25px_70px_rgba(70,40,30,0.22)]
-                backdrop-blur-xl
-            "
-        >
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-pink-100 text-3xl">
-                🎮
-            </div>
-
-            <h1 className="text-3xl font-bold text-[#713b50]">
-                Choose Your Side
-            </h1>
-
-            <p className="mt-2 text-sm text-gray-500">
-                তুমি কোনটা নিয়ে খেলবে? 💗
-            </p>
-
-            <div className="mt-7 grid grid-cols-2 gap-4">
-                <motion.button
-                    type="button"
-                    onClick={() => onChoose("X")}
-                    whileTap={{ scale: 0.94 }}
-                    className="
-                        flex
-                        flex-col
-                        items-center
-                        justify-center
-                        gap-2
-                        rounded-[28px]
-                        border-2
-                        border-orange-300
-                        bg-orange-50
-                        py-6
-                        text-orange-500
-                        shadow-lg
-                    "
-                >
-                    <span className="text-6xl font-black">
-                        ×
-                    </span>
-
-                    <span className="text-lg font-semibold">
-                        X
-                    </span>
-                </motion.button>
-
-                <motion.button
-                    type="button"
-                    onClick={() => onChoose("O")}
-                    whileTap={{ scale: 0.94 }}
-                    className="
-                        flex
-                        flex-col
-                        items-center
-                        justify-center
-                        gap-2
-                        rounded-[28px]
-                        border-2
-                        border-gray-300
-                        bg-gray-50
-                        py-6
-                        text-black
-                        shadow-lg
-                    "
-                >
-                    <span className="text-6xl font-black">
-                        ○
-                    </span>
-
-                    <span className="text-lg font-semibold">
-                        O
-                    </span>
-                </motion.button>
-            </div>
-
-            <p className="mt-6 text-xs text-gray-400">
-                One move is yours, then one move is mine 😌
-            </p>
-        </motion.div>
-    )
-}
-
-/* ======================================================
-   MAIN GAME
-====================================================== */
-
-export default function CrossGameScreen({ onNext }) {
-    const [playerSide, setPlayerSide] = useState(null)
+export default function CrossGameScreen({
+    onNext,
+}) {
+    const [playerSide, setPlayerSide] =
+        useState(null)
 
     const [board, setBoard] = useState(
         Array(9).fill(null)
@@ -448,7 +557,8 @@ export default function CrossGameScreen({ onNext }) {
 
     const [result, setResult] = useState(null)
 
-    const [winningLine, setWinningLine] = useState([])
+    const [winningLine, setWinningLine] =
+        useState([])
 
     const [computerThinking, setComputerThinking] =
         useState(false)
@@ -456,19 +566,37 @@ export default function CrossGameScreen({ onNext }) {
     const [celebrating, setCelebrating] =
         useState(false)
 
-    const [gameVersion, setGameVersion] = useState(0)
+    /* ==================================================
+       PRELOAD GIFS
 
-    const computerSide =
-        playerSide === "X" ? "O" : "X"
+       Slow net হলেও result screen-এর GIF আগে থেকেই
+       browser cache-এ রাখার চেষ্টা করবে।
+    ================================================== */
+
+    useEffect(() => {
+        const happy = new Image()
+        happy.src = "/gifs/happy.gif"
+
+        const retry = new Image()
+        retry.src = "/gifs/4.webp"
+    }, [])
 
     /* ==================================================
-       START / RESET GAME
+       START NEW GAME
+
+       Every Try Again gets a completely fresh board.
     ================================================== */
 
     const startGame = (side) => {
         setPlayerSide(side)
 
         setBoard(Array(9).fill(null))
+
+        setTurn(
+            side === "X"
+                ? "X"
+                : "X"
+        )
 
         setResult(null)
 
@@ -477,130 +605,13 @@ export default function CrossGameScreen({ onNext }) {
         setComputerThinking(false)
 
         setCelebrating(false)
-
-        setGameVersion((value) => value + 1)
-
-        /*
-          X starts.
-
-          Player X  -> player starts
-          Player O  -> computer starts
-        */
-
-        if (side === "X") {
-            setTurn("X")
-        } else {
-            setTurn("X")
-        }
     }
-
-    /* ==================================================
-       CHECK RESULT
-    ================================================== */
-
-    useEffect(() => {
-        if (!playerSide) return
-
-        const gameResult = getWinner(board)
-
-        if (!gameResult) return
-
-        setResult(gameResult.winner)
-        setWinningLine(gameResult.line)
-        setComputerThinking(false)
-        setTurn(null)
-
-        if (gameResult.winner === playerSide) {
-            setCelebrating(true)
-        }
-    }, [board, playerSide])
-
-    /* ==================================================
-       COMPUTER MOVE
-    ================================================== */
-
-    useEffect(() => {
-        if (!playerSide) return
-        if (!turn) return
-        if (turn !== computerSide) return
-        if (result) return
-        if (computerThinking) return
-
-        setComputerThinking(true)
-
-        const timer = setTimeout(() => {
-            setBoard((currentBoard) => {
-                const move = getComputerMove(
-                    currentBoard,
-                    computerSide
-                )
-
-                if (move === null) {
-                    return currentBoard
-                }
-
-                const nextBoard = [
-                    ...currentBoard,
-                ]
-
-                nextBoard[move] = computerSide
-
-                return nextBoard
-            })
-
-            setComputerThinking(false)
-        }, 700)
-
-        return () => clearTimeout(timer)
-    }, [
-        turn,
-        computerSide,
-        playerSide,
-        result,
-        gameVersion,
-    ])
-
-    /* ==================================================
-       AFTER COMPUTER MOVE
-       Give turn back to player
-    ================================================== */
-
-    useEffect(() => {
-        if (!playerSide) return
-        if (!computerSide) return
-        if (computerThinking) return
-        if (result) return
-
-        const winner = getWinner(board)
-
-        if (winner) return
-
-        const lastMove =
-            board.filter(Boolean).length
-
-        if (lastMove === 0) {
-            return
-        }
-
-        const lastValue =
-            board.findLast?.((value) => value !== null)
-
-        if (lastValue === computerSide) {
-            setTurn(playerSide)
-        }
-    }, [
-        board,
-        playerSide,
-        computerSide,
-        computerThinking,
-        result,
-    ])
 
     /* ==================================================
        PLAYER MOVE
     ================================================== */
 
-    const handleCellClick = (index) => {
+    const handlePlayerMove = (index) => {
         if (!playerSide) return
 
         if (result) return
@@ -615,13 +626,132 @@ export default function CrossGameScreen({ onNext }) {
 
         nextBoard[index] = playerSide
 
+        const gameResult =
+            getGameResult(nextBoard)
+
         setBoard(nextBoard)
 
-        setTurn(computerSide)
+        if (gameResult) {
+            setResult(
+                gameResult.winner
+            )
+
+            setWinningLine(
+                gameResult.line
+            )
+
+            setTurn(null)
+
+            if (
+                gameResult.winner ===
+                playerSide
+            ) {
+                setCelebrating(true)
+            }
+
+            return
+        }
+
+        setTurn(
+            playerSide === "X"
+                ? "O"
+                : "X"
+        )
     }
 
     /* ==================================================
-       RESULT TEXT
+       COMPUTER MOVE
+
+       IMPORTANT:
+       No second effect is used to restore player turn.
+       Computer itself decides what happens next.
+    ================================================== */
+
+    useEffect(() => {
+        if (!playerSide) return
+
+        if (!turn) return
+
+        if (result) return
+
+        const computerSide =
+            playerSide === "X"
+                ? "O"
+                : "X"
+
+        if (turn !== computerSide) {
+            return
+        }
+
+        setComputerThinking(true)
+
+        const timer = setTimeout(() => {
+            const move =
+                getComputerMove(
+                    board,
+                    computerSide
+                )
+
+            if (move === null) {
+                setComputerThinking(false)
+                return
+            }
+
+            const nextBoard = [...board]
+
+            nextBoard[move] = computerSide
+
+            const gameResult =
+                getGameResult(nextBoard)
+
+            setBoard(nextBoard)
+
+            if (gameResult) {
+                setResult(
+                    gameResult.winner
+                )
+
+                setWinningLine(
+                    gameResult.line
+                )
+
+                setTurn(null)
+
+                setComputerThinking(false)
+
+                if (
+                    gameResult.winner ===
+                    playerSide
+                ) {
+                    setCelebrating(true)
+                }
+
+                return
+            }
+
+            /* -----------------------------------------
+               COMPUTER FINISHED
+
+               DIRECTLY GIVE TURN BACK TO PLAYER
+            ----------------------------------------- */
+
+            setComputerThinking(false)
+
+            setTurn(playerSide)
+        }, 600)
+
+        return () => {
+            clearTimeout(timer)
+        }
+    }, [
+        turn,
+        result,
+        playerSide,
+        board,
+    ])
+
+    /* ==================================================
+       RESULT TITLE
     ================================================== */
 
     const resultTitle =
@@ -633,8 +763,15 @@ export default function CrossGameScreen({ onNext }) {
 
     return (
         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{
+                opacity: 0,
+            }}
+            animate={{
+                opacity: 1,
+            }}
+            transition={{
+                duration: 0.35,
+            }}
             className="
                 fixed
                 inset-0
@@ -643,296 +780,461 @@ export default function CrossGameScreen({ onNext }) {
                 bg-[#fff8f2]
             "
         >
-            {/* Background */}
 
-            <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,192,220,0.42),transparent_55%)]" />
+            {/* ==================================================
+                BEAUTIFUL BACKGROUND
+            ================================================== */}
 
-            <div className="pointer-events-none fixed left-[-50px] top-20 text-7xl text-pink-100">
-                ✦
+            <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,185,215,0.45),transparent_48%),radial-gradient(circle_at_15%_80%,rgba(210,190,255,0.22),transparent_35%),radial-gradient(circle_at_90%_75%,rgba(255,210,180,0.22),transparent_35%)]" />
+
+            {/* floating decorations */}
+
+            <motion.div
+                animate={{
+                    y: [0, -10, 0],
+                    rotate: [-5, 5, -5],
+                }}
+                transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                }}
+                className="
+                    pointer-events-none
+                    fixed
+                    left-5
+                    top-28
+                    text-4xl
+                    opacity-35
+                "
+            >
+                💕
+            </motion.div>
+
+            <motion.div
+                animate={{
+                    y: [0, 10, 0],
+                    rotate: [5, -5, 5],
+                }}
+                transition={{
+                    duration: 4.5,
+                    repeat: Infinity,
+                }}
+                className="
+                    pointer-events-none
+                    fixed
+                    right-5
+                    top-36
+                    text-3xl
+                    opacity-30
+                "
+            >
+                ✨
+            </motion.div>
+
+            <div className="pointer-events-none fixed bottom-28 left-5 text-3xl opacity-20">
+                🌸
             </div>
 
-            <div className="pointer-events-none fixed right-[-30px] top-32 text-7xl text-purple-100">
-                ✦
+            <div className="pointer-events-none fixed bottom-32 right-5 text-3xl opacity-20">
+                💗
             </div>
 
-            <div className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center px-4 py-8">
+            {/* ==================================================
+                CONTENT
+            ================================================== */}
+
+            <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-4 py-8">
 
                 <AnimatePresence mode="wait">
 
                     {/* ==================================================
-                        CHOOSE SIDE
+                        CHOOSE X / O
                     ================================================== */}
 
                     {!playerSide && (
                         <ChooseSide
-                            key="choose"
+                            key="choose-side"
                             onChoose={startGame}
                         />
                     )}
 
                     {/* ==================================================
-                        GAME
+                        GAME SCREEN
                     ================================================== */}
 
-                    {playerSide && !result && (
-                        <motion.div
-                            key={`game-${gameVersion}`}
-                            initial={{
-                                opacity: 0,
-                                scale: 0.94,
-                            }}
-                            animate={{
-                                opacity: 1,
-                                scale: 1,
-                            }}
-                            className="
-                                relative
-                                w-full
-                                max-w-[440px]
-                                rounded-[44px]
-                                border
-                                border-white/60
-                                bg-white/85
-                                p-5
-                                shadow-[0_25px_70px_rgba(70,40,30,0.20)]
-                                backdrop-blur-xl
-                            "
-                        >
-                            <div className="text-center">
+                    {playerSide &&
+                        !result && (
+                            <motion.div
+                                key="game-screen"
+                                initial={{
+                                    opacity: 0,
+                                    scale: 0.96,
+                                    y: 15,
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    scale: 1,
+                                    y: 0,
+                                }}
+                                transition={{
+                                    duration: 0.4,
+                                }}
+                                className="
+                                    relative
+                                    w-full
+                                    max-w-[440px]
+                                    overflow-hidden
+                                    rounded-[44px]
+                                    border
+                                    border-white/70
+                                    bg-white/90
+                                    p-5
+                                    shadow-[0_25px_80px_rgba(70,40,30,0.20)]
+                                    backdrop-blur-xl
+                                "
+                            >
 
-                                <div className="flex items-center justify-center gap-2">
-                                    <span className="text-sm text-gray-500">
-                                        You are
-                                    </span>
+                                {/* card decorations */}
 
-                                    <span
-                                        className={`
-                                            rounded-full
-                                            px-4
-                                            py-1
-                                            text-xl
-                                            font-black
-                                            ${
-                                                playerSide === "X"
-                                                    ? "bg-orange-100 text-orange-500"
-                                                    : "bg-gray-100 text-black"
-                                            }
-                                        `}
-                                    >
-                                        {playerSide === "X"
-                                            ? "×"
-                                            : "○"}
-                                    </span>
+                                <div className="pointer-events-none absolute -right-7 -top-7 h-24 w-24 rounded-full bg-pink-100/50 blur-2xl" />
+
+                                <div className="pointer-events-none absolute -bottom-10 -left-10 h-28 w-28 rounded-full bg-purple-100/50 blur-2xl" />
+
+                                {/* Header */}
+
+                                <div className="relative z-10 text-center">
+
+                                    <div className="flex items-center justify-center gap-2">
+
+                                        <span className="text-sm text-gray-500">
+                                            You are
+                                        </span>
+
+                                        <motion.span
+                                            animate={{
+                                                y: [
+                                                    0,
+                                                    -2,
+                                                    0,
+                                                ],
+                                            }}
+                                            transition={{
+                                                duration: 2,
+                                                repeat: Infinity,
+                                            }}
+                                            className={`
+                                                rounded-full
+                                                px-4
+                                                py-1
+                                                text-xl
+                                                font-black
+                                                shadow-sm
+                                                ${
+                                                    playerSide ===
+                                                    "X"
+                                                        ? "bg-orange-100 text-orange-500"
+                                                        : "bg-gray-100 text-black"
+                                                }
+                                            `}
+                                        >
+                                            {playerSide ===
+                                            "X"
+                                                ? "×"
+                                                : "○"}
+                                        </motion.span>
+
+                                    </div>
+
+                                    <h1 className="mt-3 text-[29px] font-bold tracking-tight text-[#713b50]">
+                                        Tic-Tac-Toe 💕
+                                    </h1>
+
+                                    <div className="mt-1 flex items-center justify-center gap-1 text-xs text-gray-400">
+                                        {computerThinking ? (
+                                            <>
+                                                <span>
+                                                    My turn
+                                                </span>
+
+                                                <motion.span
+                                                    animate={{
+                                                        opacity: [
+                                                            0.3,
+                                                            1,
+                                                            0.3,
+                                                        ],
+                                                    }}
+                                                    transition={{
+                                                        duration:
+                                                            1,
+                                                        repeat: Infinity,
+                                                    }}
+                                                >
+                                                    🤔
+                                                </motion.span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>
+                                                    Your turn
+                                                </span>
+
+                                                <span>
+                                                    ✨
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <h1 className="mt-3 text-2xl font-bold text-[#713b50]">
-                                    Tic-Tac-Toe 💕
-                                </h1>
+                                {/* Board */}
 
-                                <p className="mt-1 text-xs text-gray-400">
-                                    {computerThinking
-                                        ? "My turn... 🤔"
-                                        : "Your turn — make a move ✨"}
+                                <div className="relative z-10 mt-6">
+                                    <GameBoard
+                                        board={board}
+                                        onCellClick={
+                                            handlePlayerMove
+                                        }
+                                        disabled={
+                                            computerThinking ||
+                                            turn !==
+                                                playerSide
+                                        }
+                                        winningLine={
+                                            winningLine
+                                        }
+                                    />
+                                </div>
+
+                                {/* Legend */}
+
+                                <div className="relative z-10 mt-5 flex items-center justify-center gap-3 text-xs text-gray-400">
+
+                                    <span>
+                                        You:{" "}
+                                        <b
+                                            className={
+                                                playerSide ===
+                                                "X"
+                                                    ? "text-orange-500"
+                                                    : "text-black"
+                                            }
+                                        >
+                                            {playerSide ===
+                                            "X"
+                                                ? "×"
+                                                : "○"}
+                                        </b>
+                                    </span>
+
+                                    <span className="text-pink-200">
+                                        ♥
+                                    </span>
+
+                                    <span>
+                                        Me:{" "}
+                                        <b>
+                                            {playerSide ===
+                                            "X"
+                                                ? "○"
+                                                : "×"}
+                                        </b>
+                                    </span>
+
+                                </div>
+
+                                {/* Small bottom text */}
+
+                                <p className="relative z-10 mt-3 text-center text-[10px] text-gray-300">
+                                    Take your best move 😌
                                 </p>
-                            </div>
-
-                            <div className="mt-6">
-                                <GameBoard
-                                    board={board}
-                                    onCellClick={
-                                        handleCellClick
-                                    }
-                                    disabled={
-                                        computerThinking ||
-                                        turn !== playerSide
-                                    }
-                                    winningLine={
-                                        winningLine
-                                    }
-                                />
-                            </div>
-
-                            <div className="mt-5 flex items-center justify-center gap-2 text-xs text-gray-400">
-                                <span>
-                                    You:{" "}
-                                    <b>
-                                        {playerSide === "X"
-                                            ? "×"
-                                            : "○"}
-                                    </b>
-                                </span>
-
-                                <span>•</span>
-
-                                <span>
-                                    Me:{" "}
-                                    <b>
-                                        {computerSide === "X"
-                                            ? "×"
-                                            : "○"}
-                                    </b>
-                                </span>
-                            </div>
-                        </motion.div>
-                    )}
+                            </motion.div>
+                        )}
 
                     {/* ==================================================
                         RESULT
                     ================================================== */}
 
-                    {playerSide && result && (
-                        <motion.div
-                            key={`result-${gameVersion}`}
-                            initial={{
-                                opacity: 0,
-                                scale: 0.85,
-                                y: 20,
-                            }}
-                            animate={{
-                                opacity: 1,
-                                scale: 1,
-                                y: 0,
-                            }}
-                            className="
-                                relative
-                                w-full
-                                max-w-[420px]
-                                rounded-[44px]
-                                border
-                                border-white/60
-                                bg-white/90
-                                p-7
-                                text-center
-                                shadow-[0_25px_80px_rgba(70,40,30,0.24)]
-                                backdrop-blur-xl
-                            "
-                        >
+                    {playerSide &&
+                        result && (
+                            <motion.div
+                                key="result-screen"
+                                initial={{
+                                    opacity: 0,
+                                    scale: 0.88,
+                                    y: 20,
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    scale: 1,
+                                    y: 0,
+                                }}
+                                transition={{
+                                    duration: 0.45,
+                                }}
+                                className="
+                                    relative
+                                    w-full
+                                    max-w-[420px]
+                                    overflow-hidden
+                                    rounded-[44px]
+                                    border
+                                    border-white/70
+                                    bg-white/92
+                                    p-7
+                                    text-center
+                                    shadow-[0_25px_80px_rgba(70,40,30,0.22)]
+                                    backdrop-blur-xl
+                                "
+                            >
 
-                            {/* =========================
-                                WIN
-                            ========================= */}
+                                {/* WIN */}
 
-                            {result === playerSide ? (
-                                <>
-                                    <motion.div
-                                        animate={{
-                                            rotate: [
-                                                -8,
-                                                8,
-                                                -8,
-                                            ],
-                                            scale: [
-                                                1,
-                                                1.1,
-                                                1,
-                                            ],
-                                        }}
-                                        transition={{
-                                            duration: 1.5,
-                                            repeat: Infinity,
-                                        }}
-                                        className="text-6xl"
-                                    >
-                                        🏆
-                                    </motion.div>
-
-                                    <h1 className="mt-3 text-3xl font-bold text-pink-500">
-                                        You Win! 🎉
-                                    </h1>
-
-                                    <p className="mt-2 text-sm text-gray-500">
-                                        I knew you could do it,
-                                        Cutie! 💗
-                                    </p>
-
-                                    <div className="mt-5 overflow-hidden rounded-[28px] border border-pink-100 bg-pink-50 p-3 shadow-inner">
-                                        <img
-                                            src="/gifs/happy.gif"
-                                            alt="Happy celebration"
-                                            className="mx-auto h-[190px] w-full object-contain"
-                                        />
-                                    </div>
-
-                                    <div className="mt-6">
-                                        <Button
-                                            onClick={onNext}
-                                            className="
-                                                min-w-[210px]
-                                                justify-center
-                                                bg-gradient-to-r
-                                                from-pink-400
-                                                to-fuchsia-500
-                                                text-white
-                                                shadow-[0_10px_35px_rgba(255,80,170,0.3)]
-                                            "
+                                {result ===
+                                playerSide ? (
+                                    <>
+                                        <motion.div
+                                            animate={{
+                                                y: [
+                                                    0,
+                                                    -8,
+                                                    0,
+                                                ],
+                                                rotate: [
+                                                    -5,
+                                                    5,
+                                                    -5,
+                                                ],
+                                            }}
+                                            transition={{
+                                                duration: 1.4,
+                                                repeat: Infinity,
+                                            }}
+                                            className="text-6xl"
                                         >
-                                            Continue
-                                            <ArrowRight
-                                                size={19}
+                                            🏆
+                                        </motion.div>
+
+                                        <h1 className="mt-3 text-3xl font-bold text-pink-500">
+                                            You Win! 🎉
+                                        </h1>
+
+                                        <p className="mt-2 text-sm text-gray-500">
+                                            I knew you could
+                                            do it, Cutie! 💗
+                                        </p>
+
+                                        <div className="mt-5 overflow-hidden rounded-[28px] border border-pink-100 bg-pink-50 p-3">
+                                            <img
+                                                src="/gifs/happy.gif"
+                                                alt="Happy celebration"
+                                                className="mx-auto h-[190px] w-full object-contain"
                                             />
-                                        </Button>
-                                    </div>
-                                </>
-                            ) : (
-                                /* =========================
-                                   LOSS / DRAW
-                                ========================= */
+                                        </div>
 
-                                <>
-                                    <div className="text-6xl">
-                                        {result === "draw"
-                                            ? "🤍"
-                                            : "😭"}
-                                    </div>
+                                        <div className="mt-6">
+                                            <Button
+                                                onClick={
+                                                    onNext
+                                                }
+                                                className="
+                                                    min-w-[210px]
+                                                    justify-center
+                                                    bg-gradient-to-r
+                                                    from-pink-400
+                                                    to-fuchsia-500
+                                                    text-white
+                                                    shadow-[0_10px_35px_rgba(255,80,170,0.30)]
+                                                "
+                                            >
+                                                Continue
 
-                                    <h1 className="mt-3 text-3xl font-bold text-[#713b50]">
-                                        {resultTitle}
-                                    </h1>
-
-                                    <p className="mt-2 text-sm text-gray-500">
-                                        Don't worry... try again 💗
-                                    </p>
-
-                                    <div className="mt-5 overflow-hidden rounded-[28px] border border-gray-100 bg-gray-50 p-3 shadow-inner">
-                                        <img
-                                            src="/gifs/4.webp"
-                                            alt="Try again"
-                                            className="mx-auto h-[190px] w-full object-contain"
-                                        />
-                                    </div>
-
-                                    <div className="mt-6">
-                                        <Button
-                                            onClick={() =>
-                                                startGame(
-                                                    playerSide
-                                                )
-                                            }
-                                            className="
-                                                min-w-[210px]
-                                                justify-center
-                                                bg-gradient-to-r
-                                                from-pink-400
-                                                to-purple-500
-                                                text-white
-                                                shadow-[0_10px_35px_rgba(180,80,220,0.25)]
-                                            "
+                                                <ArrowRight
+                                                    size={
+                                                        19
+                                                    }
+                                                />
+                                            </Button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <motion.div
+                                            animate={{
+                                                y: [
+                                                    0,
+                                                    -5,
+                                                    0,
+                                                ],
+                                            }}
+                                            transition={{
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                            }}
+                                            className="text-6xl"
                                         >
-                                            <RotateCcw
-                                                size={18}
+                                            {result ===
+                                            "draw"
+                                                ? "🤍"
+                                                : "😭"}
+                                        </motion.div>
+
+                                        <h1 className="mt-3 text-3xl font-bold text-[#713b50]">
+                                            {resultTitle}
+                                        </h1>
+
+                                        <p className="mt-2 text-sm text-gray-500">
+                                            No worries...
+                                            Let's try again
+                                            💗
+                                        </p>
+
+                                        <div className="mt-5 overflow-hidden rounded-[28px] border border-gray-100 bg-gray-50 p-3">
+                                            <img
+                                                src="/gifs/4.webp"
+                                                alt="Try again"
+                                                className="mx-auto h-[190px] w-full object-contain"
                                             />
-                                            Try Again
-                                        </Button>
-                                    </div>
-                                </>
-                            )}
-                        </motion.div>
-                    )}
+                                        </div>
+
+                                        <div className="mt-6">
+                                            <Button
+                                                onClick={() =>
+                                                    startGame(
+                                                        playerSide
+                                                    )
+                                                }
+                                                className="
+                                                    min-w-[210px]
+                                                    justify-center
+                                                    bg-gradient-to-r
+                                                    from-pink-400
+                                                    to-purple-500
+                                                    text-white
+                                                    shadow-[0_10px_35px_rgba(180,80,220,0.25)]
+                                                "
+                                            >
+                                                <RotateCcw
+                                                    size={
+                                                        18
+                                                    }
+                                                />
+
+                                                Try Again
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
+
+                            </motion.div>
+                        )}
 
                 </AnimatePresence>
             </div>
 
-            {/* Celebration */}
+            {/* ==================================================
+                WIN CONFETTI
+            ================================================== */}
 
             <AnimatePresence>
                 {celebrating && (
@@ -940,7 +1242,9 @@ export default function CrossGameScreen({ onNext }) {
                 )}
             </AnimatePresence>
 
-            {/* Signature */}
+            {/* ==================================================
+                SIGNATURE
+            ================================================== */}
 
             <div className="pointer-events-none fixed bottom-3 right-4 z-[600] text-xs text-gray-400/70">
                 @Rafee🫶protiva
