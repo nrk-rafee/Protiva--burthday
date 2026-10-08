@@ -267,6 +267,7 @@ function createLetters() {
             }
 
             counter++
+
             return current
         })
     )
@@ -281,13 +282,6 @@ function FireworkLetter({
     visible,
     balloonPhase,
 }) {
-    const totalLetters = 17
-
-    /*
-      Position letters in three lines.
-      They stay below the birthday card.
-    */
-
     const wordPositions = {
         0: {
             top: "8%",
@@ -304,11 +298,6 @@ function FireworkLetter({
     }
 
     const position = wordPositions[item.wordIndex]
-
-    /*
-      Spread letters horizontally according
-      to their position inside each word.
-    */
 
     const wordLengths = {
         0: 5,
@@ -593,8 +582,18 @@ function BirthdayFireworkShow({
                 setVisibleCount(index + 1)
 
                 /*
-                  Exactly when the LAST letter appears,
-                  change the card GIF.
+                  IMPORTANT:
+                  Only tell the parent that the GIF
+                  should change.
+
+                  We DO NOT reset:
+                  - visibleCount
+                  - balloonPhase
+                  - letters
+                  - this component
+
+                  Therefore the birthday animation
+                  continues exactly where it is.
                 */
 
                 if (index === letters.length - 1) {
@@ -665,7 +664,11 @@ function BirthdayFireworkShow({
                                 0.8,
                                 0.15,
                             ],
-                            scale: [0.6, 1.4, 0.6],
+                            scale: [
+                                0.6,
+                                1.4,
+                                0.6,
+                            ],
                         }}
                         transition={{
                             duration:
@@ -679,6 +682,8 @@ function BirthdayFireworkShow({
                     />
                 )
             )}
+
+            {/* Birthday letters */}
 
             {letters.map((item, index) => (
                 <FireworkLetter
@@ -741,9 +746,16 @@ export default function IntroScreen({ onNext }) {
         useState(false)
 
     /*
-      GIF control:
-      false = /gifs/121.webp
-      true  = /gifs/5.webp
+      IMPORTANT:
+
+      false = first GIF
+              /gifs/121.webp
+
+      true = second GIF
+             /gifs/5.webp
+
+      This state ONLY controls the GIF.
+      It does NOT control the birthday animation.
     */
 
     const [showSecondGif, setShowSecondGif] =
@@ -961,9 +973,17 @@ export default function IntroScreen({ onNext }) {
                             <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
                             {/* ==================================================
-                                GIF AREA
-                                121.webp stays until the LAST letter appears.
-                                Then changes to 5.webp.
+                                ONLY GIF AREA IS CHANGED
+                                
+                                1st:
+                                /gifs/121.webp
+
+                                After ALL letters are visible:
+                                /gifs/5.webp
+
+                                IMPORTANT:
+                                The BirthdayFireworkShow itself is NOT
+                                recreated/remounted here.
                             ================================================== */}
 
                             <div
@@ -983,61 +1003,29 @@ export default function IntroScreen({ onNext }) {
                                     shadow-inner
                                 "
                             >
-                                <AnimatePresence mode="wait">
-                                    {!showSecondGif ? (
-                                        <motion.img
-                                            key="gif-121"
-                                            src="/gifs/121.webp"
-                                            alt="Birthday"
-                                            initial={{
-                                                opacity: 0,
-                                                scale: 0.9,
-                                            }}
-                                            animate={{
-                                                opacity: 1,
-                                                scale: 1,
-                                            }}
-                                            exit={{
-                                                opacity: 0,
-                                                scale: 0.9,
-                                            }}
-                                            transition={{
-                                                duration: 0.3,
-                                            }}
-                                            className="
-                                                relative
-                                                z-10
-                                                h-[95px]
-                                                w-[95px]
-                                                object-contain
-                                            "
-                                        />
-                                    ) : (
-                                        <motion.img
-                                            key="gif-5"
-                                            src="/gifs/5.webp"
-                                            alt="Birthday"
-                                            initial={{
-                                                opacity: 0,
-                                                scale: 0.9,
-                                            }}
-                                            animate={{
-                                                opacity: 1,
-                                                scale: 1,
-                                            }}
-                                            transition={{
-                                                duration: 0.4,
-                                            }}
-                                            className="
-                                                relative
-                                                z-10
-                                                h-[95px]
-                                                w-[95px]
-                                                object-contain
-                                            "
-                                        />
-                                    )}
-                                </AnimatePresence>
+                                <motion.img
+                                    key={
+                                        showSecondGif
+                                            ? "gif-5"
+                                            : "gif-121"
+                                    }
+                                    src={
+                                        showSecondGif
+                                            ? "/gifs/5.webp"
+                                            : "/gifs/121.webp"
+                                    }
+                                    alt="Birthday animation"
+                                    className="h-full w-full object-contain"
+                                    initial={{
+                                        opacity: 0,
+                                    }}
+                                    animate={{
+                                        opacity: 1,
+                                    }}
+                                    transition={{
+                                        duration: 0.35,
+                                    }}
+                                />
                             </div>
 
                             {/* Old title */}
@@ -1072,9 +1060,20 @@ export default function IntroScreen({ onNext }) {
                     ================================================== */}
 
                     <BirthdayFireworkShow
+                        /*
+                          This only changes the GIF.
+
+                          It does NOT restart the firework animation.
+                        */
                         onAllLettersShown={() =>
                             setShowSecondGif(true)
                         }
+
+                        /*
+                          This remains exactly responsible
+                          for the button appearing after
+                          balloons finish.
+                        */
                         onFinished={() =>
                             setShowStartButton(true)
                         }
