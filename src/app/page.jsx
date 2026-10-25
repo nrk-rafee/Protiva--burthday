@@ -1,7 +1,6 @@
-
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import LoaderScreen from "@/components/screens/LoaderScreen"
 import IntroScreen from "@/components/screens/IntroScreen"
@@ -15,89 +14,94 @@ import HugScreen from "@/components/screens/HugScreen"
 
 export default function HomePage() {
     const [currentScreen, setCurrentScreen] = useState(0)
+    const [musicStarted, setMusicStarted] = useState(false)
+
+    const audioRef = useRef(null)
 
     const goToScreen = useCallback((screen) => {
         setCurrentScreen(screen)
     }, [])
 
-    switch (currentScreen) {
-        // 0 — LOADER
-        case 0:
-            return (
-                <main className="relative min-h-screen overflow-hidden">
-                    <LoaderScreen onDone={() => goToScreen(1)} />
-                </main>
-            )
+    // Start music after the password screen is unlocked
+    useEffect(() => {
+        const audio = audioRef.current
 
-        // 1 — INTRO
-        case 1:
-            return (
+        if (!audio || !musicStarted) return
+
+        audio.play().catch((error) => {
+            console.log("Music playback could not start:", error)
+        })
+    }, [musicStarted])
+
+    // Called when LoaderScreen unlocks successfully
+    const handleUnlock = useCallback(() => {
+        setMusicStarted(true)
+        setCurrentScreen(1)
+    }, [])
+
+    return (
+        <>
+            {/* Background music stays mounted across all screens */}
+            <audio
+                ref={audioRef}
+                src="/images/birthdaysong.mp3"
+                preload="auto"
+                loop
+            />
+
+            {currentScreen === 0 && (
+                <main className="relative min-h-screen overflow-hidden">
+                    <LoaderScreen onDone={handleUnlock} />
+                </main>
+            )}
+
+            {currentScreen === 1 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <IntroScreen onNext={() => goToScreen(2)} />
                 </main>
-            )
+            )}
 
-        // 2 — CAKE
-        case 2:
-            return (
+            {currentScreen === 2 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <CakeScreen onNext={() => goToScreen(3)} />
                 </main>
-            )
+            )}
 
-        // 3 — BALLOON GAME
-        case 3:
-            return (
+            {currentScreen === 3 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <BalloonGameScreen onNext={() => goToScreen(4)} />
                 </main>
-            )
+            )}
 
-        // 4 — X / O GAME
-        case 4:
-            return (
+            {currentScreen === 4 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <CrossGameScreen onNext={() => goToScreen(5)} />
                 </main>
-            )
+            )}
 
-        // 5 — PHOTO GALLERY
-        case 5:
-            return (
+            {currentScreen === 5 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <PhotosScreen onNext={() => goToScreen(6)} />
                 </main>
-            )
+            )}
 
-        // 6 — PUZZLE
-        case 6:
-            return (
+            {currentScreen === 6 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <PuzzleScreen onNext={() => goToScreen(7)} />
                 </main>
-            )
+            )}
 
-        // 7 — BIRTHDAY MESSAGE
-        case 7:
-            return (
+            {currentScreen === 7 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <MessageScreen onNext={() => goToScreen(8)} />
                 </main>
-            )
+            )}
 
-        // 8 — VIRTUAL HUG
-        case 8:
-            return (
+            {currentScreen === 8 && (
                 <main className="relative min-h-screen overflow-hidden">
                     <HugScreen />
                 </main>
-            )
-
-        default:
-            return (
-                <main className="relative min-h-screen overflow-hidden">
-                    <MessageScreen onNext={() => goToScreen(8)} />
-                </main>
-            )
-    }
+            )}
+        </>
+    )
 }
