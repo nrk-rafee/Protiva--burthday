@@ -1,10 +1,10 @@
 
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
-const paragraphs = [
+const messageParagraphs = [
   {
     text: "Happy Birthday, Cutiepie! 💗",
     className: "text-[17px] font-medium text-gray-700",
@@ -35,15 +35,18 @@ const paragraphs = [
   },
 ]
 
-const fullMessage = paragraphs.map((p) => p.text).join("\n\n")
+const completeMessage = messageParagraphs
+  .map((paragraph) => paragraph.text)
+  .join("\n\n")
 
-const snowflakes = Array.from({ length: 30 }, (_, i) => ({
+const snowflakes = Array.from({ length: 32 }, (_, i) => ({
   id: i,
   left: `${(i * 37 + 11) % 100}%`,
-  delay: (i % 10) * 0.45,
-  duration: 6 + (i % 5) * 1.5,
-  size: 3 + (i % 3) * 1.5,
-  drift: ((i % 7) - 3) * 15,
+  delay: (i % 11) * 0.42,
+  duration: 6 + (i % 6) * 1.4,
+  size: 3 + (i % 4) * 1.2,
+  drift: ((i % 7) - 3) * 17,
+  opacity: 0.25 + (i % 5) * 0.1,
 }))
 
 export default function MessageScreen({ onNext }) {
@@ -51,6 +54,75 @@ export default function MessageScreen({ onNext }) {
   const [typedText, setTypedText] = useState("")
   const [typingDone, setTypingDone] = useState(false)
 
+  const audioContextRef = useRef(null)
+
+  // Create a tiny, soft keyboard-like click sound.
+  const playTypingSound = () => {
+    const audioContext = audioContextRef.current
+
+    if (!audioContext || audioContext.state !== "running") return
+
+    try {
+      const duration = 0.022
+      const sampleRate = audioContext.sampleRate
+      const buffer = audioContext.createBuffer(
+        1,
+        Math.floor(sampleRate * duration),
+        sampleRate
+      )
+
+      const data = buffer.getChannelData(0)
+
+      for (let i = 0; i < data.length; i++) {
+        data[i] = Math.random() * 2 - 1
+      }
+
+      const source = audioContext.createBufferSource()
+      const filter = audioContext.createBiquadFilter()
+      const gain = audioContext.createGain()
+
+      filter.type = "highpass"
+      filter.frequency.value = 1400
+
+      const now = audioContext.currentTime
+
+      gain.gain.setValueAtTime(0.0001, now)
+      gain.gain.exponentialRampToValueAtTime(0.045, now + 0.003)
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration)
+
+      source.buffer = buffer
+      source.connect(filter)
+      filter.connect(gain)
+      gain.connect(audioContext.destination)
+
+      source.start(now)
+      source.stop(now + duration)
+    } catch {
+      // Keep the animation working if sound is unavailable.
+    }
+  }
+
+  // Audio starts after the user taps the envelope.
+  const openLetter = async () => {
+    try {
+      const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext
+
+      if (AudioContextClass && !audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass()
+      }
+
+      if (audioContextRef.current?.state === "suspended") {
+        await audioContextRef.current.resume()
+      }
+    } catch {
+      // The letter still works if audio is blocked.
+    }
+
+    setStarted(true)
+  }
+
+  // Type the complete message one character at a time.
   useEffect(() => {
     if (!started) return
 
@@ -60,38 +132,56 @@ export default function MessageScreen({ onNext }) {
     setTypedText("")
     setTypingDone(false)
 
-    function typeNext() {
+    const typeNextCharacter = () => {
       index += 1
-      setTypedText(fullMessage.slice(0, index))
 
-      if (index < fullMessage.length) {
-        const character = fullMessage[index - 1]
+      const character = completeMessage[index - 1]
 
+      setTypedText(completeMessage.slice(0, index))
+
+      // Play a soft sound for each typed character.
+      if (character && !/\s/.test(character)) {
+        playTypingSound()
+      }
+
+      if (index < completeMessage.length) {
         const delay =
           character === "\n"
             ? 180
-            : ".,!💗🫶".includes(character)
-              ? 150
-              : 27
+            : ".!💗🫶".includes(character)
+              ? 240
+              : character === ","
+                ? 110
+                : 28
 
-        timeoutId = setTimeout(typeNext, delay)
+        timeoutId = setTimeout(typeNextCharacter, delay)
       } else {
         setTypingDone(true)
       }
     }
 
-    timeoutId = setTimeout(typeNext, 650)
+    timeoutId = setTimeout(typeNextCharacter, 500)
 
     return () => clearTimeout(timeoutId)
   }, [started])
+
+  // Release audio resources when leaving this screen.
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {})
+        audioContextRef.current = null
+      }
+    }
+  }, [])
 
   let characterOffset = 0
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.96, y: 15 }}
+      initial={{ opacity: 0, scale: 0.96, y: 18 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.65, ease: "easeOut" }}
       className="
         relative isolate mx-auto my-5
         flex min-h-[78dvh] w-full max-w-[440px]
@@ -115,14 +205,20 @@ export default function MessageScreen({ onNext }) {
               left: flake.left,
               width: flake.size,
               height: flake.size,
-              boxShadow: "0 0 7px rgba(244,114,182,0.35)",
+              opacity: flake.opacity,
+              boxShadow: "0 0 7px rgba(244, 114, 182, 0.3)",
             }}
             animate={
               started && !typingDone
                 ? {
                     y: ["0%", "110dvh"],
                     x: [0, flake.drift, -flake.drift / 2, 0],
-                    opacity: [0, 0.65, 0.4, 0],
+                    opacity: [
+                      0,
+                      flake.opacity,
+                      flake.opacity * 0.8,
+                      0,
+                    ],
                   }
                 : { y: 0, opacity: 0 }
             }
@@ -134,15 +230,15 @@ export default function MessageScreen({ onNext }) {
                     repeat: Infinity,
                     ease: "linear",
                   }
-                : { duration: 0.3 }
+                : { duration: 0.4 }
             }
           />
         ))}
       </div>
 
-      {/* Centered page content */}
       <div className="relative z-10 flex w-full flex-col items-center">
-        <div className="mb-6 text-center">
+        {/* Heading */}
+        <div className="mb-5 text-center">
           <h2 className="text-2xl font-semibold text-pink-600 sm:text-3xl">
             A Special Message 💌
           </h2>
@@ -154,58 +250,47 @@ export default function MessageScreen({ onNext }) {
 
         <AnimatePresence mode="wait">
           {!started ? (
+            /* Envelope screen — the extra GIF has been removed */
             <motion.div
               key="envelope"
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9, y: -12 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, scale: 0.88, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: -15 }}
+              transition={{ duration: 0.55 }}
               className="flex w-full flex-col items-center"
             >
-              {/* Envelope above the clickable card */}
-              <motion.div
-                animate={{ y: [0, -5, 0] }}
-                transition={{
-                  duration: 2.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="mb-6 flex h-24 items-center justify-center text-[100px] leading-none"
-                aria-hidden="true"
-              >
-                ✉️
-              </motion.div>
-
-              {/* GIF is INSIDE the card, not above it */}
               <motion.button
                 type="button"
-                onClick={() => setStarted(true)}
-                whileHover={{ scale: 1.015 }}
+                onClick={openLetter}
+                whileHover={{ scale: 1.025 }}
                 whileTap={{ scale: 0.97 }}
                 className="
-                  flex min-h-[220px] w-full
+                  group flex min-h-[230px] w-full
                   flex-col items-center justify-center
-                  rounded-[32px] border border-pink-300/70
-                  bg-gradient-to-br from-white via-[#fff8fc] to-pink-100
-                  px-5 py-7
-                  shadow-[0_0_28px_rgba(236,72,153,0.12)]
+                  rounded-[32px] border border-pink-300
+                  bg-gradient-to-br from-[#fff0fa] via-white to-pink-100
+                  px-5 py-8
+                  shadow-[0_0_30px_rgba(236,72,153,0.13)]
                   transition-shadow duration-300
-                  hover:shadow-[0_0_35px_rgba(236,72,153,0.2)]
+                  hover:shadow-[0_0_38px_rgba(236,72,153,0.24)]
                 "
               >
-                <motion.div
-                  animate={{ scale: [1, 1.04, 1] }}
-                  transition={{ duration: 1.8, repeat: Infinity }}
-                  className="flex h-[105px] w-full items-center justify-center"
+                <motion.span
+                  animate={{
+                    y: [0, -5, 0],
+                    rotate: [0, -2, 2, 0],
+                  }}
+                  transition={{
+                    duration: 2.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="text-7xl"
                 >
-                  <img
-                    src="/gifs/msg.gif"
-                    alt="A special animated message"
-                    className="max-h-[105px] max-w-full object-contain"
-                  />
-                </motion.div>
+                  💌
+                </motion.span>
 
-                <span className="mt-4 text-center text-lg font-semibold text-pink-500">
+                <span className="mt-6 text-center text-lg font-semibold text-pink-500">
                   Tap to see what's inside
                 </span>
 
@@ -215,12 +300,13 @@ export default function MessageScreen({ onNext }) {
               </motion.button>
             </motion.div>
           ) : (
+            /* Animated letter */
             <motion.div
               key="letter"
               initial={{
                 opacity: 0,
                 y: 35,
-                scale: 0.92,
+                scale: 0.94,
                 rotateX: 8,
               }}
               animate={{
@@ -232,11 +318,10 @@ export default function MessageScreen({ onNext }) {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="w-full"
             >
-              {/* Letter */}
               <div
                 className="
-                  relative w-full rounded-[34px]
-                  border border-pink-100
+                  relative w-full overflow-hidden
+                  rounded-[34px] border border-pink-100
                   bg-gradient-to-b from-white via-[#fff9fc] to-pink-100
                   p-5 shadow-inner sm:p-7
                 "
@@ -250,39 +335,36 @@ export default function MessageScreen({ onNext }) {
                 </span>
 
                 <div className="min-h-[330px] pt-7 text-center sm:min-h-[350px]">
-                  {paragraphs.map((paragraph, i) => {
+                  {messageParagraphs.map((paragraph, i) => {
                     const start = characterOffset
                     const end = start + paragraph.text.length
 
                     characterOffset = end + 2
-
-                    if (typedText.length <= start) return null
 
                     const visibleText = typedText.slice(
                       start,
                       Math.min(end, typedText.length)
                     )
 
-                    const cursorVisible =
-                      typedText.length >= start &&
-                      typedText.length < end
+                    if (typedText.length <= start) return null
 
                     return (
                       <p key={i} className={paragraph.className}>
                         {visibleText}
 
-                        {cursorVisible && (
-                          <motion.span
-                            animate={{ opacity: [1, 0, 1] }}
-                            transition={{
-                              duration: 0.8,
-                              repeat: Infinity,
-                            }}
-                            className="ml-0.5 inline-block text-pink-500"
-                          >
-                            |
-                          </motion.span>
-                        )}
+                        {typedText.length < end &&
+                          typedText.length >= start && (
+                            <motion.span
+                              animate={{ opacity: [1, 0, 1] }}
+                              transition={{
+                                duration: 0.8,
+                                repeat: Infinity,
+                              }}
+                              className="ml-0.5 inline-block text-pink-500"
+                            >
+                              |
+                            </motion.span>
+                          )}
                       </p>
                     )
                   })}
@@ -306,16 +388,16 @@ export default function MessageScreen({ onNext }) {
                 Made specially for you 💕
               </motion.p>
 
-              {/* Appears only after typing is complete */}
+              {/* Appears after the full message has been typed */}
               <AnimatePresence>
                 {typingDone && (
                   <motion.button
                     type="button"
                     onClick={onNext}
-                    initial={{ opacity: 0, y: 18, scale: 0.95 }}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.55 }}
                     whileHover={{ scale: 1.025 }}
                     whileTap={{ scale: 0.96 }}
                     className="
