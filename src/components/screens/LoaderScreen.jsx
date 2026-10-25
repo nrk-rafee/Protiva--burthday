@@ -19,8 +19,6 @@ export default function LoaderScreen({ onDone }) {
     const [code, setCode] = useState("")
     const [error, setError] = useState(false)
     const [unlocked, setUnlocked] = useState(false)
-
-    // Background videos alternate forever
     const [videoIndex, setVideoIndex] = useState(1)
 
     const handleNumber = (number) => {
@@ -56,20 +54,13 @@ export default function LoaderScreen({ onDone }) {
         setCode((prev) => prev.slice(0, -1))
     }
 
-    const handleVideoEnd = () => {
-        setVideoIndex((prev) => (prev === 1 ? 2 : 1))
-    }
-
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-[9999] flex min-h-screen items-center justify-center overflow-hidden bg-black px-4"
+            className="fixed inset-0 z-[9999] flex h-[100dvh] w-full items-center justify-center overflow-hidden bg-black"
         >
-            {/* =========================================
-                FULL-SCREEN BACKGROUND VIDEO
-                Video 1 -> Video 2 -> Video 1 -> repeat
-            ========================================= */}
+            {/* FULL-SCREEN HD VIDEO BACKGROUND */}
 
             {!unlocked && (
                 <>
@@ -84,253 +75,188 @@ export default function LoaderScreen({ onDone }) {
                         muted
                         playsInline
                         preload="auto"
-                        onEnded={handleVideoEnd}
+                        onEnded={() =>
+                            setVideoIndex((prev) =>
+                                prev === 1 ? 2 : 1
+                            )
+                        }
                         className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
                     />
 
-                    {/* Light tint so the lock card stays readable */}
-                    <div className="pointer-events-none absolute inset-0 z-[1] bg-[#fff4f8]/25" />
+                    {/* Very light tint for text readability */}
+                    <div className="pointer-events-none absolute inset-0 z-[1] bg-black/15" />
 
-                    {/* Gentle pink overlay glow */}
-                    <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(circle_at_50%_45%,rgba(255,190,220,0.20),transparent_65%)]" />
+                    {/* Subtle edge shading; no blur */}
+                    <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/20 via-transparent to-black/25" />
                 </>
             )}
 
-            {/* Soft background glow */}
-            <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
-                <motion.div
-                    animate={{
-                        scale: [1, 1.12, 1],
-                        opacity: [0.2, 0.4, 0.2],
-                    }}
-                    transition={{
-                        duration: 5,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                    className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-pink-300/40 blur-3xl"
-                />
+            {/* FLOATING HEARTS */}
 
-                <motion.div
-                    animate={{
-                        scale: [1, 1.15, 1],
-                        opacity: [0.2, 0.35, 0.2],
-                    }}
-                    transition={{
-                        duration: 6,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                    }}
-                    className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-rose-300/40 blur-3xl"
-                />
+            {!unlocked && (
+                <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
+                    {["♡", "♡", "♡", "✦", "♡", "♡"].map(
+                        (item, i) => (
+                            <motion.span
+                                key={i}
+                                initial={{
+                                    y: "110vh",
+                                    x: `${(i * 17) % 100}vw`,
+                                    opacity: 0,
+                                }}
+                                animate={{
+                                    y: "-10vh",
+                                    opacity: [0, 0.45, 0],
+                                }}
+                                transition={{
+                                    duration: 8 + i,
+                                    repeat: Infinity,
+                                    delay: i * 0.9,
+                                    ease: "linear",
+                                }}
+                                className="absolute text-xl text-pink-200/70"
+                            >
+                                {item}
+                            </motion.span>
+                        )
+                    )}
+                </div>
+            )}
 
-                {/* Floating hearts */}
-                {["♡", "♡", "♡", "♡", "✦", "♡", "♡", "♡"].map(
-                    (item, i) => (
-                        <motion.span
-                            key={i}
-                            initial={{
-                                y: "110vh",
-                                x: `${(i * 13) % 100}vw`,
-                                opacity: 0,
-                            }}
-                            animate={{
-                                y: "-10vh",
-                                opacity: [0, 0.5, 0],
-                            }}
-                            transition={{
-                                duration: 7 + i,
-                                repeat: Infinity,
-                                delay: i * 0.7,
-                                ease: "linear",
-                            }}
-                            className="absolute text-xl text-pink-300/60"
-                        >
-                            {item}
-                        </motion.span>
-                    )
-                )}
-            </div>
+            {/* ONLY TEXT AND BUTTONS — NO CARD BACKGROUND */}
 
-            {/* Main Card / Party Screen */}
             <AnimatePresence mode="wait">
                 {!unlocked ? (
                     <motion.div
                         key="lock"
-                        initial={{ y: 25, scale: 0.94, opacity: 0 }}
-                        animate={{ y: 0, scale: 1, opacity: 1 }}
-                        transition={{
-                            duration: 0.6,
-                            ease: "easeOut",
-                        }}
-                        className={`relative z-10 w-full max-w-[430px] overflow-hidden rounded-[38px] border border-white/70 bg-white/65 px-6 py-8 shadow-[0_25px_80px_rgba(236,72,153,0.25)] backdrop-blur-md sm:px-10 ${
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.96 }}
+                        transition={{ duration: 0.5 }}
+                        className={`relative z-10 flex max-h-full w-full max-w-[440px] flex-col items-center justify-center overflow-y-auto px-5 py-5 ${
                             error ? "animate-[shake_0.45s_ease-in-out]" : ""
                         }`}
                     >
-                        {/* Card highlight */}
-                        <div className="pointer-events-none absolute inset-0 rounded-[38px] bg-gradient-to-br from-white/35 via-white/10 to-pink-100/20" />
+                        {/* HEADING */}
 
-                        {/* Top decorative dots */}
-                        <div className="absolute left-0 right-0 top-0 flex justify-center gap-2 pt-4">
-                            <span className="h-1.5 w-8 rounded-full bg-pink-200" />
-                            <span className="h-1.5 w-2 rounded-full bg-rose-300" />
-                            <span className="h-1.5 w-2 rounded-full bg-pink-200" />
-                        </div>
+                        <h1 className="text-center text-[30px] font-extrabold leading-tight tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.8)] sm:text-[36px]">
+                            Unlock Your Surprise
+                        </h1>
 
-                        {/* Lock icon */}
-                        <div className="relative z-10 flex justify-center pt-4">
-                            <motion.div
-                                animate={{
-                                    y: [0, -5, 0],
-                                    rotate: [0, -2, 2, 0],
-                                }}
-                                transition={{
-                                    duration: 3,
-                                    repeat: Infinity,
-                                    ease: "easeInOut",
-                                }}
-                                className="relative flex h-28 w-28 items-center justify-center rounded-full border-[7px] border-white/90 bg-gradient-to-br from-pink-50/95 to-rose-100/95 shadow-[0_12px_35px_rgba(244,63,94,0.20)]"
-                            >
-                                <div className="text-[52px]">🔐</div>
+                        <p className="mt-3 text-center text-[15px] font-semibold text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.9)] sm:text-base">
+                            Enter the secret code to begin 💗
+                        </p>
 
-                                <motion.div
-                                    animate={{
-                                        scale: [1, 1.1, 1],
-                                    }}
-                                    transition={{
-                                        duration: 1.8,
-                                        repeat: Infinity,
-                                    }}
-                                    className="absolute -bottom-2 -right-2 flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-pink-400 to-rose-500 text-xl shadow-lg"
-                                >
-                                    💗
-                                </motion.div>
-                            </motion.div>
-                        </div>
+                        {/* CODE HEARTS */}
 
-                        {/* Heading */}
-                        <div className="relative z-10 mt-7 text-center">
-                            <h1 className="text-[30px] font-bold tracking-tight text-pink-600 sm:text-[34px]">
-                                Unlock Your Surprise
-                            </h1>
-
-                            <p className="mt-2 text-[15px] font-medium text-rose-400 sm:text-base">
-                                Enter the secret code to begin 💗
-                            </p>
-                        </div>
-
-                        {/* Code dots */}
-                        <div className="relative z-10 mt-7 flex justify-center gap-3">
+                        <div className="mt-7 flex justify-center gap-3">
                             {[0, 1, 2, 3].map((index) => (
                                 <motion.div
                                     key={index}
                                     animate={
                                         code.length > index
-                                            ? { scale: [1, 1.2, 1] }
+                                            ? { scale: [1, 1.15, 1] }
                                             : {}
                                     }
-                                    className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                                    className={`flex h-11 w-11 items-center justify-center rounded-full border-2 ${
                                         code.length > index
-                                            ? "border-pink-400 bg-pink-100/95"
-                                            : "border-pink-100 bg-white/85"
+                                            ? "border-pink-300 bg-pink-400/95"
+                                            : "border-white/80 bg-black/25"
                                     }`}
                                 >
-                                    {code.length > index ? (
-                                        <span className="text-lg text-pink-500">
-                                            ♥
-                                        </span>
-                                    ) : (
-                                        <span className="text-pink-300">
-                                            ♡
-                                        </span>
-                                    )}
+                                    <span
+                                        className={`text-xl ${
+                                            code.length > index
+                                                ? "text-white"
+                                                : "text-white"
+                                        }`}
+                                    >
+                                        {code.length > index ? "♥" : "♡"}
+                                    </span>
                                 </motion.div>
                             ))}
                         </div>
 
-                        {/* Error message */}
-                        <div className="relative z-10 h-7 pt-2 text-center">
+                        {/* ERROR MESSAGE */}
+
+                        <div className="mt-2 h-6 text-center">
                             <AnimatePresence>
                                 {error && (
                                     <motion.p
                                         initial={{ opacity: 0, y: -5 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0 }}
-                                        className="text-sm font-semibold text-rose-500"
+                                        className="text-sm font-bold text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]"
                                     >
-                                        Oops! Secret code ta vul hoyeche 💕
+                                        Wrong code! Try again 💕
                                     </motion.p>
                                 )}
                             </AnimatePresence>
                         </div>
 
-                        {/* Keypad */}
-                        <div className="relative z-10 mx-auto mt-4 grid max-w-[310px] grid-cols-3 gap-3 sm:gap-4">
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
-                                <motion.button
-                                    key={number}
-                                    type="button"
-                                    whileTap={{ scale: 0.9 }}
-                                    whileHover={{
-                                        scale: 1.04,
-                                        backgroundColor: "#fff1f6",
-                                    }}
-                                    onClick={() =>
-                                        handleNumber(String(number))
-                                    }
-                                    className="flex h-[62px] items-center justify-center rounded-full border border-pink-100/90 bg-white/85 text-2xl font-bold text-pink-500 shadow-[0_5px_18px_rgba(244,114,182,0.12)] transition-colors sm:h-[68px]"
-                                >
-                                    {number}
-                                </motion.button>
-                            ))}
+                        {/* NUMBER KEYPAD */}
+
+                        <div className="mx-auto mt-3 grid w-full max-w-[330px] grid-cols-3 gap-3 sm:gap-4">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(
+                                (number) => (
+                                    <motion.button
+                                        key={number}
+                                        type="button"
+                                        whileTap={{ scale: 0.92 }}
+                                        whileHover={{ scale: 1.04 }}
+                                        onClick={() =>
+                                            handleNumber(String(number))
+                                        }
+                                        className="flex h-[62px] items-center justify-center rounded-full border border-white/80 bg-white/90 text-2xl font-extrabold text-pink-600 shadow-[0_4px_15px_rgba(0,0,0,0.18)] sm:h-[68px]"
+                                    >
+                                        {number}
+                                    </motion.button>
+                                )
+                            )}
 
                             <div />
 
                             <motion.button
                                 type="button"
-                                whileTap={{ scale: 0.9 }}
-                                whileHover={{
-                                    scale: 1.04,
-                                    backgroundColor: "#fff1f6",
-                                }}
+                                whileTap={{ scale: 0.92 }}
+                                whileHover={{ scale: 1.04 }}
                                 onClick={() => handleNumber("0")}
-                                className="flex h-[62px] items-center justify-center rounded-full border border-pink-100/90 bg-white/85 text-2xl font-bold text-pink-500 shadow-[0_5px_18px_rgba(244,114,182,0.12)] sm:h-[68px]"
+                                className="flex h-[62px] items-center justify-center rounded-full border border-white/80 bg-white/90 text-2xl font-extrabold text-pink-600 shadow-[0_4px_15px_rgba(0,0,0,0.18)] sm:h-[68px]"
                             >
                                 0
                             </motion.button>
 
                             <motion.button
                                 type="button"
-                                whileTap={{ scale: 0.9 }}
-                                whileHover={{
-                                    scale: 1.04,
-                                    backgroundColor: "#fff1f6",
-                                }}
+                                whileTap={{ scale: 0.92 }}
+                                whileHover={{ scale: 1.04 }}
                                 onClick={handleDelete}
-                                className="flex h-[62px] items-center justify-center rounded-full border border-pink-100/90 bg-white/85 text-xl text-rose-400 shadow-[0_5px_18px_rgba(244,114,182,0.12)] sm:h-[68px]"
+                                className="flex h-[62px] items-center justify-center rounded-full border border-white/80 bg-white/90 text-xl font-bold text-pink-600 shadow-[0_4px_15px_rgba(0,0,0,0.18)] sm:h-[68px]"
                             >
                                 ⌫
                             </motion.button>
                         </div>
 
-                        {/* Bottom message */}
+                        {/* BOTTOM TEXT */}
+
                         <motion.p
-                            animate={{ opacity: [0.55, 1, 0.55] }}
+                            animate={{ opacity: [0.75, 1, 0.75] }}
                             transition={{
                                 duration: 2.5,
                                 repeat: Infinity,
                             }}
-                            className="relative z-10 mt-7 text-center text-sm font-medium text-pink-400"
+                            className="mt-6 text-center text-sm font-bold text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.9)]"
                         >
                             ✨ A little surprise is waiting for you ✨
                         </motion.p>
 
-                        <p className="relative z-10 mt-2 text-center text-xs text-rose-400">
+                        <p className="mt-2 text-center text-xs font-semibold text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.9)]">
                             Made with 💗 for a special birthday
                         </p>
                     </motion.div>
                 ) : (
-                    /* PARTY SCREEN */
+                    /* UNLOCK CELEBRATION */
+
                     <motion.div
                         key="party"
                         initial={{ scale: 0.7, opacity: 0 }}
@@ -339,9 +265,8 @@ export default function LoaderScreen({ onDone }) {
                             duration: 0.7,
                             ease: "backOut",
                         }}
-                        className="relative z-10 flex h-screen w-screen items-center justify-center"
+                        className="relative z-10 flex h-full w-full items-center justify-center"
                     >
-                        {/* Confetti */}
                         {confetti.map((item) => (
                             <motion.span
                                 key={item.id}
@@ -374,7 +299,7 @@ export default function LoaderScreen({ onDone }) {
                             </motion.span>
                         ))}
 
-                        <div className="relative z-10 text-center">
+                        <div className="relative z-10 px-4 text-center">
                             <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: [0, 1.3, 1] }}
@@ -391,7 +316,7 @@ export default function LoaderScreen({ onDone }) {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.35 }}
-                                className="mt-5 text-3xl font-bold text-pink-600"
+                                className="mt-5 text-3xl font-bold text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.8)]"
                             >
                                 Surprise Unlocked! 💗
                             </motion.h2>
@@ -400,7 +325,7 @@ export default function LoaderScreen({ onDone }) {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.7 }}
-                                className="mt-2 text-base text-rose-400"
+                                className="mt-2 text-base text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]"
                             >
                                 Get ready for your birthday surprise ✨
                             </motion.p>
@@ -409,25 +334,15 @@ export default function LoaderScreen({ onDone }) {
                 )}
             </AnimatePresence>
 
-            {/* Shake animation */}
+            {/* SHAKE ANIMATION */}
+
             <style jsx global>{`
                 @keyframes shake {
-                    0%,
-                    100% {
-                        transform: translateX(0);
-                    }
-                    20% {
-                        transform: translateX(-10px);
-                    }
-                    40% {
-                        transform: translateX(10px);
-                    }
-                    60% {
-                        transform: translateX(-7px);
-                    }
-                    80% {
-                        transform: translateX(7px);
-                    }
+                    0%, 100% { transform: translateX(0); }
+                    20% { transform: translateX(-10px); }
+                    40% { transform: translateX(10px); }
+                    60% { transform: translateX(-7px); }
+                    80% { transform: translateX(7px); }
                 }
             `}</style>
         </motion.div>
