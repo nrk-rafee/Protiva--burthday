@@ -12,7 +12,7 @@ import Button from "../Button"
 const balloonData = [
     {
         id: 1,
-        word: "You are ",
+        word: "You",
         color1: "#ff8fb8",
         color2: "#e93478",
         left: "18%",
@@ -22,7 +22,7 @@ const balloonData = [
     },
     {
         id: 2,
-        word: "my",
+        word: "are",
         color1: "#ffd1df",
         color2: "#f28cae",
         left: "39%",
@@ -32,7 +32,7 @@ const balloonData = [
     },
     {
         id: 3,
-        word: "future",
+        word: "a",
         color1: "#ffb6bd",
         color2: "#ef6f7c",
         left: "61%",
@@ -42,7 +42,7 @@ const balloonData = [
     },
     {
         id: 4,
-        word: "wife 🫶",
+        word: " cutiee 🫶",
         color1: "#d8a0ff",
         color2: "#a950df",
         left: "82%",
