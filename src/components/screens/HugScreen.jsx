@@ -136,9 +136,19 @@ export default function HugScreen() {
             transition={{ duration: 0.6 }}
             className="py-5"
           >
-            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-teal-200 to-cyan-300 text-6xl shadow-xl">
-              🫂
-            </div>
+            
+<div className="mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-gradient-to-br from-teal-200 to-cyan-300 shadow-xl">
+  <img
+    src="/gifs/12%20(1).webp"
+    alt="A warm virtual hug"
+    width="128"
+    height="128"
+    loading="eager"
+    decoding="async"
+    className="h-full w-full object-contain"
+  />
+</div>
+
 
             <h1 className="mt-8 font-serif text-3xl font-bold italic text-slate-800 sm:text-4xl">
               Hug Received!
