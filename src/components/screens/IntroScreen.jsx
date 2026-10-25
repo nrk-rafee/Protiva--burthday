@@ -30,9 +30,7 @@ function TopDecoration() {
                     key={index}
                     className="absolute top-0 flex flex-col items-center"
                     style={{ left: item.left }}
-                    animate={{
-                        rotate: [-3, 3, -3],
-                    }}
+                    animate={{ rotate: [-3, 3, -3] }}
                     transition={{
                         duration: 4 + index * 0.3,
                         delay: item.delay,
@@ -47,9 +45,7 @@ function TopDecoration() {
 
                     {item.type === "star" ? (
                         <motion.div
-                            animate={{
-                                scale: [1, 1.08, 1],
-                            }}
+                            animate={{ scale: [1, 1.08, 1] }}
                             transition={{
                                 duration: 2.5,
                                 repeat: Infinity,
@@ -118,9 +114,7 @@ function BottomBalloons() {
                 <motion.div
                     key={index}
                     className="absolute bottom-0"
-                    style={{
-                        left: `${7 + index * 16}%`,
-                    }}
+                    style={{ left: `${7 + index * 16}%` }}
                     animate={{
                         y: [0, -8, 0],
                         rotate: [-3, 3, -3],
@@ -148,9 +142,7 @@ function BottomBalloons() {
                     >
                         <div className="absolute left-[16px] top-[12px] h-5 w-3 rotate-[-25deg] rounded-full bg-white/40 blur-[2px]" />
 
-                        <div
-                            className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/20"
-                        />
+                        <div className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/20" />
                     </div>
                 </motion.div>
             ))}
@@ -282,24 +274,11 @@ function createLetters() {
    ONE FIREWORK LETTER
 ====================================================== */
 
-function FireworkLetter({
-    item,
-    visible,
-    balloonPhase,
-}) {
+function FireworkLetter({ item, visible, balloonPhase }) {
     const wordPositions = {
-        0: {
-            top: "8%",
-            left: "50%",
-        },
-        1: {
-            top: "42%",
-            left: "50%",
-        },
-        2: {
-            top: "76%",
-            left: "50%",
-        },
+        0: { top: "8%", left: "50%" },
+        1: { top: "42%", left: "50%" },
+        2: { top: "76%", left: "50%" },
     }
 
     const position = wordPositions[item.wordIndex]
@@ -311,7 +290,6 @@ function FireworkLetter({
     }
 
     const wordLength = wordLengths[item.wordIndex]
-
     const spacing = 42
 
     const offset =
@@ -332,14 +310,8 @@ function FireworkLetter({
             {visible && (
                 <motion.div
                     className="pointer-events-none absolute left-1/2 top-1/2"
-                    initial={{
-                        y: 230,
-                        opacity: 1,
-                    }}
-                    animate={{
-                        y: 0,
-                        opacity: [1, 1, 0],
-                    }}
+                    initial={{ y: 230, opacity: 1 }}
+                    animate={{ y: 0, opacity: [1, 1, 0] }}
                     transition={{
                         duration: 0.62,
                         ease: "easeOut",
@@ -363,10 +335,7 @@ function FireworkLetter({
             {visible && (
                 <motion.div
                     className="pointer-events-none absolute left-1/2 top-1/2"
-                    initial={{
-                        scale: 0,
-                        opacity: 1,
-                    }}
+                    initial={{ scale: 0, opacity: 1 }}
                     animate={{
                         scale: [0, 1.2, 1.8, 0],
                         opacity: [1, 1, 0.5, 0],
@@ -379,34 +348,19 @@ function FireworkLetter({
                 >
                     {Array.from({ length: 16 }).map(
                         (_, rayIndex) => {
-                            const angle =
-                                (360 / 16) * rayIndex
-
-                            const radians =
-                                (angle * Math.PI) /
-                                180
-
-                            const distance =
-                                25 +
-                                (rayIndex % 4) * 9
-
-                            const x =
-                                Math.cos(radians) *
-                                distance
-
-                            const y =
-                                Math.sin(radians) *
-                                distance
+                            const angle = (360 / 16) * rayIndex
+                            const radians = (angle * Math.PI) / 180
+                            const distance = 25 + (rayIndex % 4) * 9
+                            const x = Math.cos(radians) * distance
+                            const y = Math.sin(radians) * distance
 
                             return (
                                 <motion.span
                                     key={rayIndex}
                                     className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
                                     style={{
-                                        background:
-                                            item.color,
-                                        boxShadow:
-                                            `0 0 8px ${item.color}`,
+                                        background: item.color,
+                                        boxShadow: `0 0 8px ${item.color}`,
                                     }}
                                     initial={{
                                         x: 0,
@@ -451,21 +405,14 @@ function FireworkLetter({
                                 : {
                                       opacity: 1,
                                       y: 0,
-                                      scale: [
-                                          0,
-                                          1.25,
-                                          0.92,
-                                          1,
-                                      ],
+                                      scale: [0, 1.25, 0.92, 1],
                                   }
                         }
                         transition={
                             balloonPhase
                                 ? {
                                       duration: 1.8,
-                                      delay:
-                                          item.index *
-                                          0.12,
+                                      delay: item.index * 0.12,
                                       ease: "easeInOut",
                                   }
                                 : {
@@ -493,9 +440,7 @@ function FireworkLetter({
                                 }}
                                 transition={{
                                     duration: 0.45,
-                                    delay:
-                                        item.index *
-                                        0.12,
+                                    delay: item.index * 0.12,
                                     ease: "backOut",
                                 }}
                             >
@@ -514,14 +459,10 @@ function FireworkLetter({
                                                 rgba(90,30,140,0.95)
                                             )
                                         `,
-                                        boxShadow: `
-                                            0 0 18px ${item.color}
-                                        `,
+                                        boxShadow: `0 0 18px ${item.color}`,
                                     }}
                                 >
-                                    <div
-                                        className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/45"
-                                    />
+                                    <div className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/45" />
 
                                     <div
                                         className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 bg-white/50"
@@ -561,70 +502,31 @@ function FireworkLetter({
 ====================================================== */
 
 function BirthdayFireworkShow({
-    onFinished,
     onAllLettersShown,
+    onBalloonPhase,
 }) {
-    const [visibleCount, setVisibleCount] =
-        useState(0)
-
-    const [balloonPhase, setBalloonPhase] =
-        useState(false)
+    const [visibleCount, setVisibleCount] = useState(0)
+    const [balloonPhase, setBalloonPhase] = useState(false)
 
     const letters = useMemo(
         () => createLetters().flat(),
         []
     )
 
-    /*
-      IMPORTANT FIX:
-
-      The parent IntroScreen re-renders when
-      showSecondGif changes.
-
-      If we directly put onFinished / onAllLettersShown
-      inside the timer effect dependency array,
-      the entire firework timer can restart.
-
-      So we keep the latest callbacks inside refs.
-
-      This means:
-      - GIF can change
-      - parent can re-render
-      - BirthdayFireworkShow does NOT restart
-      - visibleCount stays unchanged
-      - balloonPhase stays unchanged
-    */
-
-    const onFinishedRef = useRef(onFinished)
-    const onAllLettersShownRef =
-        useRef(onAllLettersShown)
+    const onAllLettersShownRef = useRef(onAllLettersShown)
+    const onBalloonPhaseRef = useRef(onBalloonPhase)
 
     useEffect(() => {
-        onFinishedRef.current = onFinished
-        onAllLettersShownRef.current =
-            onAllLettersShown
-    }, [onFinished, onAllLettersShown])
+        onAllLettersShownRef.current = onAllLettersShown
+        onBalloonPhaseRef.current = onBalloonPhase
+    }, [onAllLettersShown, onBalloonPhase])
 
     useEffect(() => {
         const revealTimers = []
 
-        /*
-          One letter every 650ms.
-        */
-
         letters.forEach((_, index) => {
             const timer = setTimeout(() => {
                 setVisibleCount(index + 1)
-
-                /*
-                  IMPORTANT:
-
-                  Only after the FINAL letter E
-                  becomes visible, tell the parent
-                  to change the GIF.
-
-                  This does NOT restart this component.
-                */
 
                 if (index === letters.length - 1) {
                     onAllLettersShownRef.current?.()
@@ -635,39 +537,18 @@ function BirthdayFireworkShow({
         })
 
         /*
-          After last letter:
-          wait 1.5 seconds,
-          then balloons start.
+          Balloon animation starts.
+          The video starts at this same moment.
         */
 
-        const balloonTimer = setTimeout(
-            () => {
-                setBalloonPhase(true)
-            },
-            700 +
-                letters.length * 650 +
-                1500
-        )
-
-        /*
-          After balloons fly away:
-          show Start the surprise button.
-        */
-
-        const finishTimer = setTimeout(
-            () => {
-                onFinishedRef.current?.()
-            },
-            700 +
-                letters.length * 650 +
-                1500 +
-                3000
-        )
+        const balloonTimer = setTimeout(() => {
+            setBalloonPhase(true)
+            onBalloonPhaseRef.current?.()
+        }, 700 + letters.length * 650 + 1500)
 
         return () => {
             revealTimers.forEach(clearTimeout)
             clearTimeout(balloonTimer)
-            clearTimeout(finishTimer)
         }
     }, [letters])
 
@@ -675,39 +556,25 @@ function BirthdayFireworkShow({
         <div className="absolute inset-x-0 bottom-0 top-[38%] z-10 overflow-hidden">
             {/* Tiny stars */}
 
-            {Array.from({ length: 35 }).map(
-                (_, index) => (
-                    <motion.span
-                        key={index}
-                        className="absolute h-[2px] w-[2px] rounded-full bg-white"
-                        style={{
-                            left: `${(index * 37) % 100}%`,
-                            top: `${(index * 47) % 95}%`,
-                        }}
-                        animate={{
-                            opacity: [
-                                0.15,
-                                0.8,
-                                0.15,
-                            ],
-                            scale: [
-                                0.6,
-                                1.4,
-                                0.6,
-                            ],
-                        }}
-                        transition={{
-                            duration:
-                                2 +
-                                (index % 4) *
-                                    0.4,
-                            delay:
-                                (index % 6) * 0.2,
-                            repeat: Infinity,
-                        }}
-                    />
-                )
-            )}
+            {Array.from({ length: 35 }).map((_, index) => (
+                <motion.span
+                    key={index}
+                    className="absolute h-[2px] w-[2px] rounded-full bg-white"
+                    style={{
+                        left: `${(index * 37) % 100}%`,
+                        top: `${(index * 47) % 95}%`,
+                    }}
+                    animate={{
+                        opacity: [0.15, 0.8, 0.15],
+                        scale: [0.6, 1.4, 0.6],
+                    }}
+                    transition={{
+                        duration: 2 + (index % 4) * 0.4,
+                        delay: (index % 6) * 0.2,
+                        repeat: Infinity,
+                    }}
+                />
+            ))}
 
             {/* Birthday letters */}
 
@@ -723,40 +590,25 @@ function BirthdayFireworkShow({
             {/* Continuous small launch sparks */}
 
             {!balloonPhase &&
-                Array.from({ length: 12 }).map(
-                    (_, index) => (
-                        <motion.span
-                            key={`launch-${index}`}
-                            className="absolute bottom-0 h-1 w-1 rounded-full bg-white"
-                            style={{
-                                left: `${
-                                    5 +
-                                    (index * 19) %
-                                        90
-                                }%`,
-                            }}
-                            animate={{
-                                y: [
-                                    0,
-                                    -80,
-                                    -180,
-                                ],
-                                opacity: [
-                                    0,
-                                    1,
-                                    0,
-                                ],
-                            }}
-                            transition={{
-                                duration: 2,
-                                delay:
-                                    index * 0.3,
-                                repeat: Infinity,
-                                ease: "easeOut",
-                            }}
-                        />
-                    )
-                )}
+                Array.from({ length: 12 }).map((_, index) => (
+                    <motion.span
+                        key={`launch-${index}`}
+                        className="absolute bottom-0 h-1 w-1 rounded-full bg-white"
+                        style={{
+                            left: `${5 + (index * 19) % 90}%`,
+                        }}
+                        animate={{
+                            y: [0, -80, -180],
+                            opacity: [0, 1, 0],
+                        }}
+                        transition={{
+                            duration: 2,
+                            delay: index * 0.3,
+                            repeat: Infinity,
+                            ease: "easeOut",
+                        }}
+                    />
+                ))}
         </div>
     )
 }
@@ -771,21 +623,45 @@ export default function IntroScreen({ onNext }) {
     const [showStartButton, setShowStartButton] =
         useState(false)
 
-    /*
-      false = first GIF
-              /gifs/121.webp
-
-      true = second GIF
-             /gifs/5.webp
-
-      IMPORTANT:
-      This state ONLY controls the GIF.
-      It does NOT control or restart
-      the birthday firework animation.
-    */
-
     const [showSecondGif, setShowSecondGif] =
         useState(false)
+
+    /*
+      NEW:
+      Video starts when the birthday letters begin
+      flying away with balloons.
+    */
+
+    const [showCurtainVideo, setShowCurtainVideo] =
+        useState(false)
+
+    /*
+      NEW:
+      Prevents the button from appearing more than once.
+    */
+
+    const buttonShownRef = useRef(false)
+
+    /*
+      NEW:
+      The button appears when the girl has moved
+      behind the curtain.
+      Adjust this value if the curtain opens earlier/later.
+    */
+
+    const CURTAIN_REVEAL_TIME = 5.0
+
+    const handleCurtainVideoTime = (event) => {
+        const video = event.currentTarget
+
+        if (
+            video.currentTime >= CURTAIN_REVEAL_TIME &&
+            !buttonShownRef.current
+        ) {
+            buttonShownRef.current = true
+            setShowStartButton(true)
+        }
+    }
 
     return (
         <AnimatePresence mode="wait">
@@ -808,9 +684,7 @@ export default function IntroScreen({ onNext }) {
                         opacity: 0,
                         scale: 1.015,
                     }}
-                    transition={{
-                        duration: 0.4,
-                    }}
+                    transition={{ duration: 0.4 }}
                     className="fixed inset-0 overflow-hidden bg-[#070d2b]"
                 >
                     <div className="absolute inset-0 bg-[#070d2b]" />
@@ -829,9 +703,7 @@ export default function IntroScreen({ onNext }) {
                                 opacity: 1,
                                 y: 0,
                             }}
-                            transition={{
-                                duration: 0.45,
-                            }}
+                            transition={{ duration: 0.45 }}
                             className="
                                 relative
                                 mx-auto
@@ -871,11 +743,7 @@ export default function IntroScreen({ onNext }) {
                                     className="text-7xl md:text-8xl"
                                     animate={{
                                         y: [0, -7, 0],
-                                        rotate: [
-                                            -2,
-                                            2,
-                                            -2,
-                                        ],
+                                        rotate: [-2, 2, -2],
                                     }}
                                     transition={{
                                         duration: 2.5,
@@ -894,16 +762,13 @@ export default function IntroScreen({ onNext }) {
                                 </h1>
 
                                 <p className="mt-5 text-base text-[#c7cbe7] md:text-lg">
-                                    Tap the button to open
-                                    it ✨
+                                    Tap the button to open it ✨
                                 </p>
                             </div>
 
                             <div className="relative z-10 mt-8 flex justify-center">
                                 <Button
-                                    onClick={() =>
-                                        setStep(1)
-                                    }
+                                    onClick={() => setStep(1)}
                                     className="
                                         w-full
                                         max-w-[320px]
@@ -916,10 +781,7 @@ export default function IntroScreen({ onNext }) {
                                     "
                                 >
                                     <Gift size={21} />
-
-                                    <span>
-                                        Open It!
-                                    </span>
+                                    <span>Open It!</span>
                                 </Button>
                             </div>
                         </motion.div>
@@ -934,7 +796,7 @@ export default function IntroScreen({ onNext }) {
             )}
 
             {/* ==================================================
-                STEP 1 — OLD BIRTHDAY CARD + NEW FIREWORK SHOW
+                STEP 1 — BIRTHDAY FIREWORK + CURTAIN VIDEO
             ================================================== */}
 
             {step === 1 && (
@@ -944,12 +806,7 @@ export default function IntroScreen({ onNext }) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="
-                        fixed
-                        inset-0
-                        overflow-hidden
-                        bg-[#03050f]
-                    "
+                    className="fixed inset-0 overflow-hidden bg-[#03050f]"
                 >
                     {/* Night sky */}
 
@@ -960,6 +817,37 @@ export default function IntroScreen({ onNext }) {
                     <div className="absolute inset-x-0 bottom-0 h-[55%] bg-[radial-gradient(circle_at_50%_100%,rgba(255,70,180,0.15),transparent_65%)]" />
 
                     <BackgroundFireworks />
+
+                    {/* ==================================================
+                        NEW CURTAIN VIDEO
+                        Starts with the balloon animation.
+                        Black background blends into the night sky.
+                    ================================================== */}
+
+                    {showCurtainVideo && (
+                        <motion.video
+                            key="curtain-video"
+                            src="/curtain.mp4"
+                            autoPlay
+                            muted
+                            playsInline
+                            preload="auto"
+                            onTimeUpdate={handleCurtainVideoTime}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            className="
+                                pointer-events-none
+                                absolute
+                                inset-0
+                                z-20
+                                h-full
+                                w-full
+                                object-contain
+                                mix-blend-screen
+                            "
+                        />
+                    )}
 
                     {/* ==================================================
                         OLD BIRTHDAY CARD
@@ -994,8 +882,6 @@ export default function IntroScreen({ onNext }) {
                                 backdrop-blur-xl
                             "
                         >
-                            {/* Card glow */}
-
                             <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
                             {/* GIF */}
@@ -1030,15 +916,9 @@ export default function IntroScreen({ onNext }) {
                                     }
                                     alt="Birthday animation"
                                     className="h-full w-full object-contain"
-                                    initial={{
-                                        opacity: 0,
-                                    }}
-                                    animate={{
-                                        opacity: 1,
-                                    }}
-                                    transition={{
-                                        duration: 0.35,
-                                    }}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.35 }}
                                 />
                             </div>
 
@@ -1071,12 +951,10 @@ export default function IntroScreen({ onNext }) {
                     ================================================== */}
 
                     <BirthdayFireworkShow
-                        onAllLettersShown={() =>
-                            setShowSecondGif(true)
-                        }
-                        onFinished={() =>
-                            setShowStartButton(true)
-                        }
+                        onAllLettersShown={() => setShowSecondGif(true)}
+                        onBalloonPhase={() => {
+                            setShowCurtainVideo(true)
+                        }}
                     />
 
                     {/* ==================================================
@@ -1100,9 +978,7 @@ export default function IntroScreen({ onNext }) {
                             opacity: 1,
                             y: 0,
                         }}
-                        transition={{
-                            duration: 0.7,
-                        }}
+                        transition={{ duration: 0.7 }}
                     >
                         <p className="text-[10px] uppercase tracking-[0.32em] text-white/45">
                             A little surprise
@@ -1111,6 +987,8 @@ export default function IntroScreen({ onNext }) {
 
                     {/* ==================================================
                         START THE SURPRISE BUTTON
+                        Appears only when the video reaches the
+                        curtain-reveal moment.
                     ================================================== */}
 
                     <AnimatePresence>
@@ -1144,9 +1022,7 @@ export default function IntroScreen({ onNext }) {
                                 "
                             >
                                 <Button
-                                    onClick={() =>
-                                        onNext?.()
-                                    }
+                                    onClick={() => onNext?.()}
                                     className="
                                         min-w-[230px]
                                         justify-center
@@ -1156,10 +1032,7 @@ export default function IntroScreen({ onNext }) {
                                     "
                                 >
                                     <Heart size={20} />
-
-                                    <span>
-                                        Start the surprise
-                                    </span>
+                                    <span>Start the surprise</span>
                                 </Button>
                             </motion.div>
                         )}
@@ -1267,16 +1140,13 @@ export default function IntroScreen({ onNext }) {
                             </h1>
 
                             <p className="mt-4 text-foreground">
-                                Yes, it’s YOU! A little
-                                surprise awaits...
+                                Yes, it’s YOU! A little surprise awaits...
                             </p>
                         </div>
 
                         <div className="mt-4">
                             <Button
-                                onClick={() =>
-                                    onNext?.()
-                                }
+                                onClick={() => onNext?.()}
                                 className="
                                     justify-center
                                     bg-[#f1caeb]
@@ -1284,10 +1154,7 @@ export default function IntroScreen({ onNext }) {
                                 "
                             >
                                 <Gift size={20} />
-
-                                <span>
-                                    Start the surprise
-                                </span>
+                                <span>Start the surprise</span>
                             </Button>
                         </div>
                     </div>
