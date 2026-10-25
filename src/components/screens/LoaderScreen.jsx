@@ -1,3 +1,4 @@
+
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
@@ -19,6 +20,9 @@ export default function LoaderScreen({ onDone }) {
     const [error, setError] = useState(false)
     const [unlocked, setUnlocked] = useState(false)
 
+    // Background videos alternate forever
+    const [videoIndex, setVideoIndex] = useState(1)
+
     const handleNumber = (number) => {
         if (unlocked || code.length >= 4) return
 
@@ -31,7 +35,6 @@ export default function LoaderScreen({ onDone }) {
             if (newCode === SECRET_CODE) {
                 setUnlocked(true)
 
-                // Party animation er por main website open hobe
                 setTimeout(() => {
                     onDone?.()
                 }, 550)
@@ -48,42 +51,77 @@ export default function LoaderScreen({ onDone }) {
 
     const handleDelete = () => {
         if (unlocked) return
+
         setError(false)
         setCode((prev) => prev.slice(0, -1))
+    }
+
+    const handleVideoEnd = () => {
+        setVideoIndex((prev) => (prev === 1 ? 2 : 1))
     }
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-[9999] flex min-h-screen items-center justify-center overflow-hidden bg-[#fff4f8] px-4"
+            className="fixed inset-0 z-[9999] flex min-h-screen items-center justify-center overflow-hidden bg-black px-4"
         >
+            {/* =========================================
+                FULL-SCREEN BACKGROUND VIDEO
+                Video 1 -> Video 2 -> Video 1 -> repeat
+            ========================================= */}
+
+            {!unlocked && (
+                <>
+                    <video
+                        key={videoIndex}
+                        src={
+                            videoIndex === 1
+                                ? "/lockscreen1.mp4"
+                                : "/lockscreen2.mp4"
+                        }
+                        autoPlay
+                        muted
+                        playsInline
+                        preload="auto"
+                        onEnded={handleVideoEnd}
+                        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
+                    />
+
+                    {/* Light tint so the lock card stays readable */}
+                    <div className="pointer-events-none absolute inset-0 z-[1] bg-[#fff4f8]/25" />
+
+                    {/* Gentle pink overlay glow */}
+                    <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(circle_at_50%_45%,rgba(255,190,220,0.20),transparent_65%)]" />
+                </>
+            )}
+
             {/* Soft background glow */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
                 <motion.div
                     animate={{
                         scale: [1, 1.12, 1],
-                        opacity: [0.35, 0.55, 0.35],
+                        opacity: [0.2, 0.4, 0.2],
                     }}
                     transition={{
                         duration: 5,
                         repeat: Infinity,
                         ease: "easeInOut",
                     }}
-                    className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-pink-200/50 blur-3xl"
+                    className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-pink-300/40 blur-3xl"
                 />
 
                 <motion.div
                     animate={{
                         scale: [1, 1.15, 1],
-                        opacity: [0.3, 0.5, 0.3],
+                        opacity: [0.2, 0.35, 0.2],
                     }}
                     transition={{
                         duration: 6,
                         repeat: Infinity,
                         ease: "easeInOut",
                     }}
-                    className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-rose-200/50 blur-3xl"
+                    className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-rose-300/40 blur-3xl"
                 />
 
                 {/* Floating hearts */}
@@ -106,7 +144,7 @@ export default function LoaderScreen({ onDone }) {
                                 delay: i * 0.7,
                                 ease: "linear",
                             }}
-                            className="absolute text-xl text-pink-300/50"
+                            className="absolute text-xl text-pink-300/60"
                         >
                             {item}
                         </motion.span>
@@ -114,7 +152,7 @@ export default function LoaderScreen({ onDone }) {
                 )}
             </div>
 
-            {/* Main Card */}
+            {/* Main Card / Party Screen */}
             <AnimatePresence mode="wait">
                 {!unlocked ? (
                     <motion.div
@@ -125,10 +163,13 @@ export default function LoaderScreen({ onDone }) {
                             duration: 0.6,
                             ease: "easeOut",
                         }}
-                        className={`relative w-full max-w-[430px] overflow-hidden rounded-[38px] border border-white/80 bg-white/85 px-6 py-8 shadow-[0_25px_80px_rgba(236,72,153,0.18)] backdrop-blur-xl sm:px-10 ${
+                        className={`relative z-10 w-full max-w-[430px] overflow-hidden rounded-[38px] border border-white/70 bg-white/65 px-6 py-8 shadow-[0_25px_80px_rgba(236,72,153,0.25)] backdrop-blur-md sm:px-10 ${
                             error ? "animate-[shake_0.45s_ease-in-out]" : ""
                         }`}
                     >
+                        {/* Card highlight */}
+                        <div className="pointer-events-none absolute inset-0 rounded-[38px] bg-gradient-to-br from-white/35 via-white/10 to-pink-100/20" />
+
                         {/* Top decorative dots */}
                         <div className="absolute left-0 right-0 top-0 flex justify-center gap-2 pt-4">
                             <span className="h-1.5 w-8 rounded-full bg-pink-200" />
@@ -137,7 +178,7 @@ export default function LoaderScreen({ onDone }) {
                         </div>
 
                         {/* Lock icon */}
-                        <div className="flex justify-center pt-4">
+                        <div className="relative z-10 flex justify-center pt-4">
                             <motion.div
                                 animate={{
                                     y: [0, -5, 0],
@@ -148,7 +189,7 @@ export default function LoaderScreen({ onDone }) {
                                     repeat: Infinity,
                                     ease: "easeInOut",
                                 }}
-                                className="relative flex h-28 w-28 items-center justify-center rounded-full border-[7px] border-white bg-gradient-to-br from-pink-50 to-rose-100 shadow-[0_12px_35px_rgba(244,63,94,0.15)]"
+                                className="relative flex h-28 w-28 items-center justify-center rounded-full border-[7px] border-white/90 bg-gradient-to-br from-pink-50/95 to-rose-100/95 shadow-[0_12px_35px_rgba(244,63,94,0.20)]"
                             >
                                 <div className="text-[52px]">🔐</div>
 
@@ -168,7 +209,7 @@ export default function LoaderScreen({ onDone }) {
                         </div>
 
                         {/* Heading */}
-                        <div className="mt-7 text-center">
+                        <div className="relative z-10 mt-7 text-center">
                             <h1 className="text-[30px] font-bold tracking-tight text-pink-600 sm:text-[34px]">
                                 Unlock Your Surprise
                             </h1>
@@ -179,21 +220,19 @@ export default function LoaderScreen({ onDone }) {
                         </div>
 
                         {/* Code dots */}
-                        <div className="mt-7 flex justify-center gap-3">
+                        <div className="relative z-10 mt-7 flex justify-center gap-3">
                             {[0, 1, 2, 3].map((index) => (
                                 <motion.div
                                     key={index}
                                     animate={
                                         code.length > index
-                                            ? {
-                                                  scale: [1, 1.2, 1],
-                                              }
+                                            ? { scale: [1, 1.2, 1] }
                                             : {}
                                     }
                                     className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
                                         code.length > index
-                                            ? "border-pink-400 bg-pink-100"
-                                            : "border-pink-100 bg-white"
+                                            ? "border-pink-400 bg-pink-100/95"
+                                            : "border-pink-100 bg-white/85"
                                     }`}
                                 >
                                     {code.length > index ? (
@@ -201,7 +240,7 @@ export default function LoaderScreen({ onDone }) {
                                             ♥
                                         </span>
                                     ) : (
-                                        <span className="text-pink-200">
+                                        <span className="text-pink-300">
                                             ♡
                                         </span>
                                     )}
@@ -210,7 +249,7 @@ export default function LoaderScreen({ onDone }) {
                         </div>
 
                         {/* Error message */}
-                        <div className="h-7 pt-2 text-center">
+                        <div className="relative z-10 h-7 pt-2 text-center">
                             <AnimatePresence>
                                 {error && (
                                     <motion.p
@@ -226,17 +265,20 @@ export default function LoaderScreen({ onDone }) {
                         </div>
 
                         {/* Keypad */}
-                        <div className="mx-auto mt-4 grid max-w-[310px] grid-cols-3 gap-3 sm:gap-4">
+                        <div className="relative z-10 mx-auto mt-4 grid max-w-[310px] grid-cols-3 gap-3 sm:gap-4">
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
                                 <motion.button
                                     key={number}
+                                    type="button"
                                     whileTap={{ scale: 0.9 }}
                                     whileHover={{
                                         scale: 1.04,
                                         backgroundColor: "#fff1f6",
                                     }}
-                                    onClick={() => handleNumber(String(number))}
-                                    className="flex h-[62px] items-center justify-center rounded-full border border-pink-100 bg-white text-2xl font-bold text-pink-500 shadow-[0_5px_18px_rgba(244,114,182,0.10)] transition-colors sm:h-[68px]"
+                                    onClick={() =>
+                                        handleNumber(String(number))
+                                    }
+                                    className="flex h-[62px] items-center justify-center rounded-full border border-pink-100/90 bg-white/85 text-2xl font-bold text-pink-500 shadow-[0_5px_18px_rgba(244,114,182,0.12)] transition-colors sm:h-[68px]"
                                 >
                                     {number}
                                 </motion.button>
@@ -245,25 +287,27 @@ export default function LoaderScreen({ onDone }) {
                             <div />
 
                             <motion.button
+                                type="button"
                                 whileTap={{ scale: 0.9 }}
                                 whileHover={{
                                     scale: 1.04,
                                     backgroundColor: "#fff1f6",
                                 }}
                                 onClick={() => handleNumber("0")}
-                                className="flex h-[62px] items-center justify-center rounded-full border border-pink-100 bg-white text-2xl font-bold text-pink-500 shadow-[0_5px_18px_rgba(244,114,182,0.10)] sm:h-[68px]"
+                                className="flex h-[62px] items-center justify-center rounded-full border border-pink-100/90 bg-white/85 text-2xl font-bold text-pink-500 shadow-[0_5px_18px_rgba(244,114,182,0.12)] sm:h-[68px]"
                             >
                                 0
                             </motion.button>
 
                             <motion.button
+                                type="button"
                                 whileTap={{ scale: 0.9 }}
                                 whileHover={{
                                     scale: 1.04,
                                     backgroundColor: "#fff1f6",
                                 }}
                                 onClick={handleDelete}
-                                className="flex h-[62px] items-center justify-center rounded-full border border-pink-100 bg-white text-xl text-rose-400 shadow-[0_5px_18px_rgba(244,114,182,0.10)] sm:h-[68px]"
+                                className="flex h-[62px] items-center justify-center rounded-full border border-pink-100/90 bg-white/85 text-xl text-rose-400 shadow-[0_5px_18px_rgba(244,114,182,0.12)] sm:h-[68px]"
                             >
                                 ⌫
                             </motion.button>
@@ -276,12 +320,12 @@ export default function LoaderScreen({ onDone }) {
                                 duration: 2.5,
                                 repeat: Infinity,
                             }}
-                            className="mt-7 text-center text-sm font-medium text-pink-300"
+                            className="relative z-10 mt-7 text-center text-sm font-medium text-pink-400"
                         >
                             ✨ A little surprise is waiting for you ✨
                         </motion.p>
 
-                        <p className="mt-2 text-center text-xs text-rose-300">
+                        <p className="relative z-10 mt-2 text-center text-xs text-rose-400">
                             Made with 💗 for a special birthday
                         </p>
                     </motion.div>
@@ -295,7 +339,7 @@ export default function LoaderScreen({ onDone }) {
                             duration: 0.7,
                             ease: "backOut",
                         }}
-                        className="relative flex h-screen w-screen items-center justify-center"
+                        className="relative z-10 flex h-screen w-screen items-center justify-center"
                     >
                         {/* Confetti */}
                         {confetti.map((item) => (
