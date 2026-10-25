@@ -1,8 +1,9 @@
+
 "use client"
 
 import { motion } from "framer-motion"
 
-export default function MessageScreen() {
+export default function MessageScreen({ onNext }) {
   return (
     <motion.div
       initial={{
@@ -135,6 +136,36 @@ export default function MessageScreen() {
       >
         Made specially for you 💕
       </motion.div>
+
+      {/* ONE LAST THING BUTTON */}
+
+      <motion.button
+        type="button"
+        onClick={onNext}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.96 }}
+        className="
+          mt-2
+          w-full
+          rounded-full
+          bg-gradient-to-r
+          from-pink-500
+          to-rose-500
+          px-6
+          py-4
+          font-bold
+          text-white
+          shadow-lg
+          shadow-pink-200
+          transition-shadow
+          hover:shadow-xl
+        "
+      >
+        One Last Thing 💗 →
+      </motion.button>
     </motion.div>
   )
 }
