@@ -1,3 +1,4 @@
+
 "use client"
 
 import {
@@ -16,11 +17,11 @@ import Button from "../Button"
 ====================================================== */
 
 const hangingDecorations = [
-    { type: "moon", left: "5%", size: 70, length: 100, delay: 0 },
-    { type: "star", left: "28%", size: 38, length: 85, delay: 0.5 },
-    { type: "star", left: "52%", size: 34, length: 70, delay: 1 },
-    { type: "star", left: "74%", size: 42, length: 95, delay: 0.3 },
-    { type: "moon", left: "91%", size: 55, length: 80, delay: 1.2 },
+    { type: "moon", left: "5%", size: 70, length: 100 },
+    { type: "star", left: "28%", size: 38, length: 85 },
+    { type: "star", left: "52%", size: 34, length: 70 },
+    { type: "star", left: "74%", size: 42, length: 95 },
+    { type: "moon", left: "91%", size: 55, length: 80 },
 ]
 
 function TopDecoration() {
@@ -34,7 +35,6 @@ function TopDecoration() {
                     animate={{ rotate: [-3, 3, -3] }}
                     transition={{
                         duration: 4 + index * 0.3,
-                        delay: item.delay,
                         repeat: Infinity,
                         ease: "easeInOut",
                     }}
@@ -47,10 +47,7 @@ function TopDecoration() {
                     {item.type === "star" ? (
                         <motion.div
                             animate={{ scale: [1, 1.08, 1] }}
-                            transition={{
-                                duration: 2.5,
-                                repeat: Infinity,
-                            }}
+                            transition={{ duration: 2.5, repeat: Infinity }}
                             style={{
                                 fontSize: item.size,
                                 lineHeight: 1,
@@ -63,10 +60,7 @@ function TopDecoration() {
                     ) : (
                         <div
                             className="relative rounded-full"
-                            style={{
-                                width: item.size,
-                                height: item.size,
-                            }}
+                            style={{ width: item.size, height: item.size }}
                         >
                             <div
                                 className="absolute inset-0 rounded-full"
@@ -74,7 +68,6 @@ function TopDecoration() {
                                     background: "linear-gradient(135deg,#ffd98a,#d99238)",
                                 }}
                             />
-
                             <div
                                 className="absolute rounded-full"
                                 style={{
@@ -114,10 +107,7 @@ function BottomBalloons() {
                     key={index}
                     className="absolute bottom-0"
                     style={{ left: `${7 + index * 16}%` }}
-                    animate={{
-                        y: [0, -8, 0],
-                        rotate: [-3, 3, -3],
-                    }}
+                    animate={{ y: [0, -8, 0], rotate: [-3, 3, -3] }}
                     transition={{
                         duration: 4 + index * 0.3,
                         delay: index * 0.3,
@@ -157,15 +147,12 @@ const backgroundFireworks = [
 
 function BackgroundFireworks() {
     return (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
             {backgroundFireworks.map((item, index) => (
                 <motion.div
                     key={index}
                     className="absolute"
-                    style={{
-                        left: item.left,
-                        top: item.top,
-                    }}
+                    style={{ left: item.left, top: item.top }}
                 >
                     <motion.div
                         className="h-2 w-2 rounded-full"
@@ -173,10 +160,7 @@ function BackgroundFireworks() {
                             background: item.color,
                             boxShadow: `0 0 25px 8px ${item.color}`,
                         }}
-                        animate={{
-                            scale: [0, 1.8, 0],
-                            opacity: [0, 1, 0],
-                        }}
+                        animate={{ scale: [0, 1.8, 0], opacity: [0, 1, 0] }}
                         transition={{
                             duration: 1.5,
                             delay: item.delay,
@@ -184,32 +168,6 @@ function BackgroundFireworks() {
                             repeatDelay: 3,
                         }}
                     />
-
-                    {Array.from({ length: 12 }).map((_, ray) => {
-                        const angle = (360 / 12) * ray
-
-                        return (
-                            <motion.span
-                                key={ray}
-                                className="absolute left-1/2 top-1/2 h-8 w-[2px] origin-bottom rounded-full"
-                                style={{
-                                    background: item.color,
-                                    boxShadow: `0 0 7px ${item.color}`,
-                                    transform: `translate(-50%, -100%) rotate(${angle}deg)`,
-                                }}
-                                animate={{
-                                    scaleY: [0, 1, 0],
-                                    opacity: [0, 1, 0],
-                                }}
-                                transition={{
-                                    duration: 1.4,
-                                    delay: item.delay,
-                                    repeat: Infinity,
-                                    repeatDelay: 3,
-                                }}
-                            />
-                        )
-                    })}
                 </motion.div>
             ))}
         </div>
@@ -217,7 +175,7 @@ function BackgroundFireworks() {
 }
 
 /* ======================================================
-   LETTER DATA
+   BIRTHDAY LETTERS
 ====================================================== */
 
 const words = ["HAPPY", "BIRTHDAY", "CUTIE"]
@@ -234,47 +192,29 @@ const letterColors = [
 function createLetters() {
     let counter = 0
 
-    return words.map((word, wordIndex) =>
-        [...word].map((letter, letterIndex) => {
-            const current = {
-                id: `${wordIndex}-${letterIndex}`,
-                letter,
-                wordIndex,
-                letterIndex,
-                index: counter,
-                color: letterColors[counter % letterColors.length],
-            }
-
-            counter++
-            return current
-        })
+    return words.flatMap((word, wordIndex) =>
+        [...word].map((letter, letterIndex) => ({
+            id: `${wordIndex}-${letterIndex}`,
+            letter,
+            wordIndex,
+            letterIndex,
+            index: counter,
+            color: letterColors[counter++ % letterColors.length],
+        }))
     )
 }
 
-/* ======================================================
-   ONE FIREWORK LETTER
-====================================================== */
-
 function FireworkLetter({ item, visible, balloonPhase }) {
-    const wordPositions = {
-        0: { top: "8%", left: "50%" },
-        1: { top: "42%", left: "50%" },
-        2: { top: "76%", left: "50%" },
-    }
+    const positions = [
+        { top: "12%", length: 5 },
+        { top: "45%", length: 8 },
+        { top: "78%", length: 4 },
+    ]
 
-    const position = wordPositions[item.wordIndex]
-
-    const wordLengths = {
-        0: 5,
-        1: 8,
-        2: 4,
-    }
-
-    const wordLength = wordLengths[item.wordIndex]
-    const spacing = 42
-
-    const offset =
-        (item.letterIndex - (wordLength - 1) / 2) * spacing
+    const position = positions[item.wordIndex]
+    const offset = (
+        item.letterIndex - (position.length - 1) / 2
+    ) * 32
 
     return (
         <div
@@ -285,151 +225,35 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                 transform: "translate(-50%, -50%)",
             }}
         >
-            {visible && (
-                <motion.div
-                    className="pointer-events-none absolute left-1/2 top-1/2"
-                    initial={{ y: 230, opacity: 1 }}
-                    animate={{ y: 0, opacity: [1, 1, 0] }}
-                    transition={{
-                        duration: 0.62,
-                        ease: "easeOut",
-                    }}
-                >
-                    <div
-                        className="h-2 w-2 rounded-full"
-                        style={{
-                            background: item.color,
-                            boxShadow: `0 0 8px ${item.color}, 0 0 20px ${item.color}`,
-                        }}
-                    />
-                </motion.div>
-            )}
-
-            {visible && (
-                <motion.div
-                    className="pointer-events-none absolute left-1/2 top-1/2"
-                    initial={{ scale: 0, opacity: 1 }}
-                    animate={{
-                        scale: [0, 1.2, 1.8, 0],
-                        opacity: [1, 1, 0.5, 0],
-                    }}
-                    transition={{
-                        duration: 0.7,
-                        delay: 0.55,
-                        ease: "easeOut",
-                    }}
-                >
-                    {Array.from({ length: 16 }).map((_, rayIndex) => {
-                        const angle = (360 / 16) * rayIndex
-                        const radians = (angle * Math.PI) / 180
-                        const distance = 25 + (rayIndex % 4) * 9
-                        const x = Math.cos(radians) * distance
-                        const y = Math.sin(radians) * distance
-
-                        return (
-                            <motion.span
-                                key={rayIndex}
-                                className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
-                                style={{
-                                    background: item.color,
-                                    boxShadow: `0 0 8px ${item.color}`,
-                                }}
-                                initial={{
-                                    x: 0,
-                                    y: 0,
-                                    opacity: 1,
-                                    scale: 1,
-                                }}
-                                animate={{
-                                    x,
-                                    y,
-                                    opacity: 0,
-                                    scale: 0,
-                                }}
-                                transition={{
-                                    duration: 0.65,
-                                    delay: 0.55,
-                                    ease: "easeOut",
-                                }}
-                            />
-                        )
-                    })}
-                </motion.div>
-            )}
-
             <AnimatePresence>
                 {visible && (
                     <motion.div
-                        initial={{
-                            opacity: 0,
-                            scale: 0,
-                        }}
+                        initial={{ opacity: 0, scale: 0 }}
                         animate={
                             balloonPhase
-                                ? {
-                                      opacity: 0,
-                                      y: -230,
-                                      scale: 0.85,
-                                  }
-                                : {
-                                      opacity: 1,
-                                      y: 0,
-                                      scale: [0, 1.25, 0.92, 1],
-                                  }
+                                ? { opacity: 0, y: -230, scale: 0.85 }
+                                : { opacity: 1, y: 0, scale: [0, 1.2, 1] }
                         }
-                        transition={
-                            balloonPhase
-                                ? {
-                                      duration: 1.8,
-                                      delay: item.index * 0.12,
-                                      ease: "easeInOut",
-                                  }
-                                : {
-                                      duration: 0.6,
-                                      delay: 0.6,
-                                      ease: "backOut",
-                                  }
-                        }
-                        className="relative"
+                        transition={{
+                            duration: balloonPhase ? 1.8 : 0.6,
+                            delay: balloonPhase ? item.index * 0.12 : 0,
+                            ease: "easeOut",
+                        }}
                     >
                         {balloonPhase && (
                             <motion.div
                                 className="absolute bottom-full left-1/2 -translate-x-1/2"
-                                initial={{
-                                    opacity: 0,
-                                    scale: 0,
-                                    y: 20,
-                                }}
-                                animate={{
-                                    opacity: 1,
-                                    scale: 1,
-                                    y: 0,
-                                }}
-                                transition={{
-                                    duration: 0.45,
-                                    delay: item.index * 0.12,
-                                    ease: "backOut",
-                                }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: item.index * 0.12 }}
                             >
                                 <div
-                                    className="relative h-11 w-9 rounded-[50%]"
+                                    className="h-11 w-9 rounded-[50%]"
                                     style={{
-                                        background: `
-                                            radial-gradient(circle at 30% 25%, rgba(255,255,255,0.9), transparent 18%),
-                                            linear-gradient(145deg, ${item.color}, rgba(90,30,140,0.95))
-                                        `,
+                                        background: `linear-gradient(145deg, ${item.color}, rgba(90,30,140,0.95))`,
                                         boxShadow: `0 0 18px ${item.color}`,
                                     }}
-                                >
-                                    <div className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/45" />
-
-                                    <div
-                                        className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 bg-white/50"
-                                        style={{
-                                            clipPath: "polygon(0 0,100% 0,50% 100%)",
-                                        }}
-                                    />
-                                </div>
+                                />
                             </motion.div>
                         )}
 
@@ -457,45 +281,42 @@ function FireworkLetter({ item, visible, balloonPhase }) {
    BIRTHDAY FIREWORK SHOW
 ====================================================== */
 
-function BirthdayFireworkShow({
-    onAllLettersShown,
-    onBalloonPhase,
-}) {
+function BirthdayFireworkShow({ onAllLettersShown, onBalloonPhase }) {
     const [visibleCount, setVisibleCount] = useState(0)
     const [balloonPhase, setBalloonPhase] = useState(false)
 
-    const letters = useMemo(() => createLetters().flat(), [])
+    const letters = useMemo(() => createLetters(), [])
 
-    const onAllLettersShownRef = useRef(onAllLettersShown)
-    const onBalloonPhaseRef = useRef(onBalloonPhase)
+    const onAllRef = useRef(onAllLettersShown)
+    const onBalloonRef = useRef(onBalloonPhase)
 
     useEffect(() => {
-        onAllLettersShownRef.current = onAllLettersShown
-        onBalloonPhaseRef.current = onBalloonPhase
+        onAllRef.current = onAllLettersShown
+        onBalloonRef.current = onBalloonPhase
     }, [onAllLettersShown, onBalloonPhase])
 
     useEffect(() => {
-        const revealTimers = []
+        const timers = []
 
         letters.forEach((_, index) => {
-            const timer = setTimeout(() => {
-                setVisibleCount(index + 1)
+            timers.push(
+                setTimeout(() => {
+                    setVisibleCount(index + 1)
 
-                if (index === letters.length - 1) {
-                    onAllLettersShownRef.current?.()
-                }
-            }, 700 + index * 650)
-
-            revealTimers.push(timer)
+                    if (index === letters.length - 1) {
+                        onAllRef.current?.()
+                    }
+                }, 700 + index * 650)
+            )
         })
 
         const balloonTimer = setTimeout(() => {
             setBalloonPhase(true)
-            onBalloonPhaseRef.current?.()
+            onBalloonRef.current?.()
         }, 700 + letters.length * 650 + 1500)
 
         return () => {
-            revealTimers.forEach(clearTimeout)
+            timers.forEach(clearTimeout)
             clearTimeout(balloonTimer)
         }
     }, [letters])
@@ -510,13 +331,9 @@ function BirthdayFireworkShow({
                         left: `${(index * 37) % 100}%`,
                         top: `${(index * 47) % 95}%`,
                     }}
-                    animate={{
-                        opacity: [0.15, 0.8, 0.15],
-                        scale: [0.6, 1.4, 0.6],
-                    }}
+                    animate={{ opacity: [0.15, 0.8, 0.15] }}
                     transition={{
                         duration: 2 + (index % 4) * 0.4,
-                        delay: (index % 6) * 0.2,
                         repeat: Infinity,
                     }}
                 />
@@ -530,27 +347,6 @@ function BirthdayFireworkShow({
                     balloonPhase={balloonPhase}
                 />
             ))}
-
-            {!balloonPhase &&
-                Array.from({ length: 12 }).map((_, index) => (
-                    <motion.span
-                        key={`launch-${index}`}
-                        className="absolute bottom-0 h-1 w-1 rounded-full bg-white"
-                        style={{
-                            left: `${5 + (index * 19) % 90}%`,
-                        }}
-                        animate={{
-                            y: [0, -80, -180],
-                            opacity: [0, 1, 0],
-                        }}
-                        transition={{
-                            duration: 2,
-                            delay: index * 0.3,
-                            repeat: Infinity,
-                            ease: "easeOut",
-                        }}
-                    />
-                ))}
         </div>
     )
 }
@@ -562,23 +358,21 @@ function BirthdayFireworkShow({
 export default function IntroScreen({ onNext }) {
     const [step, setStep] = useState(0)
 
-    const [showStartButton, setShowStartButton] = useState(false)
     const [showSecondGif, setShowSecondGif] = useState(false)
     const [showCurtainVideo, setShowCurtainVideo] = useState(false)
     const [showFinalVideo, setShowFinalVideo] = useState(false)
+    const [showStartButton, setShowStartButton] = useState(false)
 
     const [remainingSeconds, setRemainingSeconds] = useState(10)
     const [midnightReached, setMidnightReached] = useState(false)
 
     const audioRef = useRef(null)
     const audioStartedRef = useRef(false)
+    const curtainHandledRef = useRef(false)
 
-    // এই ref দিয়ে নিশ্চিত করা হচ্ছে final video একবারই চালু হবে
-    const buttonShownRef = useRef(false)
+    const CURTAIN_REVEAL_TIME = 5
 
-    const CURTAIN_REVEAL_TIME = 5.0
-
-    // Countdown
+    /* Countdown */
     useEffect(() => {
         if (step !== 0 || midnightReached) return
 
@@ -604,7 +398,7 @@ export default function IntroScreen({ onNext }) {
         return () => clearInterval(timer)
     }, [step, midnightReached])
 
-    // Birthday song
+    /* Birthday song */
     useEffect(() => {
         if (!midnightReached || audioStartedRef.current) return
 
@@ -613,7 +407,6 @@ export default function IntroScreen({ onNext }) {
 
         audioStartedRef.current = true
         audio.currentTime = 0
-
         audio.play().catch(() => {})
     }, [midnightReached])
 
@@ -621,9 +414,7 @@ export default function IntroScreen({ onNext }) {
         const audio = audioRef.current
         if (!audio) return
 
-        audio.play().catch((error) => {
-            console.log("Audio playback needs user interaction:", error)
-        })
+        audio.play().catch(() => {})
     }
 
     const handleOpenIt = () => {
@@ -631,29 +422,26 @@ export default function IntroScreen({ onNext }) {
         setStep(1)
     }
 
-    // মেয়েটি পর্দার আড়ালে যাওয়ার মুহূর্তেই দ্বিতীয় ভিডিও চালু হবে
-    const handleCurtainVideoTime = (event) => {
-        const video = event.currentTarget
+    /* Start final video exactly once */
+    const startFinalVideo = () => {
+        if (curtainHandledRef.current) return
 
+        curtainHandledRef.current = true
+        setShowCurtainVideo(false)
+        setShowFinalVideo(true)
+    }
+
+    const handleCurtainTime = (event) => {
         if (
-            video.currentTime >= CURTAIN_REVEAL_TIME &&
-            !buttonShownRef.current
+            event.currentTarget.currentTime >= CURTAIN_REVEAL_TIME
         ) {
-            buttonShownRef.current = true
-
-            // প্রথম ভিডিও সরিয়ে সঙ্গে সঙ্গেই দ্বিতীয় ভিডিও দেখানো
-            setShowCurtainVideo(false)
-            setShowFinalVideo(true)
+            startFinalVideo()
         }
     }
 
-    // প্রথম ভিডিও ৫ সেকেন্ডের আগেই শেষ হলেও দ্বিতীয় ভিডিও চালু হবে
-    const handleCurtainVideoEnd = () => {
-        if (!buttonShownRef.current) {
-            buttonShownRef.current = true
-            setShowCurtainVideo(false)
-            setShowFinalVideo(true)
-        }
+    /* Final video finished or failed */
+    const finishFinalVideo = () => {
+        setShowStartButton(true)
     }
 
     const clockSeconds = 50 + (10 - remainingSeconds)
@@ -689,8 +477,6 @@ export default function IntroScreen({ onNext }) {
                         transition={{ duration: 0.4 }}
                         className="fixed inset-0 overflow-hidden bg-black"
                     >
-                        <div className="absolute inset-0 bg-black" />
-
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(150,110,35,0.13),transparent_60%)]" />
 
                         <TopDecoration />
@@ -711,8 +497,6 @@ export default function IntroScreen({ onNext }) {
                             >
                                 <div className="pointer-events-none absolute inset-0 rounded-[42px] border border-white/5" />
 
-                                <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-amber-300/10 blur-3xl" />
-
                                 <div className="relative z-10 mb-5 flex flex-col items-center">
                                     <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#d8b66f]">
                                         <Clock size={17} />
@@ -724,31 +508,17 @@ export default function IntroScreen({ onNext }) {
                                         initial={{ opacity: 0.65, scale: 0.97 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ duration: 0.15 }}
-                                        className="
-                                            mt-4 rounded-[22px]
-                                            border border-[#d6b66f]/30
-                                            bg-[#100e09] px-8 py-4
-                                            shadow-[0_0_30px_rgba(218,170,95,0.10)]
-                                        "
+                                        className="mt-4 rounded-[22px] border border-[#d6b66f]/30 bg-[#100e09] px-8 py-4"
                                     >
-                                        <div className="text-center font-mono text-[34px] font-bold tracking-[0.12em] text-[#f5d58b] drop-shadow-[0_0_12px_rgba(245,213,139,0.35)]">
+                                        <div className="text-center font-mono text-[34px] font-bold tracking-[0.12em] text-[#f5d58b]">
                                             {clockText}
                                         </div>
                                     </motion.div>
                                 </div>
 
-                                {/* VIDEO AREA — BLACK BACKGROUND */}
-                                <div
-                                    className="
-                                        relative z-10 flex h-[250px] w-full
-                                        items-end justify-center overflow-hidden
-                                        rounded-[32px] border border-[#d6b66f]/20
-                                        bg-black
-                                        shadow-[inset_0_0_35px_rgba(218,170,95,0.05)]
-                                        sm:h-[280px]
-                                    "
-                                >
-                                    <motion.video
+                                {/* Countdown video */}
+                                <div className="relative z-10 flex h-[250px] w-full items-center justify-center overflow-hidden rounded-[32px] bg-black sm:h-[280px]">
+                                    <video
                                         src="/1.2.mp4"
                                         autoPlay
                                         muted
@@ -756,14 +526,11 @@ export default function IntroScreen({ onNext }) {
                                         playsInline
                                         preload="auto"
                                         className="h-full w-full object-contain"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.7 }}
                                     />
                                 </div>
 
                                 <div className="relative z-10 mt-7 text-center">
-                                    <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 drop-shadow-[0_2px_12px_rgba(255,150,220,0.25)] md:text-4xl">
+                                    <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 md:text-4xl">
                                         Something special
                                         <br />
                                         is waiting...
@@ -787,7 +554,6 @@ export default function IntroScreen({ onNext }) {
                                                 <motion.div
                                                     className="h-full rounded-full bg-gradient-to-r from-amber-400 via-pink-400 to-fuchsia-500"
                                                     style={{ width: `${loadingProgress}%` }}
-                                                    transition={{ duration: 0.15 }}
                                                 />
                                             </div>
 
@@ -808,8 +574,7 @@ export default function IntroScreen({ onNext }) {
                                                     w-full max-w-[320px] justify-center
                                                     rounded-full border border-[#f5d58b]/40
                                                     bg-gradient-to-r from-[#b98736] via-[#f0c875] to-[#b98736]
-                                                    text-black shadow-[0_8px_35px_rgba(218,170,95,0.30)]
-                                                    transition-transform hover:scale-[1.03]
+                                                    text-black
                                                 "
                                             >
                                                 <Gift size={21} />
@@ -841,27 +606,23 @@ export default function IntroScreen({ onNext }) {
                         className="fixed inset-0 overflow-hidden bg-[#03050f]"
                     >
                         <div className="absolute inset-0 bg-[#03050f]" />
-
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(80,50,180,0.27),transparent_62%)]" />
-
                         <div className="absolute inset-x-0 bottom-0 h-[55%] bg-[radial-gradient(circle_at_50%_100%,rgba(255,70,180,0.15),transparent_65%)]" />
 
                         <BackgroundFireworks />
 
-                        {/* প্রথম ভিডিও: পর্দার আড়াল থেকে মেয়েটি বের হবে */}
+                        {/* Curtain video: no upward animation */}
                         {showCurtainVideo && (
-                            <motion.video
+                            <video
                                 key="curtain-video"
                                 src="/curtain.mp4"
                                 autoPlay
                                 muted
                                 playsInline
                                 preload="auto"
-                                onTimeUpdate={handleCurtainVideoTime}
-                                onEnded={handleCurtainVideoEnd}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
+                                onTimeUpdate={handleCurtainTime}
+                                onEnded={startFinalVideo}
+                                onError={startFinalVideo}
                                 className="
                                     pointer-events-none absolute inset-0
                                     z-20 h-full w-full
@@ -870,98 +631,40 @@ export default function IntroScreen({ onNext }) {
                             />
                         )}
 
-                        {/* দ্বিতীয় ভিডিও: পর্দার ভিডিওতে মেয়েটি আড়ালে গেলেই চালু হবে */}
-                        <AnimatePresence>
-                            {showFinalVideo && (
-                                <motion.div
-                                    key="final-video-container"
-                                    initial={{
-                                        opacity: 0,
-                                        y: 70,
-                                    }}
-                                    animate={{
-                                        opacity: 1,
-                                        y: 0,
-                                    }}
-                                    exit={{
-                                        opacity: 0,
-                                        y: 40,
-                                    }}
-                                    transition={{
-                                        duration: 0.8,
-                                        ease: "easeOut",
-                                    }}
-                                    className="
-                                        pointer-events-none
-                                        absolute
-                                        left-0
-                                        right-0
-                                        top-[34%]
-                                        bottom-[8%]
-                                        z-20
-                                        flex
-                                        items-center
-                                        justify-center
-                                        overflow-hidden
-                                    "
-                                >
-                                    <video
-                                        src="/lv_0_20261030214702.mp4"
-                                        autoPlay
-                                        muted
-                                        playsInline
-                                        preload="auto"
-                                        className="
-                                            h-full
-                                            w-full
-                                            object-contain
-                                            object-center
-                                            mix-blend-screen
-                                        "
-                                        onEnded={() => {
-                                            setShowStartButton(true)
-                                        }}
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        {/* Final video: directly starts, no slide-up effect */}
+                        {showFinalVideo && (
+                            <video
+                                key="final-video"
+                                src="/lv_0_20261030214702.mp4"
+                                autoPlay
+                                muted
+                                playsInline
+                                preload="auto"
+                                onEnded={finishFinalVideo}
+                                onError={finishFinalVideo}
+                                className="
+                                    pointer-events-none absolute inset-0
+                                    z-20 h-full w-full
+                                    object-contain object-center
+                                    mix-blend-screen
+                                "
+                            />
+                        )}
 
-                        {/* Birthday card */}
+                        {/* Birthday card: transparent background */}
                         <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
                             <motion.div
-                                initial={{
-                                    opacity: 0,
-                                    y: 20,
-                                    scale: 0.95,
-                                }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                    scale: 1,
-                                }}
-                                transition={{
-                                    duration: 0.6,
-                                    ease: "easeOut",
-                                }}
+                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{ duration: 0.6 }}
                                 className="
                                     relative w-full max-w-[420px]
-                                    rounded-[42px] border border-white/25
-                                    bg-white/[0.90] p-5
-                                    shadow-[0_25px_80px_rgba(0,0,0,0.45)]
-                                    backdrop-blur-xl
+                                    rounded-[42px] p-5
+                                    bg-transparent
                                 "
                             >
-                                <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
-
-                                {/* GIF */}
-                                <div
-                                    className="
-                                        relative z-10 flex h-[105px] w-full
-                                        items-center justify-center overflow-hidden
-                                        rounded-[30px] bg-gradient-to-b
-                                        from-pink-100 to-pink-200 shadow-inner
-                                    "
-                                >
+                                {/* GIF area: transparent */}
+                                <div className="relative z-10 flex h-[105px] w-full items-center justify-center overflow-hidden bg-transparent">
                                     <motion.img
                                         key={showSecondGif ? "gif-5" : "gif-121"}
                                         src={
@@ -977,35 +680,28 @@ export default function IntroScreen({ onNext }) {
                                     />
                                 </div>
 
-                                {/* Title */}
                                 <div className="relative z-10 mt-5 text-center">
-                                    <h1 className="text-2xl font-semibold leading-tight text-primary md:text-3xl">
+                                    <h1 className="text-2xl font-semibold leading-tight text-pink-200 md:text-3xl">
                                         Happy Birthday,
                                         <br />
                                         Cutie ❤️
                                     </h1>
 
-                                    <p className="mt-2 text-sm text-primary/65 md:text-base">
+                                    <p className="mt-2 text-sm text-white/75 md:text-base">
                                         Today is all about you ✨
                                     </p>
                                 </div>
                             </motion.div>
                         </div>
 
-                        {/* Firework + letters */}
+                        {/* Fireworks and letters */}
                         <BirthdayFireworkShow
                             onAllLettersShown={() => setShowSecondGif(true)}
-                            onBalloonPhase={() => {
-                                setShowCurtainVideo(true)
-                            }}
+                            onBalloonPhase={() => setShowCurtainVideo(true)}
                         />
 
-                        {/* A little surprise */}
                         <motion.div
-                            className="
-                                absolute left-1/2 top-[27%] z-30
-                                -translate-x-1/2 whitespace-nowrap
-                            "
+                            className="absolute left-1/2 top-[27%] z-30 -translate-x-1/2 whitespace-nowrap"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7 }}
@@ -1019,28 +715,11 @@ export default function IntroScreen({ onNext }) {
                         <AnimatePresence>
                             {showStartButton && (
                                 <motion.div
-                                    initial={{
-                                        opacity: 0,
-                                        y: 35,
-                                        scale: 0.9,
-                                    }}
-                                    animate={{
-                                        opacity: 1,
-                                        y: 0,
-                                        scale: 1,
-                                    }}
-                                    exit={{
-                                        opacity: 0,
-                                        y: 20,
-                                    }}
-                                    transition={{
-                                        duration: 0.6,
-                                        ease: "backOut",
-                                    }}
-                                    className="
-                                        fixed bottom-8 left-1/2
-                                        z-[200] -translate-x-1/2 px-4
-                                    "
+                                    initial={{ opacity: 0, y: 35, scale: 0.9 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    transition={{ duration: 0.6, ease: "backOut" }}
+                                    className="fixed bottom-8 left-1/2 z-[200] -translate-x-1/2 px-4"
                                 >
                                     <Button
                                         onClick={() => onNext?.()}
@@ -1057,96 +736,8 @@ export default function IntroScreen({ onNext }) {
                             )}
                         </AnimatePresence>
 
-                        {/* Signature */}
                         <div className="fixed bottom-4 right-4 z-[150] text-sm text-white/30">
                             @Rafee🫶protiva
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* STEP 2 — ORIGINAL CUTIEPIE SCREEN */}
-
-                {step === 2 && (
-                    <motion.div
-                        key="step2"
-                        initial={{
-                            opacity: 0,
-                            scale: 0.96,
-                            y: 20,
-                        }}
-                        animate={{
-                            opacity: 1,
-                            scale: 1,
-                            y: 0,
-                        }}
-                        exit={{
-                            opacity: 0,
-                            scale: 1.03,
-                        }}
-                        transition={{
-                            duration: 0.5,
-                            ease: "easeOut",
-                        }}
-                        className="
-                            fixed inset-0 flex min-h-screen
-                            items-center justify-center overflow-y-auto
-                            px-4 py-6
-                        "
-                    >
-                        <div
-                            className="
-                                mx-auto flex w-full max-w-[440px]
-                                flex-col items-center gap-4
-                                rounded-[60px] bg-[#fff8fc] p-7
-                                drop-shadow-2xl
-                            "
-                        >
-                            <div
-                                className="
-                                    relative flex h-44 w-full items-end
-                                    justify-center overflow-hidden
-                                    rounded-[40px] bg-gradient-to-b
-                                    from-white/80 to-pink-200 shadow-inner
-                                    md:h-52
-                                "
-                            >
-                                <img
-                                    loading="lazy"
-                                    src="/gifs/intro.gif"
-                                    alt="Cute"
-                                    className="w-26 md:w-32"
-                                />
-                            </div>
-
-                            <div className="text-center">
-                                <h1
-                                    className="
-                                        text-2xl font-semibold leading-tight
-                                        text-primary drop-shadow md:text-3xl
-                                    "
-                                >
-                                    A Cutiepie was born today,
-                                    <br />
-                                    16 years ago!
-                                </h1>
-
-                                <p className="mt-4 text-foreground">
-                                    Yes, it’s YOU! A little surprise awaits...
-                                </p>
-                            </div>
-
-                            <div className="mt-4">
-                                <Button
-                                    onClick={() => onNext?.()}
-                                    className="
-                                        justify-center bg-[#f1caeb]
-                                        text-primary
-                                    "
-                                >
-                                    <Gift size={20} />
-                                    <span>Start the surprise</span>
-                                </Button>
-                            </div>
                         </div>
                     </motion.div>
                 )}
