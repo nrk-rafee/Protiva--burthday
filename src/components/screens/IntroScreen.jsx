@@ -567,7 +567,6 @@ export default function IntroScreen({ onNext }) {
     const [showSecondGif, setShowSecondGif] = useState(false)
     const [showCurtainVideo, setShowCurtainVideo] = useState(false)
 
-    // Countdown: 11:59:50 to 12:00:00
     const [remainingSeconds, setRemainingSeconds] = useState(10)
     const [midnightReached, setMidnightReached] = useState(false)
 
@@ -578,7 +577,6 @@ export default function IntroScreen({ onNext }) {
 
     const CURTAIN_REVEAL_TIME = 5.0
 
-    // Countdown runs once when the first screen appears
     useEffect(() => {
         if (step !== 0 || midnightReached) return
 
@@ -604,7 +602,6 @@ export default function IntroScreen({ onNext }) {
         return () => clearInterval(timer)
     }, [step, midnightReached])
 
-    // Try to start birthday song exactly when countdown ends
     useEffect(() => {
         if (!midnightReached || audioStartedRef.current) return
 
@@ -614,10 +611,7 @@ export default function IntroScreen({ onNext }) {
         audioStartedRef.current = true
         audio.currentTime = 0
 
-        audio.play().catch(() => {
-            // Mobile browsers may require a user tap.
-            // The Open It button also tries to play the audio.
-        })
+        audio.play().catch(() => {})
     }, [midnightReached])
 
     const startBirthdaySong = () => {
@@ -659,7 +653,6 @@ export default function IntroScreen({ onNext }) {
 
     return (
         <>
-            {/* Birthday audio */}
             <audio
                 ref={audioRef}
                 src="/images/birthdaysong.mp3"
@@ -669,25 +662,14 @@ export default function IntroScreen({ onNext }) {
 
             <AnimatePresence mode="wait">
 
-                {/* ==================================================
-                    STEP 0 — MIDNIGHT COUNTDOWN SCREEN
-                ================================================== */}
+                {/* STEP 0 — MIDNIGHT COUNTDOWN */}
 
                 {step === 0 && (
                     <motion.div
                         key="step0"
-                        initial={{
-                            opacity: 0,
-                            scale: 0.985,
-                        }}
-                        animate={{
-                            opacity: 1,
-                            scale: 1,
-                        }}
-                        exit={{
-                            opacity: 0,
-                            scale: 1.015,
-                        }}
+                        initial={{ opacity: 0, scale: 0.985 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.015 }}
                         transition={{ duration: 0.4 }}
                         className="fixed inset-0 overflow-hidden bg-black"
                     >
@@ -700,56 +682,37 @@ export default function IntroScreen({ onNext }) {
                         <div className="relative z-20 flex min-h-screen w-full items-center justify-center px-4 py-8">
 
                             <motion.div
-                                initial={{
-                                    opacity: 0,
-                                    y: 18,
-                                }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                }}
+                                initial={{ opacity: 0, y: 18 }}
+                                animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.45 }}
                                 className="
-                                    relative
-                                    mx-auto
-                                    w-full
-                                    max-w-[440px]
-                                    overflow-hidden
-                                    rounded-[42px]
-                                    border
-                                    border-[#d6b66f]/30
-                                    bg-black/80
-                                    p-6
+                                    relative mx-auto w-full max-w-[440px]
+                                    overflow-hidden rounded-[42px]
+                                    border border-[#d6b66f]/30
+                                    bg-black/80 p-6
                                     shadow-[0_25px_80px_rgba(0,0,0,0.8),0_0_35px_rgba(218,170,95,0.12)]
-                                    backdrop-blur-xl
-                                    md:p-8
+                                    backdrop-blur-xl md:p-8
                                 "
                             >
                                 <div className="pointer-events-none absolute inset-0 rounded-[42px] border border-white/5" />
 
                                 <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-amber-300/10 blur-3xl" />
 
-                                {/* Midnight label */}
                                 <div className="relative z-10 mb-5 flex flex-col items-center">
                                     <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#d8b66f]">
                                         <Clock size={17} />
                                         Midnight Surprise
                                     </div>
 
-                                    {/* Clock */}
                                     <motion.div
                                         key={clockText}
                                         initial={{ opacity: 0.65, scale: 0.97 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ duration: 0.15 }}
                                         className="
-                                            mt-4
-                                            rounded-[22px]
-                                            border
-                                            border-[#d6b66f]/30
-                                            bg-[#100e09]
-                                            px-8
-                                            py-4
+                                            mt-4 rounded-[22px]
+                                            border border-[#d6b66f]/30
+                                            bg-[#100e09] px-8 py-4
                                             shadow-[0_0_30px_rgba(218,170,95,0.10)]
                                         "
                                     >
@@ -759,21 +722,15 @@ export default function IntroScreen({ onNext }) {
                                     </motion.div>
                                 </div>
 
-                                {/* Birthday video */}
+                                {/* VIDEO — পাশের জায়গাগুলো এখন কালো */}
+
                                 <div
                                     className="
-                                        relative
-                                        z-10
-                                        flex
-                                        h-[250px]
-                                        w-full
-                                        items-end
-                                        justify-center
-                                        overflow-hidden
-                                        rounded-[32px]
-                                        border
-                                        border-[#d6b66f]/20
-                                        bg-[radial-gradient(circle_at_50%_45%,rgba(120,90,40,0.16),#050505_75%)]
+                                        relative z-10 flex h-[250px] w-full
+                                        items-end justify-center
+                                        overflow-hidden rounded-[32px]
+                                        border border-[#d6b66f]/20
+                                        bg-black
                                         shadow-[inset_0_0_35px_rgba(218,170,95,0.05)]
                                         sm:h-[280px]
                                     "
@@ -785,14 +742,13 @@ export default function IntroScreen({ onNext }) {
                                         loop
                                         playsInline
                                         preload="auto"
-                                        className="h-full w-full object-contain"
+                                        className="h-full w-full bg-black object-contain"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.7 }}
                                     />
                                 </div>
 
-                                {/* Title */}
                                 <div className="relative z-10 mt-7 text-center">
                                     <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 drop-shadow-[0_2px_12px_rgba(255,150,220,0.25)] md:text-4xl">
                                         Something special
@@ -807,7 +763,6 @@ export default function IntroScreen({ onNext }) {
                                     </p>
                                 </div>
 
-                                {/* Loading / Open button */}
                                 <div className="relative z-10 mt-8 min-h-[90px]">
 
                                     {!midnightReached ? (
@@ -822,9 +777,7 @@ export default function IntroScreen({ onNext }) {
                                                     style={{
                                                         width: `${loadingProgress}%`,
                                                     }}
-                                                    transition={{
-                                                        duration: 0.15,
-                                                    }}
+                                                    transition={{ duration: 0.15 }}
                                                 />
                                             </div>
 
@@ -853,20 +806,14 @@ export default function IntroScreen({ onNext }) {
                                             <Button
                                                 onClick={handleOpenIt}
                                                 className="
-                                                    w-full
-                                                    max-w-[320px]
-                                                    justify-center
-                                                    rounded-full
-                                                    border
-                                                    border-[#f5d58b]/40
+                                                    w-full max-w-[320px]
+                                                    justify-center rounded-full
+                                                    border border-[#f5d58b]/40
                                                     bg-gradient-to-r
-                                                    from-[#b98736]
-                                                    via-[#f0c875]
-                                                    to-[#b98736]
+                                                    from-[#b98736] via-[#f0c875] to-[#b98736]
                                                     text-black
                                                     shadow-[0_8px_35px_rgba(218,170,95,0.30)]
-                                                    transition-transform
-                                                    hover:scale-[1.03]
+                                                    transition-transform hover:scale-[1.03]
                                                 "
                                             >
                                                 <Gift size={21} />
@@ -886,9 +833,7 @@ export default function IntroScreen({ onNext }) {
                     </motion.div>
                 )}
 
-                {/* ==================================================
-                    STEP 1 — BIRTHDAY FIREWORK + CURTAIN VIDEO
-                ================================================== */}
+                {/* STEP 1 — BIRTHDAY FIREWORK + VIDEO OVERLAY */}
 
                 {step === 1 && (
                     <motion.div
@@ -907,33 +852,34 @@ export default function IntroScreen({ onNext }) {
 
                         <BackgroundFireworks />
 
-                        {/* Curtain video */}
+                        {/* নতুন ভিডিও: পর্দার অ্যানিমেশনের জায়গায় full-screen overlay */}
+
                         {showCurtainVideo && (
                             <motion.video
-                                key="curtain-video"
-                                src="/curtain.mp4"
+                                key="birthday-overlay-video"
+                                src="/lv_0_20261030214702.mp4"
                                 autoPlay
                                 muted
                                 playsInline
                                 preload="auto"
                                 onTimeUpdate={handleCurtainVideoTime}
+                                onEnded={() => setShowStartButton(true)}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
                                 className="
                                     pointer-events-none
-                                    absolute
-                                    inset-0
+                                    fixed inset-0
                                     z-20
-                                    h-full
-                                    w-full
+                                    h-full w-full
+                                    bg-black
                                     object-contain
-                                    mix-blend-screen
                                 "
                             />
                         )}
 
                         {/* Birthday card */}
+
                         <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
                             <motion.div
                                 initial={{
@@ -951,14 +897,9 @@ export default function IntroScreen({ onNext }) {
                                     ease: "easeOut",
                                 }}
                                 className="
-                                    relative
-                                    w-full
-                                    max-w-[420px]
-                                    rounded-[42px]
-                                    border
-                                    border-white/25
-                                    bg-white/[0.90]
-                                    p-5
+                                    relative w-full max-w-[420px]
+                                    rounded-[42px] border border-white/25
+                                    bg-white/[0.90] p-5
                                     shadow-[0_25px_80px_rgba(0,0,0,0.45)]
                                     backdrop-blur-xl
                                 "
@@ -966,20 +907,13 @@ export default function IntroScreen({ onNext }) {
                                 <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
                                 {/* GIF */}
+
                                 <div
                                     className="
-                                        relative
-                                        z-10
-                                        flex
-                                        h-[105px]
-                                        w-full
-                                        items-center
-                                        justify-center
-                                        overflow-hidden
-                                        rounded-[30px]
-                                        bg-gradient-to-b
-                                        from-pink-100
-                                        to-pink-200
+                                        relative z-10 flex h-[105px] w-full
+                                        items-center justify-center
+                                        overflow-hidden rounded-[30px]
+                                        bg-gradient-to-b from-pink-100 to-pink-200
                                         shadow-inner
                                     "
                                 >
@@ -999,6 +933,7 @@ export default function IntroScreen({ onNext }) {
                                 </div>
 
                                 {/* Title */}
+
                                 <div className="relative z-10 mt-5 text-center">
                                     <h1 className="text-2xl font-semibold leading-tight text-primary md:text-3xl">
                                         Happy Birthday,
@@ -1013,7 +948,6 @@ export default function IntroScreen({ onNext }) {
                             </motion.div>
                         </div>
 
-                        {/* Firework + letters */}
                         <BirthdayFireworkShow
                             onAllLettersShown={() => setShowSecondGif(true)}
                             onBalloonPhase={() => {
@@ -1021,24 +955,13 @@ export default function IntroScreen({ onNext }) {
                             }}
                         />
 
-                        {/* A little surprise */}
                         <motion.div
                             className="
-                                absolute
-                                left-1/2
-                                top-[27%]
-                                z-30
-                                -translate-x-1/2
-                                whitespace-nowrap
+                                absolute left-1/2 top-[27%]
+                                z-30 -translate-x-1/2 whitespace-nowrap
                             "
-                            initial={{
-                                opacity: 0,
-                                y: -10,
-                            }}
-                            animate={{
-                                opacity: 1,
-                                y: 0,
-                            }}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7 }}
                         >
                             <p className="text-[10px] uppercase tracking-[0.32em] text-white/45">
@@ -1047,6 +970,7 @@ export default function IntroScreen({ onNext }) {
                         </motion.div>
 
                         {/* Start button */}
+
                         <AnimatePresence>
                             {showStartButton && (
                                 <motion.div
@@ -1069,21 +993,15 @@ export default function IntroScreen({ onNext }) {
                                         ease: "backOut",
                                     }}
                                     className="
-                                        fixed
-                                        bottom-8
-                                        left-1/2
-                                        z-[200]
-                                        -translate-x-1/2
-                                        px-4
+                                        fixed bottom-8 left-1/2
+                                        z-[200] -translate-x-1/2 px-4
                                     "
                                 >
                                     <Button
                                         onClick={() => onNext?.()}
                                         className="
-                                            min-w-[230px]
-                                            justify-center
-                                            bg-[#f1caeb]
-                                            text-primary
+                                            min-w-[230px] justify-center
+                                            bg-[#f1caeb] text-primary
                                             shadow-[0_10px_40px_rgba(255,120,210,0.35)]
                                         "
                                     >
@@ -1094,16 +1012,13 @@ export default function IntroScreen({ onNext }) {
                             )}
                         </AnimatePresence>
 
-                        {/* Signature */}
                         <div className="fixed bottom-4 right-4 z-[150] text-sm text-white/30">
                             @Rafee🫶protiva
                         </div>
                     </motion.div>
                 )}
 
-                {/* ==================================================
-                    STEP 2 — ORIGINAL CUTIEPIE SCREEN
-                ================================================== */}
+                {/* STEP 2 — ORIGINAL CUTIEPIE SCREEN */}
 
                 {step === 2 && (
                     <motion.div
@@ -1127,46 +1042,25 @@ export default function IntroScreen({ onNext }) {
                             ease: "easeOut",
                         }}
                         className="
-                            fixed
-                            inset-0
-                            flex
-                            min-h-screen
-                            items-center
-                            justify-center
-                            overflow-y-auto
-                            px-4
-                            py-6
+                            fixed inset-0 flex min-h-screen
+                            items-center justify-center overflow-y-auto
+                            px-4 py-6
                         "
                     >
                         <div
                             className="
-                                mx-auto
-                                flex
-                                w-full
-                                max-w-[440px]
-                                flex-col
-                                items-center
-                                gap-4
-                                rounded-[60px]
-                                bg-[#fff8fc]
-                                p-7
+                                mx-auto flex w-full max-w-[440px]
+                                flex-col items-center gap-4
+                                rounded-[60px] bg-[#fff8fc] p-7
                                 drop-shadow-2xl
                             "
                         >
                             <div
                                 className="
-                                    relative
-                                    flex
-                                    h-44
-                                    w-full
-                                    items-end
-                                    justify-center
-                                    overflow-hidden
-                                    rounded-[40px]
-                                    bg-gradient-to-b
-                                    from-white/80
-                                    to-pink-200
-                                    shadow-inner
+                                    relative flex h-44 w-full
+                                    items-end justify-center overflow-hidden
+                                    rounded-[40px] bg-gradient-to-b
+                                    from-white/80 to-pink-200 shadow-inner
                                     md:h-52
                                 "
                             >
@@ -1181,12 +1075,8 @@ export default function IntroScreen({ onNext }) {
                             <div className="text-center">
                                 <h1
                                     className="
-                                        text-2xl
-                                        font-semibold
-                                        leading-tight
-                                        text-primary
-                                        drop-shadow
-                                        md:text-3xl
+                                        text-2xl font-semibold leading-tight
+                                        text-primary drop-shadow md:text-3xl
                                     "
                                 >
                                     A Cutiepie was born today,
@@ -1203,8 +1093,7 @@ export default function IntroScreen({ onNext }) {
                                 <Button
                                     onClick={() => onNext?.()}
                                     className="
-                                        justify-center
-                                        bg-[#f1caeb]
+                                        justify-center bg-[#f1caeb]
                                         text-primary
                                     "
                                 >
