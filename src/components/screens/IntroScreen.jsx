@@ -626,28 +626,10 @@ export default function IntroScreen({ onNext }) {
     const [showSecondGif, setShowSecondGif] =
         useState(false)
 
-    /*
-      NEW:
-      Video starts when the birthday letters begin
-      flying away with balloons.
-    */
-
     const [showCurtainVideo, setShowCurtainVideo] =
         useState(false)
 
-    /*
-      NEW:
-      Prevents the button from appearing more than once.
-    */
-
     const buttonShownRef = useRef(false)
-
-    /*
-      NEW:
-      The button appears when the girl has moved
-      behind the curtain.
-      Adjust this value if the curtain opens earlier/later.
-    */
 
     const CURTAIN_REVEAL_TIME = 5.0
 
@@ -721,6 +703,8 @@ export default function IntroScreen({ onNext }) {
                         >
                             <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-gradient-to-b from-white/[0.06] to-transparent" />
 
+                            {/* GIFT + VIDEO */}
+
                             <div
                                 className="
                                     relative
@@ -730,6 +714,7 @@ export default function IntroScreen({ onNext }) {
                                     w-full
                                     items-center
                                     justify-center
+                                    gap-3
                                     overflow-hidden
                                     rounded-[38px]
                                     border
@@ -737,10 +722,13 @@ export default function IntroScreen({ onNext }) {
                                     bg-gradient-to-b
                                     from-[#77758e]
                                     to-[#66657d]
+                                    px-3
                                 "
                             >
+                                {/* Original Gift */}
+
                                 <motion.div
-                                    className="text-7xl md:text-8xl"
+                                    className="flex h-full flex-1 items-center justify-center text-7xl md:text-8xl"
                                     animate={{
                                         y: [0, -7, 0],
                                         rotate: [-2, 2, -2],
@@ -752,6 +740,20 @@ export default function IntroScreen({ onNext }) {
                                 >
                                     🎁
                                 </motion.div>
+
+                                {/* NEW VIDEO - Gift er dan pashe */}
+
+                                <div className="flex h-[135px] w-[46%] shrink-0 items-center justify-center overflow-hidden rounded-[24px]">
+                                    <video
+                                        src="/1.2.mp4"
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        preload="auto"
+                                        className="h-full w-full rounded-[24px] object-contain"
+                                    />
+                                </div>
                             </div>
 
                             <div className="relative z-10 mt-8 text-center">
@@ -818,11 +820,7 @@ export default function IntroScreen({ onNext }) {
 
                     <BackgroundFireworks />
 
-                    {/* ==================================================
-                        NEW CURTAIN VIDEO
-                        Starts with the balloon animation.
-                        Black background blends into the night sky.
-                    ================================================== */}
+                    {/* CURTAIN VIDEO */}
 
                     {showCurtainVideo && (
                         <motion.video
@@ -849,9 +847,7 @@ export default function IntroScreen({ onNext }) {
                         />
                     )}
 
-                    {/* ==================================================
-                        OLD BIRTHDAY CARD
-                    ================================================== */}
+                    {/* OLD BIRTHDAY CARD */}
 
                     <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
                         <motion.div
@@ -946,9 +942,7 @@ export default function IntroScreen({ onNext }) {
                         </motion.div>
                     </div>
 
-                    {/* ==================================================
-                        FIREWORK + LETTER AREA
-                    ================================================== */}
+                    {/* FIREWORK + LETTER AREA */}
 
                     <BirthdayFireworkShow
                         onAllLettersShown={() => setShowSecondGif(true)}
@@ -957,9 +951,7 @@ export default function IntroScreen({ onNext }) {
                         }}
                     />
 
-                    {/* ==================================================
-                        A LITTLE SURPRISE
-                    ================================================== */}
+                    {/* A LITTLE SURPRISE */}
 
                     <motion.div
                         className="
@@ -985,11 +977,7 @@ export default function IntroScreen({ onNext }) {
                         </p>
                     </motion.div>
 
-                    {/* ==================================================
-                        START THE SURPRISE BUTTON
-                        Appears only when the video reaches the
-                        curtain-reveal moment.
-                    ================================================== */}
+                    {/* START THE SURPRISE BUTTON */}
 
                     <AnimatePresence>
                         {showStartButton && (
