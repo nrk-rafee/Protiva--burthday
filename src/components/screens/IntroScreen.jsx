@@ -1,20 +1,14 @@
 
 "use client"
 
-import {
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react"
-
+import { useEffect, useMemo, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Gift, Heart, Clock } from "lucide-react"
 import Button from "../Button"
 
-/* ======================================================
+/* =========================================
    TOP DECORATIONS
-====================================================== */
+========================================= */
 
 const hangingDecorations = [
     { type: "moon", left: "5%", size: 70, length: 100, delay: 0 },
@@ -94,9 +88,9 @@ function TopDecoration() {
     )
 }
 
-/* ======================================================
+/* =========================================
    BOTTOM BALLOONS
-====================================================== */
+========================================= */
 
 const bottomBalloons = [
     "#e9a44f",
@@ -144,9 +138,9 @@ function BottomBalloons() {
     )
 }
 
-/* ======================================================
-   FIREWORK BACKGROUND
-====================================================== */
+/* =========================================
+   BACKGROUND FIREWORKS
+========================================= */
 
 const backgroundFireworks = [
     { left: "10%", top: "18%", color: "#ff6fae", delay: 0 },
@@ -217,9 +211,9 @@ function BackgroundFireworks() {
     )
 }
 
-/* ======================================================
-   LETTER DATA
-====================================================== */
+/* =========================================
+   BIRTHDAY LETTER DATA
+========================================= */
 
 const words = ["HAPPY", "BIRTHDAY", "CUTIE"]
 
@@ -252,9 +246,9 @@ function createLetters() {
     )
 }
 
-/* ======================================================
-   ONE FIREWORK LETTER
-====================================================== */
+/* =========================================
+   FIREWORK LETTER
+========================================= */
 
 function FireworkLetter({ item, visible, balloonPhase }) {
     const wordPositions = {
@@ -263,14 +257,13 @@ function FireworkLetter({ item, visible, balloonPhase }) {
         2: { top: "76%", left: "50%" },
     }
 
-    const position = wordPositions[item.wordIndex]
-
     const wordLengths = {
         0: 5,
         1: 8,
         2: 4,
     }
 
+    const position = wordPositions[item.wordIndex]
     const wordLength = wordLengths[item.wordIndex]
     const spacing = 42
 
@@ -324,8 +317,6 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                         const angle = (360 / 16) * rayIndex
                         const radians = (angle * Math.PI) / 180
                         const distance = 25 + (rayIndex % 4) * 9
-                        const x = Math.cos(radians) * distance
-                        const y = Math.sin(radians) * distance
 
                         return (
                             <motion.span
@@ -342,8 +333,8 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                                     scale: 1,
                                 }}
                                 animate={{
-                                    x,
-                                    y,
+                                    x: Math.cos(radians) * distance,
+                                    y: Math.sin(radians) * distance,
                                     opacity: 0,
                                     scale: 0,
                                 }}
@@ -454,9 +445,9 @@ function FireworkLetter({ item, visible, balloonPhase }) {
     )
 }
 
-/* ======================================================
+/* =========================================
    BIRTHDAY FIREWORK SHOW
-====================================================== */
+========================================= */
 
 function BirthdayFireworkShow({
     onAllLettersShown,
@@ -556,9 +547,9 @@ function BirthdayFireworkShow({
     )
 }
 
-/* ======================================================
+/* =========================================
    MAIN INTRO SCREEN
-====================================================== */
+========================================= */
 
 export default function IntroScreen({ onNext }) {
     const [step, setStep] = useState(0)
@@ -567,23 +558,22 @@ export default function IntroScreen({ onNext }) {
     const [showSecondGif, setShowSecondGif] = useState(false)
     const [showCurtainVideo, setShowCurtainVideo] = useState(false)
 
-    // Countdown: 11:59:50 to 12:00:00
+    // Countdown: 11:59:50 -> 12:00:00
     const [remainingSeconds, setRemainingSeconds] = useState(10)
     const [midnightReached, setMidnightReached] = useState(false)
 
     const audioRef = useRef(null)
     const audioStartedRef = useRef(false)
-
     const buttonShownRef = useRef(false)
 
-    const CURTAIN_REVEAL_TIME = 5.0
+    const CURTAIN_REVEAL_TIME = 5
 
-    // Countdown runs once when the first screen appears
+    /* 10-second countdown */
     useEffect(() => {
         if (step !== 0 || midnightReached) return
 
         const startTime = Date.now()
-        const duration = 10000
+        const duration = 10 * 1000
 
         const timer = setInterval(() => {
             const elapsed = Date.now() - startTime
@@ -604,7 +594,7 @@ export default function IntroScreen({ onNext }) {
         return () => clearInterval(timer)
     }, [step, midnightReached])
 
-    // Try to start birthday song exactly when countdown ends
+    /* Try playing birthday song at midnight */
     useEffect(() => {
         if (!midnightReached || audioStartedRef.current) return
 
@@ -615,8 +605,8 @@ export default function IntroScreen({ onNext }) {
         audio.currentTime = 0
 
         audio.play().catch(() => {
-            // Mobile browsers may require a user tap.
-            // The Open It button also tries to play the audio.
+            // Mobile browser may require a tap.
+            // The Open It button will also start the song.
         })
     }, [midnightReached])
 
@@ -634,6 +624,7 @@ export default function IntroScreen({ onNext }) {
         setStep(1)
     }
 
+    /* Show button 5 seconds after curtain video starts */
     const handleCurtainVideoTime = (event) => {
         const video = event.currentTarget
 
@@ -659,7 +650,7 @@ export default function IntroScreen({ onNext }) {
 
     return (
         <>
-            {/* Birthday audio */}
+            {/* Birthday song */}
             <audio
                 ref={audioRef}
                 src="/images/birthdaysong.mp3"
@@ -669,9 +660,9 @@ export default function IntroScreen({ onNext }) {
 
             <AnimatePresence mode="wait">
 
-                {/* ==================================================
-                    STEP 0 — MIDNIGHT COUNTDOWN SCREEN
-                ================================================== */}
+                {/* =====================================
+                    STEP 0 — MIDNIGHT COUNTDOWN
+                ===================================== */}
 
                 {step === 0 && (
                     <motion.div
@@ -698,7 +689,6 @@ export default function IntroScreen({ onNext }) {
                         <TopDecoration />
 
                         <div className="relative z-20 flex min-h-screen w-full items-center justify-center px-4 py-8">
-
                             <motion.div
                                 initial={{
                                     opacity: 0,
@@ -710,46 +700,34 @@ export default function IntroScreen({ onNext }) {
                                 }}
                                 transition={{ duration: 0.45 }}
                                 className="
-                                    relative
-                                    mx-auto
-                                    w-full
-                                    max-w-[440px]
-                                    overflow-hidden
-                                    rounded-[42px]
-                                    border
-                                    border-[#d6b66f]/30
-                                    bg-black/80
-                                    p-6
+                                    relative mx-auto w-full max-w-[440px]
+                                    overflow-hidden rounded-[42px]
+                                    border border-[#d6b66f]/30
+                                    bg-black/80 p-6
                                     shadow-[0_25px_80px_rgba(0,0,0,0.8),0_0_35px_rgba(218,170,95,0.12)]
-                                    backdrop-blur-xl
-                                    md:p-8
+                                    backdrop-blur-xl md:p-8
                                 "
                             >
                                 <div className="pointer-events-none absolute inset-0 rounded-[42px] border border-white/5" />
 
                                 <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-amber-300/10 blur-3xl" />
 
-                                {/* Midnight label */}
+                                {/* Midnight label and clock */}
                                 <div className="relative z-10 mb-5 flex flex-col items-center">
                                     <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#d8b66f]">
                                         <Clock size={17} />
                                         Midnight Surprise
                                     </div>
 
-                                    {/* Clock */}
                                     <motion.div
                                         key={clockText}
                                         initial={{ opacity: 0.65, scale: 0.97 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         transition={{ duration: 0.15 }}
                                         className="
-                                            mt-4
-                                            rounded-[22px]
-                                            border
-                                            border-[#d6b66f]/30
-                                            bg-[#100e09]
-                                            px-8
-                                            py-4
+                                            mt-4 rounded-[22px]
+                                            border border-[#d6b66f]/30
+                                            bg-[#100e09] px-8 py-4
                                             shadow-[0_0_30px_rgba(218,170,95,0.10)]
                                         "
                                     >
@@ -759,33 +737,62 @@ export default function IntroScreen({ onNext }) {
                                     </motion.div>
                                 </div>
 
-                                {/* Anime video */}
+                                {/* Animated birthday visual (no missing GIF) */}
                                 <div
                                     className="
-                                        relative
-                                        z-10
-                                        flex
-                                        h-[250px]
-                                        w-full
-                                        items-end
-                                        justify-center
-                                        overflow-hidden
-                                        rounded-[32px]
-                                        border
-                                        border-[#d6b66f]/20
-                                        bg-[radial-gradient(circle_at_50%_45%,rgba(120,90,40,0.16),#050505_75%)]
+                                        relative z-10 flex h-[250px] w-full
+                                        items-center justify-center overflow-hidden
+                                        rounded-[32px] border border-[#d6b66f]/20
+                                        bg-[radial-gradient(circle_at_50%_45%,rgba(120,90,40,0.22),#050505_75%)]
                                         shadow-[inset_0_0_35px_rgba(218,170,95,0.05)]
                                         sm:h-[280px]
                                     "
                                 >
-                                    <motion.img
-                                        src="/gifs/intro.gif"
-                                        alt="Birthday surprise"
-                                        className="h-full w-full object-contain"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.7 }}
-                                    />
+                                    <motion.div
+                                        animate={{
+                                            y: [0, -12, 0],
+                                            rotate: [-4, 4, -4],
+                                            scale: [1, 1.06, 1],
+                                        }}
+                                        transition={{
+                                            duration: 3,
+                                            repeat: Infinity,
+                                            ease: "easeInOut",
+                                        }}
+                                        className="text-center"
+                                    >
+                                        <div className="text-7xl drop-shadow-[0_0_25px_rgba(255,190,90,0.5)]">
+                                            🎁
+                                        </div>
+
+                                        <p className="mt-5 text-sm font-semibold uppercase tracking-[0.3em] text-[#f5d58b]">
+                                            A Birthday Surprise
+                                        </p>
+
+                                        <div className="mt-3 text-2xl">
+                                            ✨ 💛 ✨
+                                        </div>
+                                    </motion.div>
+
+                                    {Array.from({ length: 12 }).map((_, index) => (
+                                        <motion.span
+                                            key={index}
+                                            className="absolute h-1.5 w-1.5 rounded-full bg-amber-200"
+                                            style={{
+                                                left: `${(index * 37) % 100}%`,
+                                                top: `${(index * 29) % 100}%`,
+                                            }}
+                                            animate={{
+                                                opacity: [0.1, 1, 0.1],
+                                                scale: [0.5, 1.5, 0.5],
+                                            }}
+                                            transition={{
+                                                duration: 2,
+                                                delay: index * 0.2,
+                                                repeat: Infinity,
+                                            }}
+                                        />
+                                    ))}
                                 </div>
 
                                 {/* Title */}
@@ -805,7 +812,6 @@ export default function IntroScreen({ onNext }) {
 
                                 {/* Loading / Open button */}
                                 <div className="relative z-10 mt-8 min-h-[90px]">
-
                                     {!midnightReached ? (
                                         <div className="flex flex-col items-center">
                                             <p className="mb-4 text-[10px] uppercase tracking-[0.35em] text-[#d6b66f]/70">
@@ -849,20 +855,14 @@ export default function IntroScreen({ onNext }) {
                                             <Button
                                                 onClick={handleOpenIt}
                                                 className="
-                                                    w-full
-                                                    max-w-[320px]
-                                                    justify-center
-                                                    rounded-full
-                                                    border
-                                                    border-[#f5d58b]/40
-                                                    bg-gradient-to-r
-                                                    from-[#b98736]
-                                                    via-[#f0c875]
-                                                    to-[#b98736]
+                                                    w-full max-w-[320px]
+                                                    justify-center rounded-full
+                                                    border border-[#f5d58b]/40
+                                                    bg-gradient-to-r from-[#b98736]
+                                                    via-[#f0c875] to-[#b98736]
                                                     text-black
                                                     shadow-[0_8px_35px_rgba(218,170,95,0.30)]
-                                                    transition-transform
-                                                    hover:scale-[1.03]
+                                                    transition-transform hover:scale-[1.03]
                                                 "
                                             >
                                                 <Gift size={21} />
@@ -882,10 +882,9 @@ export default function IntroScreen({ onNext }) {
                     </motion.div>
                 )}
 
-                {/* ==================================================
-                    STEP 1 — BIRTHDAY FIREWORK + CURTAIN VIDEO
-                    Original screen preserved
-                ================================================== */}
+                {/* =====================================
+                    STEP 1 — FIREWORK + CURTAIN VIDEO
+                ===================================== */}
 
                 {step === 1 && (
                     <motion.div
@@ -904,27 +903,27 @@ export default function IntroScreen({ onNext }) {
 
                         <BackgroundFireworks />
 
-                        {/* Curtain video */}
+                        {/* Curtain video
+                            IMPORTANT: File must be public/1.2.mp4
+                        */}
                         {showCurtainVideo && (
                             <motion.video
                                 key="curtain-video"
-                                src="/curtain.mp4"
+                                src="/1.2.mp4"
                                 autoPlay
                                 muted
                                 playsInline
                                 preload="auto"
                                 onTimeUpdate={handleCurtainVideoTime}
+                                onError={() => {
+                                    console.error("Could not load /1.2.mp4")
+                                }}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
                                 className="
-                                    pointer-events-none
-                                    absolute
-                                    inset-0
-                                    z-20
-                                    h-full
-                                    w-full
-                                    object-contain
+                                    pointer-events-none absolute inset-0 z-20
+                                    h-full w-full object-contain
                                     mix-blend-screen
                                 "
                             />
@@ -948,36 +947,22 @@ export default function IntroScreen({ onNext }) {
                                     ease: "easeOut",
                                 }}
                                 className="
-                                    relative
-                                    w-full
-                                    max-w-[420px]
-                                    rounded-[42px]
-                                    border
-                                    border-white/25
-                                    bg-white/[0.90]
-                                    p-5
+                                    relative w-full max-w-[420px]
+                                    rounded-[42px] border border-white/25
+                                    bg-white/[0.90] p-5
                                     shadow-[0_25px_80px_rgba(0,0,0,0.45)]
                                     backdrop-blur-xl
                                 "
                             >
                                 <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
-                                {/* GIF */}
+                                {/* GIF area */}
                                 <div
                                     className="
-                                        relative
-                                        z-10
-                                        flex
-                                        h-[105px]
-                                        w-full
-                                        items-center
-                                        justify-center
-                                        overflow-hidden
-                                        rounded-[30px]
-                                        bg-gradient-to-b
-                                        from-pink-100
-                                        to-pink-200
-                                        shadow-inner
+                                        relative z-10 flex h-[105px] w-full
+                                        items-center justify-center overflow-hidden
+                                        rounded-[30px] bg-gradient-to-b
+                                        from-pink-100 to-pink-200 shadow-inner
                                     "
                                 >
                                     <motion.img
@@ -988,11 +973,18 @@ export default function IntroScreen({ onNext }) {
                                                 : "/gifs/121.webp"
                                         }
                                         alt="Birthday animation"
+                                        onError={(event) => {
+                                            event.currentTarget.style.display = "none"
+                                        }}
                                         className="h-full w-full object-contain"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ duration: 0.35 }}
                                     />
+
+                                    <span className="absolute text-4xl">
+                                        🎂
+                                    </span>
                                 </div>
 
                                 {/* Title */}
@@ -1010,7 +1002,7 @@ export default function IntroScreen({ onNext }) {
                             </motion.div>
                         </div>
 
-                        {/* Firework + letters */}
+                        {/* Firework letters */}
                         <BirthdayFireworkShow
                             onAllLettersShown={() => setShowSecondGif(true)}
                             onBalloonPhase={() => {
@@ -1018,15 +1010,11 @@ export default function IntroScreen({ onNext }) {
                             }}
                         />
 
-                        {/* A little surprise */}
+                        {/* Little surprise label */}
                         <motion.div
                             className="
-                                absolute
-                                left-1/2
-                                top-[27%]
-                                z-30
-                                -translate-x-1/2
-                                whitespace-nowrap
+                                absolute left-1/2 top-[27%] z-30
+                                -translate-x-1/2 whitespace-nowrap
                             "
                             initial={{
                                 opacity: 0,
@@ -1066,21 +1054,15 @@ export default function IntroScreen({ onNext }) {
                                         ease: "backOut",
                                     }}
                                     className="
-                                        fixed
-                                        bottom-8
-                                        left-1/2
-                                        z-[200]
-                                        -translate-x-1/2
-                                        px-4
+                                        fixed bottom-8 left-1/2 z-[200]
+                                        -translate-x-1/2 px-4
                                     "
                                 >
                                     <Button
                                         onClick={() => onNext?.()}
                                         className="
-                                            min-w-[230px]
-                                            justify-center
-                                            bg-[#f1caeb]
-                                            text-primary
+                                            min-w-[230px] justify-center
+                                            bg-[#f1caeb] text-primary
                                             shadow-[0_10px_40px_rgba(255,120,210,0.35)]
                                         "
                                     >
@@ -1094,121 +1076,6 @@ export default function IntroScreen({ onNext }) {
                         {/* Signature */}
                         <div className="fixed bottom-4 right-4 z-[150] text-sm text-white/30">
                             @Rafee🫶protiva
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* ==================================================
-                    STEP 2 — ORIGINAL CUTIEPIE SCREEN
-                ================================================== */}
-
-                {step === 2 && (
-                    <motion.div
-                        key="step2"
-                        initial={{
-                            opacity: 0,
-                            scale: 0.96,
-                            y: 20,
-                        }}
-                        animate={{
-                            opacity: 1,
-                            scale: 1,
-                            y: 0,
-                        }}
-                        exit={{
-                            opacity: 0,
-                            scale: 1.03,
-                        }}
-                        transition={{
-                            duration: 0.5,
-                            ease: "easeOut",
-                        }}
-                        className="
-                            fixed
-                            inset-0
-                            flex
-                            min-h-screen
-                            items-center
-                            justify-center
-                            overflow-y-auto
-                            px-4
-                            py-6
-                        "
-                    >
-                        <div
-                            className="
-                                mx-auto
-                                flex
-                                w-full
-                                max-w-[440px]
-                                flex-col
-                                items-center
-                                gap-4
-                                rounded-[60px]
-                                bg-[#fff8fc]
-                                p-7
-                                drop-shadow-2xl
-                            "
-                        >
-                            <div
-                                className="
-                                    relative
-                                    flex
-                                    h-44
-                                    w-full
-                                    items-end
-                                    justify-center
-                                    overflow-hidden
-                                    rounded-[40px]
-                                    bg-gradient-to-b
-                                    from-white/80
-                                    to-pink-200
-                                    shadow-inner
-                                    md:h-52
-                                "
-                            >
-                                <img
-                                    loading="lazy"
-                                    src="/gifs/intro.gif"
-                                    alt="Cute"
-                                    className="w-26 md:w-32"
-                                />
-                            </div>
-
-                            <div className="text-center">
-                                <h1
-                                    className="
-                                        text-2xl
-                                        font-semibold
-                                        leading-tight
-                                        text-primary
-                                        drop-shadow
-                                        md:text-3xl
-                                    "
-                                >
-                                    A Cutiepie was born today,
-                                    <br />
-                                    16 years ago!
-                                </h1>
-
-                                <p className="mt-4 text-foreground">
-                                    Yes, it’s YOU! A little surprise awaits...
-                                </p>
-                            </div>
-
-                            <div className="mt-4">
-                                <Button
-                                    onClick={() => onNext?.()}
-                                    className="
-                                        justify-center
-                                        bg-[#f1caeb]
-                                        text-primary
-                                    "
-                                >
-                                    <Gift size={20} />
-                                    <span>Start the surprise</span>
-                                </Button>
-                            </div>
                         </div>
                     </motion.div>
                 )}
