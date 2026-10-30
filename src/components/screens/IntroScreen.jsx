@@ -1,3 +1,4 @@
+
 "use client"
 
 import {
@@ -54,8 +55,7 @@ function TopDecoration() {
                                 fontSize: item.size,
                                 lineHeight: 1,
                                 color: "#e7ad59",
-                                textShadow:
-                                    "0 0 20px rgba(231,173,89,0.4)",
+                                textShadow: "0 0 20px rgba(231,173,89,0.4)",
                             }}
                         >
                             ★
@@ -71,8 +71,7 @@ function TopDecoration() {
                             <div
                                 className="absolute inset-0 rounded-full"
                                 style={{
-                                    background:
-                                        "linear-gradient(135deg,#ffd98a,#d99238)",
+                                    background: "linear-gradient(135deg,#ffd98a,#d99238)",
                                 }}
                             />
 
@@ -131,17 +130,11 @@ function BottomBalloons() {
                         style={{
                             width: 70,
                             height: 82,
-                            background: `linear-gradient(
-                                145deg,
-                                ${color},
-                                rgba(0,0,0,0.55)
-                            )`,
-                            boxShadow:
-                                "inset -10px -12px 20px rgba(0,0,0,0.2)",
+                            background: `linear-gradient(145deg, ${color}, rgba(0,0,0,0.55))`,
+                            boxShadow: "inset -10px -12px 20px rgba(0,0,0,0.2)",
                         }}
                     >
                         <div className="absolute left-[16px] top-[12px] h-5 w-3 rotate-[-25deg] rounded-full bg-white/40 blur-[2px]" />
-
                         <div className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/20" />
                     </div>
                 </motion.div>
@@ -264,7 +257,6 @@ function createLetters() {
             }
 
             counter++
-
             return current
         })
     )
@@ -293,8 +285,7 @@ function FireworkLetter({ item, visible, balloonPhase }) {
     const spacing = 42
 
     const offset =
-        (item.letterIndex - (wordLength - 1) / 2) *
-        spacing
+        (item.letterIndex - (wordLength - 1) / 2) * spacing
 
     return (
         <div
@@ -305,8 +296,6 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                 transform: "translate(-50%, -50%)",
             }}
         >
-            {/* Launching spark */}
-
             {visible && (
                 <motion.div
                     className="pointer-events-none absolute left-1/2 top-1/2"
@@ -321,16 +310,11 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                         className="h-2 w-2 rounded-full"
                         style={{
                             background: item.color,
-                            boxShadow: `
-                                0 0 8px ${item.color},
-                                0 0 20px ${item.color}
-                            `,
+                            boxShadow: `0 0 8px ${item.color}, 0 0 20px ${item.color}`,
                         }}
                     />
                 </motion.div>
             )}
-
-            {/* Firework explosion */}
 
             {visible && (
                 <motion.div
@@ -346,47 +330,43 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                         ease: "easeOut",
                     }}
                 >
-                    {Array.from({ length: 16 }).map(
-                        (_, rayIndex) => {
-                            const angle = (360 / 16) * rayIndex
-                            const radians = (angle * Math.PI) / 180
-                            const distance = 25 + (rayIndex % 4) * 9
-                            const x = Math.cos(radians) * distance
-                            const y = Math.sin(radians) * distance
+                    {Array.from({ length: 16 }).map((_, rayIndex) => {
+                        const angle = (360 / 16) * rayIndex
+                        const radians = (angle * Math.PI) / 180
+                        const distance = 25 + (rayIndex % 4) * 9
+                        const x = Math.cos(radians) * distance
+                        const y = Math.sin(radians) * distance
 
-                            return (
-                                <motion.span
-                                    key={rayIndex}
-                                    className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
-                                    style={{
-                                        background: item.color,
-                                        boxShadow: `0 0 8px ${item.color}`,
-                                    }}
-                                    initial={{
-                                        x: 0,
-                                        y: 0,
-                                        opacity: 1,
-                                        scale: 1,
-                                    }}
-                                    animate={{
-                                        x,
-                                        y,
-                                        opacity: 0,
-                                        scale: 0,
-                                    }}
-                                    transition={{
-                                        duration: 0.65,
-                                        delay: 0.55,
-                                        ease: "easeOut",
-                                    }}
-                                />
-                            )
-                        }
-                    )}
+                        return (
+                            <motion.span
+                                key={rayIndex}
+                                className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
+                                style={{
+                                    background: item.color,
+                                    boxShadow: `0 0 8px ${item.color}`,
+                                }}
+                                initial={{
+                                    x: 0,
+                                    y: 0,
+                                    opacity: 1,
+                                    scale: 1,
+                                }}
+                                animate={{
+                                    x,
+                                    y,
+                                    opacity: 0,
+                                    scale: 0,
+                                }}
+                                transition={{
+                                    duration: 0.65,
+                                    delay: 0.55,
+                                    ease: "easeOut",
+                                }}
+                            />
+                        )
+                    })}
                 </motion.div>
             )}
-
-            {/* Letter + balloon */}
 
             <AnimatePresence>
                 {visible && (
@@ -423,8 +403,6 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                         }
                         className="relative"
                     >
-                        {/* Balloon */}
-
                         {balloonPhase && (
                             <motion.div
                                 className="absolute bottom-full left-1/2 -translate-x-1/2"
@@ -448,16 +426,8 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                                     className="relative h-11 w-9 rounded-[50%]"
                                     style={{
                                         background: `
-                                            radial-gradient(
-                                                circle at 30% 25%,
-                                                rgba(255,255,255,0.9),
-                                                transparent 18%
-                                            ),
-                                            linear-gradient(
-                                                145deg,
-                                                ${item.color},
-                                                rgba(90,30,140,0.95)
-                                            )
+                                            radial-gradient(circle at 30% 25%, rgba(255,255,255,0.9), transparent 18%),
+                                            linear-gradient(145deg, ${item.color}, rgba(90,30,140,0.95))
                                         `,
                                         boxShadow: `0 0 18px ${item.color}`,
                                     }}
@@ -467,15 +437,12 @@ function FireworkLetter({ item, visible, balloonPhase }) {
                                     <div
                                         className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 bg-white/50"
                                         style={{
-                                            clipPath:
-                                                "polygon(0 0,100% 0,50% 100%)",
+                                            clipPath: "polygon(0 0,100% 0,50% 100%)",
                                         }}
                                     />
                                 </div>
                             </motion.div>
                         )}
-
-                        {/* Actual letter */}
 
                         <span
                             className="block text-3xl font-black uppercase md:text-4xl"
@@ -508,10 +475,7 @@ function BirthdayFireworkShow({
     const [visibleCount, setVisibleCount] = useState(0)
     const [balloonPhase, setBalloonPhase] = useState(false)
 
-    const letters = useMemo(
-        () => createLetters().flat(),
-        []
-    )
+    const letters = useMemo(() => createLetters().flat(), [])
 
     const onAllLettersShownRef = useRef(onAllLettersShown)
     const onBalloonPhaseRef = useRef(onBalloonPhase)
@@ -536,11 +500,6 @@ function BirthdayFireworkShow({
             revealTimers.push(timer)
         })
 
-        /*
-          Balloon animation starts.
-          The video starts at this same moment.
-        */
-
         const balloonTimer = setTimeout(() => {
             setBalloonPhase(true)
             onBalloonPhaseRef.current?.()
@@ -554,8 +513,6 @@ function BirthdayFireworkShow({
 
     return (
         <div className="absolute inset-x-0 bottom-0 top-[38%] z-10 overflow-hidden">
-            {/* Tiny stars */}
-
             {Array.from({ length: 35 }).map((_, index) => (
                 <motion.span
                     key={index}
@@ -576,8 +533,6 @@ function BirthdayFireworkShow({
                 />
             ))}
 
-            {/* Birthday letters */}
-
             {letters.map((item, index) => (
                 <FireworkLetter
                     key={item.id}
@@ -586,8 +541,6 @@ function BirthdayFireworkShow({
                     balloonPhase={balloonPhase}
                 />
             ))}
-
-            {/* Continuous small launch sparks */}
 
             {!balloonPhase &&
                 Array.from({ length: 12 }).map((_, index) => (
@@ -620,14 +573,9 @@ function BirthdayFireworkShow({
 export default function IntroScreen({ onNext }) {
     const [step, setStep] = useState(0)
 
-    const [showStartButton, setShowStartButton] =
-        useState(false)
-
-    const [showSecondGif, setShowSecondGif] =
-        useState(false)
-
-    const [showCurtainVideo, setShowCurtainVideo] =
-        useState(false)
+    const [showStartButton, setShowStartButton] = useState(false)
+    const [showSecondGif, setShowSecondGif] = useState(false)
+    const [showCurtainVideo, setShowCurtainVideo] = useState(false)
 
     const buttonShownRef = useRef(false)
 
@@ -691,19 +639,30 @@ export default function IntroScreen({ onNext }) {
                                 mx-auto
                                 w-full
                                 max-w-[440px]
+                                overflow-hidden
                                 rounded-[48px]
                                 border
-                                border-white/15
-                                bg-[#20264f]/95
+                                border-[#e7c58b]/30
+                                bg-gradient-to-br
+                                from-[#292f60]
+                                via-[#20264f]
+                                to-[#111a3d]
                                 p-6
-                                shadow-[0_25px_70px_rgba(0,0,0,0.45)]
-                                backdrop-blur-md
+                                shadow-[0_25px_80px_rgba(0,0,0,0.55),0_0_35px_rgba(218,170,95,0.12)]
+                                backdrop-blur-xl
                                 md:p-8
                             "
                         >
-                            <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-gradient-to-b from-white/[0.06] to-transparent" />
+                            <div className="pointer-events-none absolute inset-0 rounded-[48px] border border-white/10" />
 
-                            {/* GIFT + VIDEO */}
+                            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-pink-400/10 blur-3xl" />
+
+                            <div className="pointer-events-none absolute -bottom-20 -left-16 h-48 w-48 rounded-full bg-amber-300/10 blur-3xl" />
+
+                            {/* ==================================================
+                                GIFT + ANIME VIDEO
+                                Video: public/1.2.mp4
+                            ================================================== */}
 
                             <div
                                 className="
@@ -714,36 +673,41 @@ export default function IntroScreen({ onNext }) {
                                     w-full
                                     items-center
                                     justify-center
-                                    gap-3
+                                    gap-1
                                     overflow-hidden
                                     rounded-[38px]
                                     border
-                                    border-white/10
-                                    bg-gradient-to-b
+                                    border-[#f5d9a1]/25
+                                    bg-gradient-to-br
                                     from-[#77758e]
-                                    to-[#66657d]
-                                    px-3
+                                    via-[#66657d]
+                                    to-[#494d70]
+                                    shadow-[inset_0_2px_20px_rgba(255,255,255,0.12),0_8px_25px_rgba(0,0,0,0.18)]
                                 "
                             >
-                                {/* Original Gift */}
+                                {/* Soft golden glow */}
+                                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,220,160,0.18),transparent_70%)]" />
 
+                                {/* Gift box */}
                                 <motion.div
-                                    className="flex h-full flex-1 items-center justify-center text-7xl md:text-8xl"
+                                    className="relative z-10 flex h-full w-[46%] shrink-0 items-center justify-center"
                                     animate={{
-                                        y: [0, -7, 0],
+                                        y: [0, -6, 0],
                                         rotate: [-2, 2, -2],
                                     }}
                                     transition={{
-                                        duration: 2.5,
+                                        duration: 3,
                                         repeat: Infinity,
+                                        ease: "easeInOut",
                                     }}
                                 >
-                                    🎁
+                                    <span className="text-[68px] drop-shadow-[0_8px_12px_rgba(0,0,0,0.25)] sm:text-7xl">
+                                        🎁
+                                    </span>
                                 </motion.div>
 
-                                {/* NEW VIDEO - Gift er dan pashe */}
-
-                                <div className="flex h-[135px] w-[46%] shrink-0 items-center justify-center overflow-hidden rounded-[24px]">
+                                {/* Anime video */}
+                                <div className="relative z-10 flex h-full min-w-0 flex-1 items-center justify-center overflow-hidden">
                                     <video
                                         src="/1.2.mp4"
                                         autoPlay
@@ -751,23 +715,30 @@ export default function IntroScreen({ onNext }) {
                                         loop
                                         playsInline
                                         preload="auto"
-                                        className="h-full w-full rounded-[24px] object-contain"
+                                        className="
+                                            h-full
+                                            w-full
+                                            object-contain
+                                            mix-blend-screen
+                                        "
                                     />
                                 </div>
                             </div>
 
+                            {/* Title */}
                             <div className="relative z-10 mt-8 text-center">
-                                <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 md:text-4xl">
+                                <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 drop-shadow-[0_2px_12px_rgba(255,150,220,0.18)] md:text-4xl">
                                     Something special
                                     <br />
                                     is waiting...
                                 </h1>
 
-                                <p className="mt-5 text-base text-[#c7cbe7] md:text-lg">
+                                <p className="mt-5 text-base text-[#d5d8f0] md:text-lg">
                                     Tap the button to open it ✨
                                 </p>
                             </div>
 
+                            {/* Open button */}
                             <div className="relative z-10 mt-8 flex justify-center">
                                 <Button
                                     onClick={() => setStep(1)}
@@ -775,11 +746,17 @@ export default function IntroScreen({ onNext }) {
                                         w-full
                                         max-w-[320px]
                                         justify-center
+                                        rounded-full
+                                        border
+                                        border-pink-200/30
                                         bg-gradient-to-r
                                         from-pink-500
-                                        to-fuchsia-500
+                                        via-fuchsia-500
+                                        to-purple-500
                                         text-white
-                                        shadow-[0_8px_30px_rgba(255,20,147,0.25)]
+                                        shadow-[0_8px_30px_rgba(255,20,147,0.30)]
+                                        transition-transform
+                                        hover:scale-[1.03]
                                     "
                                 >
                                     <Gift size={21} />
@@ -810,8 +787,6 @@ export default function IntroScreen({ onNext }) {
                     transition={{ duration: 0.5 }}
                     className="fixed inset-0 overflow-hidden bg-[#03050f]"
                 >
-                    {/* Night sky */}
-
                     <div className="absolute inset-0 bg-[#03050f]" />
 
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(80,50,180,0.27),transparent_62%)]" />
@@ -820,8 +795,7 @@ export default function IntroScreen({ onNext }) {
 
                     <BackgroundFireworks />
 
-                    {/* CURTAIN VIDEO */}
-
+                    {/* Curtain video */}
                     {showCurtainVideo && (
                         <motion.video
                             key="curtain-video"
@@ -847,8 +821,7 @@ export default function IntroScreen({ onNext }) {
                         />
                     )}
 
-                    {/* OLD BIRTHDAY CARD */}
-
+                    {/* Birthday card */}
                     <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
                         <motion.div
                             initial={{
@@ -881,7 +854,6 @@ export default function IntroScreen({ onNext }) {
                             <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
                             {/* GIF */}
-
                             <div
                                 className="
                                     relative
@@ -900,11 +872,7 @@ export default function IntroScreen({ onNext }) {
                                 "
                             >
                                 <motion.img
-                                    key={
-                                        showSecondGif
-                                            ? "gif-5"
-                                            : "gif-121"
-                                    }
+                                    key={showSecondGif ? "gif-5" : "gif-121"}
                                     src={
                                         showSecondGif
                                             ? "/gifs/5.webp"
@@ -918,18 +886,9 @@ export default function IntroScreen({ onNext }) {
                                 />
                             </div>
 
-                            {/* Old title */}
-
+                            {/* Title */}
                             <div className="relative z-10 mt-5 text-center">
-                                <h1
-                                    className="
-                                        text-2xl
-                                        font-semibold
-                                        leading-tight
-                                        text-primary
-                                        md:text-3xl
-                                    "
-                                >
+                                <h1 className="text-2xl font-semibold leading-tight text-primary md:text-3xl">
                                     Happy Birthday,
                                     <br />
                                     Cutie ❤️
@@ -942,8 +901,7 @@ export default function IntroScreen({ onNext }) {
                         </motion.div>
                     </div>
 
-                    {/* FIREWORK + LETTER AREA */}
-
+                    {/* Firework + letters */}
                     <BirthdayFireworkShow
                         onAllLettersShown={() => setShowSecondGif(true)}
                         onBalloonPhase={() => {
@@ -951,8 +909,7 @@ export default function IntroScreen({ onNext }) {
                         }}
                     />
 
-                    {/* A LITTLE SURPRISE */}
-
+                    {/* A little surprise */}
                     <motion.div
                         className="
                             absolute
@@ -977,8 +934,7 @@ export default function IntroScreen({ onNext }) {
                         </p>
                     </motion.div>
 
-                    {/* START THE SURPRISE BUTTON */}
-
+                    {/* Start button */}
                     <AnimatePresence>
                         {showStartButton && (
                             <motion.div
@@ -1027,7 +983,6 @@ export default function IntroScreen({ onNext }) {
                     </AnimatePresence>
 
                     {/* Signature */}
-
                     <div className="fixed bottom-4 right-4 z-[150] text-sm text-white/30">
                         @Rafee🫶protiva
                     </div>
