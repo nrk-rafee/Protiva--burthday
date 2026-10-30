@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -58,7 +59,7 @@ function NightBackground() {
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(87,55,160,0.25),transparent_40%)]" />
 
-      {/* FULL ROUND MOON */}
+      {/* Full Moon */}
       <motion.div
         className="absolute top-10 right-8 md:right-16 w-20 h-20 md:w-28 md:h-28 rounded-full bg-white shadow-[0_0_45px_rgba(255,255,255,0.65)]"
         animate={{ y: [0, 4, 0, -3, 0] }}
@@ -94,7 +95,7 @@ function NightBackground() {
         </motion.div>
       ))}
 
-      {/* Tiny stars */}
+      {/* Tiny Stars */}
       {Array.from({ length: 35 }).map((_, index) => (
         <motion.span
           key={index}
@@ -150,8 +151,16 @@ function BalloonDecoration() {
               width: balloon.size,
               height: balloon.size * 1.15,
               background: `
-                radial-gradient(circle at 30% 22%, rgba(255,255,255,0.65), transparent 13%),
-                linear-gradient(145deg, ${balloon.color1}, ${balloon.color2})
+                radial-gradient(
+                  circle at 30% 22%,
+                  rgba(255,255,255,0.65),
+                  transparent 13%
+                ),
+                linear-gradient(
+                  145deg,
+                  ${balloon.color1},
+                  ${balloon.color2}
+                )
               `,
               boxShadow:
                 "inset -10px -14px 20px rgba(0,0,0,0.18), 0 4px 15px rgba(0,0,0,0.25)",
@@ -220,10 +229,12 @@ export default function CakeScreen({ onNext }) {
           : "relative overflow-hidden bg-[#fff8fc] p-7 rounded-[60px] drop-shadow-2xl min-w-48 w-full max-w-110 flex flex-col items-center gap-4 my-10 min-h-[650px]"
       }
     >
+      {/* Full Screen Night Background */}
       <AnimatePresence>
         {lit && <NightBackground />}
       </AnimatePresence>
 
+      {/* Balloons */}
       <AnimatePresence>
         {lit && <BalloonDecoration />}
       </AnimatePresence>
@@ -231,7 +242,7 @@ export default function CakeScreen({ onNext }) {
       {/* Content */}
       <div className="relative z-40 min-h-screen w-full flex flex-col items-center justify-center px-5 py-8">
 
-        {/* Birthday title */}
+        {/* Birthday Title */}
         <motion.div
           className="w-full max-w-[430px] text-center text-3xl md:text-4xl font-semibold drop-shadow leading-tight"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -240,12 +251,15 @@ export default function CakeScreen({ onNext }) {
             scale: 1,
             color: lit ? "#ffc9df" : "#a23b61",
           }}
-          transition={{ duration: 1, delay: lit ? 0.4 : 0 }}
+          transition={{
+            duration: 1,
+            delay: lit ? 0.4 : 0,
+          }}
         >
           Happy Birthday, Cutiepiee!
         </motion.div>
 
-        {/* Cake area */}
+        {/* Cake Video Area */}
         <motion.div
           className="relative flex flex-col items-center justify-center w-full max-w-[560px] mt-7 rounded-[40px] overflow-hidden"
           animate={{
@@ -259,6 +273,7 @@ export default function CakeScreen({ onNext }) {
           transition={{ duration: 1.5 }}
           style={{ minHeight: 310 }}
         >
+          {/* Small Sparkles */}
           {lit && (
             <>
               <motion.div
@@ -285,7 +300,7 @@ export default function CakeScreen({ onNext }) {
             </>
           )}
 
-          {/* Cake video — public/cake.mp4 */}
+          {/* cake.mp4 */}
           <div className="relative z-30 flex items-end justify-center w-full h-80 pb-8">
             <video
               src="/cake.mp4"
@@ -294,7 +309,13 @@ export default function CakeScreen({ onNext }) {
               loop
               playsInline
               preload="auto"
-              className="h-full w-full object-contain mix-blend-screen"
+              className="
+                w-full
+                h-full
+                object-contain
+                bg-transparent
+                mix-blend-screen
+              "
             />
           </div>
         </motion.div>
@@ -322,7 +343,10 @@ export default function CakeScreen({ onNext }) {
                 key="next"
                 initial={{ opacity: 0, scale: 0.7, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 2 }}
+                transition={{
+                  duration: 0.6,
+                  delay: 2,
+                }}
               >
                 <Button
                   onClick={onNext}
