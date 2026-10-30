@@ -134,7 +134,7 @@ function BottomBalloons() {
 }
 
 /* ======================================================
-   FIREWORK BACKGROUND
+   BACKGROUND FIREWORKS
 ====================================================== */
 
 const backgroundFireworks = [
@@ -169,6 +169,84 @@ function BackgroundFireworks() {
                         }}
                     />
                 </motion.div>
+            ))}
+        </div>
+    )
+}
+
+/* ======================================================
+   SKY FIREWORK SHOW
+   Starts after balloons fly away.
+   Continues until Start button is clicked.
+====================================================== */
+
+const skyBursts = [
+    { left: "14%", top: "20%", color: "#ff5fa2", delay: 0 },
+    { left: "78%", top: "17%", color: "#ffd166", delay: 0.8 },
+    { left: "48%", top: "30%", color: "#8be9fd", delay: 1.6 },
+    { left: "87%", top: "43%", color: "#c7a0ff", delay: 2.4 },
+    { left: "22%", top: "48%", color: "#fff0a6", delay: 3.2 },
+    { left: "63%", top: "12%", color: "#ff8fab", delay: 4 },
+]
+
+function SkyFireworks({ active }) {
+    if (!active) return null
+
+    return (
+        <div className="pointer-events-none absolute inset-0 z-[25] overflow-hidden">
+            {skyBursts.map((burst, index) => (
+                <div
+                    key={index}
+                    className="absolute"
+                    style={{
+                        left: burst.left,
+                        top: burst.top,
+                    }}
+                >
+                    <motion.div
+                        animate={{
+                            scale: [0, 1, 0],
+                            opacity: [0, 1, 0],
+                        }}
+                        transition={{
+                            duration: 1.8,
+                            delay: burst.delay,
+                            repeat: Infinity,
+                            repeatDelay: 2.2,
+                            ease: "easeOut",
+                        }}
+                        className="relative h-2 w-2"
+                    >
+                        {Array.from({ length: 12 }).map((_, particle) => {
+                            const angle = (particle * 30 * Math.PI) / 180
+                            const distance = 48
+
+                            return (
+                                <motion.span
+                                    key={particle}
+                                    className="absolute left-1/2 top-1/2 h-[5px] w-[5px] rounded-full"
+                                    style={{
+                                        background: burst.color,
+                                        boxShadow: `0 0 12px 3px ${burst.color}`,
+                                    }}
+                                    animate={{
+                                        x: Math.cos(angle) * distance,
+                                        y: Math.sin(angle) * distance,
+                                        opacity: [1, 0],
+                                        scale: [1, 0.3],
+                                    }}
+                                    transition={{
+                                        duration: 1.1,
+                                        delay: burst.delay,
+                                        repeat: Infinity,
+                                        repeatDelay: 2.9,
+                                        ease: "easeOut",
+                                    }}
+                                />
+                            )
+                        })}
+                    </motion.div>
+                </div>
             ))}
         </div>
     )
@@ -362,6 +440,7 @@ export default function IntroScreen({ onNext }) {
     const [showCurtainVideo, setShowCurtainVideo] = useState(false)
     const [showFinalVideo, setShowFinalVideo] = useState(false)
     const [showStartButton, setShowStartButton] = useState(false)
+    const [showSkyFireworks, setShowSkyFireworks] = useState(false)
 
     const [remainingSeconds, setRemainingSeconds] = useState(10)
     const [midnightReached, setMidnightReached] = useState(false)
@@ -373,6 +452,7 @@ export default function IntroScreen({ onNext }) {
     const CURTAIN_REVEAL_TIME = 5
 
     /* Countdown */
+
     useEffect(() => {
         if (step !== 0 || midnightReached) return
 
@@ -399,6 +479,7 @@ export default function IntroScreen({ onNext }) {
     }, [step, midnightReached])
 
     /* Birthday song */
+
     useEffect(() => {
         if (!midnightReached || audioStartedRef.current) return
 
@@ -422,13 +503,19 @@ export default function IntroScreen({ onNext }) {
         setStep(1)
     }
 
-    /* Start final video exactly once */
+    /* Curtain disappears:
+       Final video and button start together. */
+
     const startFinalVideo = () => {
         if (curtainHandledRef.current) return
 
         curtainHandledRef.current = true
+
         setShowCurtainVideo(false)
         setShowFinalVideo(true)
+
+        // Button appears at the same time as the final video.
+        setShowStartButton(true)
     }
 
     const handleCurtainTime = (event) => {
@@ -437,11 +524,6 @@ export default function IntroScreen({ onNext }) {
         ) {
             startFinalVideo()
         }
-    }
-
-    /* Final video finished or failed */
-    const finishFinalVideo = () => {
-        setShowStartButton(true)
     }
 
     const clockSeconds = 50 + (10 - remainingSeconds)
@@ -516,7 +598,6 @@ export default function IntroScreen({ onNext }) {
                                     </motion.div>
                                 </div>
 
-                                {/* Countdown video */}
                                 <div className="relative z-10 flex h-[250px] w-full items-center justify-center overflow-hidden rounded-[32px] bg-black sm:h-[280px]">
                                     <video
                                         src="/1.2.mp4"
@@ -611,7 +692,10 @@ export default function IntroScreen({ onNext }) {
 
                         <BackgroundFireworks />
 
-                        {/* Curtain video: no upward animation */}
+                        {/* Sky fireworks after balloons fly away */}
+                        <SkyFireworks active={showSkyFireworks} />
+
+                        {/* Curtain video */}
                         {showCurtainVideo && (
                             <video
                                 key="curtain-video"
@@ -624,14 +708,16 @@ export default function IntroScreen({ onNext }) {
                                 onEnded={startFinalVideo}
                                 onError={startFinalVideo}
                                 className="
-                                    pointer-events-none absolute inset-0
-                                    z-20 h-full w-full
-                                    object-contain mix-blend-screen
+                                    pointer-events-none absolute
+                                    left-0 top-[12%]
+                                    z-20 h-[88%] w-full
+                                    object-contain object-center
+                                    mix-blend-screen
                                 "
                             />
                         )}
 
-                        {/* Final video: directly starts, no slide-up effect */}
+                        {/* Final video — moved lower */}
                         {showFinalVideo && (
                             <video
                                 key="final-video"
@@ -640,18 +726,18 @@ export default function IntroScreen({ onNext }) {
                                 muted
                                 playsInline
                                 preload="auto"
-                                onEnded={finishFinalVideo}
-                                onError={finishFinalVideo}
+                                loop
                                 className="
-                                    pointer-events-none absolute inset-0
-                                    z-20 h-full w-full
+                                    pointer-events-none absolute
+                                    left-0 top-[17%]
+                                    z-20 h-[83%] w-full
                                     object-contain object-center
                                     mix-blend-screen
                                 "
                             />
                         )}
 
-                        {/* Birthday card: transparent background */}
+                        {/* Birthday card */}
                         <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
                             <motion.div
                                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -663,7 +749,6 @@ export default function IntroScreen({ onNext }) {
                                     bg-transparent
                                 "
                             >
-                                {/* GIF area: transparent */}
                                 <div className="relative z-10 flex h-[105px] w-full items-center justify-center overflow-hidden bg-transparent">
                                     <motion.img
                                         key={showSecondGif ? "gif-5" : "gif-121"}
@@ -694,10 +779,13 @@ export default function IntroScreen({ onNext }) {
                             </motion.div>
                         </div>
 
-                        {/* Fireworks and letters */}
+                        {/* Birthday letters and balloons */}
                         <BirthdayFireworkShow
                             onAllLettersShown={() => setShowSecondGif(true)}
-                            onBalloonPhase={() => setShowCurtainVideo(true)}
+                            onBalloonPhase={() => {
+                                setShowSkyFireworks(true)
+                                setShowCurtainVideo(true)
+                            }}
                         />
 
                         <motion.div
@@ -711,7 +799,7 @@ export default function IntroScreen({ onNext }) {
                             </p>
                         </motion.div>
 
-                        {/* Start button */}
+                        {/* Start button — appears with final video */}
                         <AnimatePresence>
                             {showStartButton && (
                                 <motion.div
