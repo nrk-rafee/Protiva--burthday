@@ -269,14 +269,15 @@ const letterColors = [
 
 function BirthdayLetters() {
     const letters = useMemo(
-        () => birthdayWords.flatMap((word, wordIndex) =>
-            [...word].map((letter, letterIndex) => ({
-                id: `${wordIndex}-${letterIndex}`,
-                letter,
-                wordIndex,
-                letterIndex,
-            }))
-        ),
+        () =>
+            birthdayWords.flatMap((word, wordIndex) =>
+                [...word].map((letter, letterIndex) => ({
+                    id: `${wordIndex}-${letterIndex}`,
+                    letter,
+                    wordIndex,
+                    letterIndex,
+                }))
+            ),
         []
     )
 
@@ -375,7 +376,6 @@ export default function IntroScreen({ onNext }) {
     const [showStartButton, setShowStartButton] = useState(false)
 
     const audioRef = useRef(null)
-    const startedRef = useRef(false)
 
     /* =====================================
        COUNTDOWN
@@ -402,34 +402,55 @@ export default function IntroScreen({ onNext }) {
     }, [midnightReached])
 
     /* =====================================
-       MIDNIGHT: BIRTHDAY + MUSIC
+       MIDNIGHT: START MUSIC
+       Stay on the countdown page.
     ===================================== */
 
     useEffect(() => {
-        if (!midnightReached || startedRef.current) return
+        if (!midnightReached) return
 
-        startedRef.current = true
-
-        // Birthday celebration starts
-        setStep(1)
-
-        // Start music at midnight
         const audio = audioRef.current
 
         if (audio) {
             audio.currentTime = 0
+
+            audio.play()
+                .then(() => setMusicBlocked(false))
+                .catch(() => setMusicBlocked(true))
+        }
+    }, [midnightReached])
+
+    /* =====================================
+       OPEN IT BUTTON
+       Go to the original birthday screen.
+    ===================================== */
+
+    const handleOpenIt = () => {
+        // Try playing music again after the user's tap.
+        const audio = audioRef.current
+
+        if (audio && midnightReached) {
             audio.play()
                 .then(() => setMusicBlocked(false))
                 .catch(() => setMusicBlocked(true))
         }
 
-        // Curtain video starts later
+        setStep(1)
+    }
+
+    /* =====================================
+       START CURTAIN TIMER AFTER OPEN IT
+    ===================================== */
+
+    useEffect(() => {
+        if (step !== 1) return
+
         const curtainTimer = setTimeout(() => {
             setShowCurtainVideo(true)
         }, 12000)
 
         return () => clearTimeout(curtainTimer)
-    }, [midnightReached])
+    }, [step])
 
     /* =====================================
        CURTAIN VIDEO BUTTON
@@ -453,7 +474,7 @@ export default function IntroScreen({ onNext }) {
 
     return (
         <>
-            {/* Music: put music.mp3 inside public folder */}
+            {/* Music stays mounted while IntroScreen is open */}
             <audio
                 ref={audioRef}
                 src="/music.mp3"
@@ -475,14 +496,11 @@ export default function IntroScreen({ onNext }) {
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 overflow-hidden bg-black"
                     >
-                        {/* Pure black background */}
                         <div className="absolute inset-0 bg-black" />
 
                         <TopDecoration />
 
-                        {/* Main card */}
                         <div className="relative z-20 flex min-h-screen w-full items-center justify-center px-4 py-8">
-
                             <motion.div
                                 initial={{ opacity: 0, y: 25, scale: 0.96 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -502,7 +520,6 @@ export default function IntroScreen({ onNext }) {
                                     sm:p-7
                                 "
                             >
-                                {/* Golden border shine */}
                                 <div className="pointer-events-none absolute inset-0 rounded-[42px] border border-white/10" />
 
                                 <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-amber-400/10 blur-3xl" />
@@ -538,7 +555,7 @@ export default function IntroScreen({ onNext }) {
                                     </motion.div>
                                 </div>
 
-                                {/* Anime video — gift removed */}
+                                {/* Anime video */}
                                 <div
                                     className="
                                         relative
@@ -616,9 +633,7 @@ export default function IntroScreen({ onNext }) {
                                         Get ready to celebrate
                                     </p>
 
-                                    <motion.div
-                                        className="mx-auto mt-3 h-1.5 max-w-[220px] overflow-hidden rounded-full bg-white/10"
-                                    >
+                                    <motion.div className="mx-auto mt-3 h-1.5 max-w-[220px] overflow-hidden rounded-full bg-white/10">
                                         <motion.div
                                             className="h-full rounded-full bg-gradient-to-r from-amber-400 to-pink-400"
                                             initial={{ width: "0%" }}
@@ -629,6 +644,77 @@ export default function IntroScreen({ onNext }) {
                                         />
                                     </motion.div>
                                 </div>
+
+                                {/* OPEN IT BUTTON */}
+                                <AnimatePresence>
+                                    {midnightReached && (
+                                        <motion.div
+                                            initial={{
+                                                opacity: 0,
+                                                y: 20,
+                                                scale: 0.85,
+                                            }}
+                                            animate={{
+                                                opacity: 1,
+                                                y: 0,
+                                                scale: 1,
+                                            }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            transition={{
+                                                duration: 0.6,
+                                                ease: "backOut",
+                                            }}
+                                            className="relative z-30 mt-6 flex justify-center"
+                                        >
+                                            <Button
+                                                onClick={handleOpenIt}
+                                                className="
+                                                    min-w-[190px]
+                                                    justify-center
+                                                    rounded-full
+                                                    border
+                                                    border-pink-200/30
+                                                    bg-gradient-to-r
+                                                    from-pink-500
+                                                    to-purple-500
+                                                    px-8
+                                                    py-3
+                                                    text-white
+                                                    shadow-[0_10px_40px_rgba(255,120,210,0.4)]
+                                                "
+                                            >
+                                                <Heart size={20} />
+                                                <span>Open It</span>
+                                            </Button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Music fallback */}
+                                {musicBlocked && midnightReached && (
+                                    <motion.button
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        onClick={enableMusic}
+                                        className="
+                                            relative
+                                            z-30
+                                            mx-auto
+                                            mt-3
+                                            block
+                                            rounded-full
+                                            border
+                                            border-[#e9bd70]/50
+                                            bg-black
+                                            px-5
+                                            py-2
+                                            text-xs
+                                            text-[#ffd98a]
+                                        "
+                                    >
+                                        ♫ Tap to play birthday music
+                                    </motion.button>
+                                )}
                             </motion.div>
                         </div>
 
@@ -642,6 +728,7 @@ export default function IntroScreen({ onNext }) {
 
                 {/* =====================================
                     STEP 1 — MIDNIGHT BIRTHDAY CELEBRATION
+                    ORIGINAL DESIGN PRESERVED
                 ===================================== */}
 
                 {step === 1 && (
@@ -657,19 +744,15 @@ export default function IntroScreen({ onNext }) {
 
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(75,35,100,0.22),transparent_65%)]" />
 
-                        {/* Continuous celebration effects */}
                         <CelebrationFireworks />
                         <FallingGlitter />
 
-                        {/* Top decoration */}
                         <TopDecoration />
 
-                        {/* Birthday heading */}
                         <div className="absolute inset-x-0 top-[22%] z-30 flex justify-center px-3">
                             <BirthdayLetters />
                         </div>
 
-                        {/* Birthday subtitle */}
                         <motion.div
                             className="absolute inset-x-0 top-[48%] z-30 text-center"
                             initial={{ opacity: 0, y: 15 }}
@@ -754,7 +837,7 @@ export default function IntroScreen({ onNext }) {
                             )}
                         </AnimatePresence>
 
-                        {/* Music fallback if browser blocks autoplay */}
+                        {/* Music fallback */}
                         {musicBlocked && (
                             <motion.button
                                 initial={{ opacity: 0, y: 15 }}
@@ -792,6 +875,7 @@ export default function IntroScreen({ onNext }) {
 
                 {/* =====================================
                     STEP 2 — ORIGINAL CUTIEPIE SCREEN
+                    PRESERVED
                 ===================================== */}
 
                 {step === 2 && (
