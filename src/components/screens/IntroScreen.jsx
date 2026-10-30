@@ -7,6 +7,7 @@ import {
     useRef,
     useState,
 } from "react"
+
 import { motion, AnimatePresence } from "framer-motion"
 import { Gift, Heart } from "lucide-react"
 import Button from "../Button"
@@ -595,8 +596,9 @@ export default function IntroScreen({ onNext }) {
 
     return (
         <AnimatePresence mode="wait">
+
             {/* ==================================================
-                STEP 0 — SOMETHING SPECIAL
+                STEP 0 — LUXURY BLACK INTRO
             ================================================== */}
 
             {step === 0 && (
@@ -624,6 +626,7 @@ export default function IntroScreen({ onNext }) {
                     <TopDecoration />
 
                     <div className="relative z-20 flex min-h-screen w-full items-center justify-center px-4 py-8">
+
                         <motion.div
                             initial={{
                                 opacity: 0,
@@ -640,28 +643,26 @@ export default function IntroScreen({ onNext }) {
                                 w-full
                                 max-w-[440px]
                                 overflow-hidden
-                                rounded-[48px]
+                                rounded-[42px]
                                 border
-                                border-[#e7c58b]/30
-                                bg-gradient-to-br
-                                from-[#292f60]
-                                via-[#20264f]
-                                to-[#111a3d]
+                                border-[#d6ad68]/50
+                                bg-black
                                 p-6
-                                shadow-[0_25px_80px_rgba(0,0,0,0.55),0_0_35px_rgba(218,170,95,0.12)]
-                                backdrop-blur-xl
+                                shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_35px_rgba(218,170,95,0.16)]
                                 md:p-8
                             "
                         >
-                            <div className="pointer-events-none absolute inset-0 rounded-[48px] border border-white/10" />
+                            {/* Luxury golden border glow */}
 
-                            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-pink-400/10 blur-3xl" />
+                            <div className="pointer-events-none absolute inset-0 rounded-[42px] border border-[#f4d69a]/15" />
 
-                            <div className="pointer-events-none absolute -bottom-20 -left-16 h-48 w-48 rounded-full bg-amber-300/10 blur-3xl" />
+                            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-pink-500/10 blur-3xl" />
+
+                            <div className="pointer-events-none absolute -bottom-20 -left-16 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
 
                             {/* ==================================================
                                 GIFT + ANIME VIDEO
-                                Video: public/1.2.mp4
+                                Video file: public/1.2.mp4
                             ================================================== */}
 
                             <div
@@ -673,26 +674,35 @@ export default function IntroScreen({ onNext }) {
                                     w-full
                                     items-center
                                     justify-center
-                                    gap-1
+                                    gap-2
                                     overflow-hidden
-                                    rounded-[38px]
+                                    rounded-[30px]
                                     border
-                                    border-[#f5d9a1]/25
-                                    bg-gradient-to-br
-                                    from-[#77758e]
-                                    via-[#66657d]
-                                    to-[#494d70]
-                                    shadow-[inset_0_2px_20px_rgba(255,255,255,0.12),0_8px_25px_rgba(0,0,0,0.18)]
+                                    border-[#d6ad68]/30
+                                    bg-black
+                                    shadow-[inset_0_0_25px_rgba(255,255,255,0.04),0_8px_30px_rgba(0,0,0,0.5)]
+                                    sm:gap-3
                                 "
                             >
-                                {/* Soft golden glow */}
-                                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,220,160,0.18),transparent_70%)]" />
+                                {/* Golden glow */}
+
+                                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(218,170,95,0.10),transparent_70%)]" />
 
                                 {/* Gift box */}
+
                                 <motion.div
-                                    className="relative z-10 flex h-full w-[46%] shrink-0 items-center justify-center"
+                                    className="
+                                        relative
+                                        z-10
+                                        flex
+                                        h-full
+                                        w-[42%]
+                                        shrink-0
+                                        items-center
+                                        justify-center
+                                    "
                                     animate={{
-                                        y: [0, -6, 0],
+                                        y: [0, -5, 0],
                                         rotate: [-2, 2, -2],
                                     }}
                                     transition={{
@@ -701,13 +711,14 @@ export default function IntroScreen({ onNext }) {
                                         ease: "easeInOut",
                                     }}
                                 >
-                                    <span className="text-[68px] drop-shadow-[0_8px_12px_rgba(0,0,0,0.25)] sm:text-7xl">
+                                    <span className="text-[66px] drop-shadow-[0_8px_15px_rgba(255,180,50,0.25)] sm:text-7xl">
                                         🎁
                                     </span>
                                 </motion.div>
 
                                 {/* Anime video */}
-                                <div className="relative z-10 flex h-full min-w-0 flex-1 items-center justify-center overflow-hidden">
+
+                                <div className="relative z-10 flex h-full w-[42%] shrink-0 items-center justify-center overflow-hidden bg-black">
                                     <video
                                         src="/1.2.mp4"
                                         autoPlay
@@ -726,8 +737,9 @@ export default function IntroScreen({ onNext }) {
                             </div>
 
                             {/* Title */}
+
                             <div className="relative z-10 mt-8 text-center">
-                                <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 drop-shadow-[0_2px_12px_rgba(255,150,220,0.18)] md:text-4xl">
+                                <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 drop-shadow-[0_2px_12px_rgba(255,150,220,0.25)] md:text-4xl">
                                     Something special
                                     <br />
                                     is waiting...
@@ -739,6 +751,7 @@ export default function IntroScreen({ onNext }) {
                             </div>
 
                             {/* Open button */}
+
                             <div className="relative z-10 mt-8 flex justify-center">
                                 <Button
                                     onClick={() => setStep(1)}
@@ -796,6 +809,7 @@ export default function IntroScreen({ onNext }) {
                     <BackgroundFireworks />
 
                     {/* Curtain video */}
+
                     {showCurtainVideo && (
                         <motion.video
                             key="curtain-video"
@@ -822,6 +836,7 @@ export default function IntroScreen({ onNext }) {
                     )}
 
                     {/* Birthday card */}
+
                     <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
                         <motion.div
                             initial={{
@@ -854,6 +869,7 @@ export default function IntroScreen({ onNext }) {
                             <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
                             {/* GIF */}
+
                             <div
                                 className="
                                     relative
@@ -887,6 +903,7 @@ export default function IntroScreen({ onNext }) {
                             </div>
 
                             {/* Title */}
+
                             <div className="relative z-10 mt-5 text-center">
                                 <h1 className="text-2xl font-semibold leading-tight text-primary md:text-3xl">
                                     Happy Birthday,
@@ -902,6 +919,7 @@ export default function IntroScreen({ onNext }) {
                     </div>
 
                     {/* Firework + letters */}
+
                     <BirthdayFireworkShow
                         onAllLettersShown={() => setShowSecondGif(true)}
                         onBalloonPhase={() => {
@@ -910,6 +928,7 @@ export default function IntroScreen({ onNext }) {
                     />
 
                     {/* A little surprise */}
+
                     <motion.div
                         className="
                             absolute
@@ -935,6 +954,7 @@ export default function IntroScreen({ onNext }) {
                     </motion.div>
 
                     {/* Start button */}
+
                     <AnimatePresence>
                         {showStartButton && (
                             <motion.div
@@ -983,6 +1003,7 @@ export default function IntroScreen({ onNext }) {
                     </AnimatePresence>
 
                     {/* Signature */}
+
                     <div className="fixed bottom-4 right-4 z-[150] text-sm text-white/30">
                         @Rafee🫶protiva
                     </div>
@@ -1103,6 +1124,7 @@ export default function IntroScreen({ onNext }) {
                     </div>
                 </motion.div>
             )}
+
         </AnimatePresence>
     )
 }
