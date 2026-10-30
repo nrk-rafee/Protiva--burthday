@@ -566,6 +566,7 @@ export default function IntroScreen({ onNext }) {
     const [showStartButton, setShowStartButton] = useState(false)
     const [showSecondGif, setShowSecondGif] = useState(false)
     const [showCurtainVideo, setShowCurtainVideo] = useState(false)
+    const [showFinalVideo, setShowFinalVideo] = useState(false)
 
     const [remainingSeconds, setRemainingSeconds] = useState(10)
     const [midnightReached, setMidnightReached] = useState(false)
@@ -577,6 +578,7 @@ export default function IntroScreen({ onNext }) {
 
     const CURTAIN_REVEAL_TIME = 5.0
 
+    // Countdown
     useEffect(() => {
         if (step !== 0 || midnightReached) return
 
@@ -602,6 +604,7 @@ export default function IntroScreen({ onNext }) {
         return () => clearInterval(timer)
     }, [step, midnightReached])
 
+    // Birthday song
     useEffect(() => {
         if (!midnightReached || audioStartedRef.current) return
 
@@ -640,6 +643,12 @@ export default function IntroScreen({ onNext }) {
         }
     }
 
+    // Curtain video শেষ হলে পরের ভিডিও চালু হবে
+    const handleCurtainVideoEnd = () => {
+        setShowCurtainVideo(false)
+        setShowFinalVideo(true)
+    }
+
     const clockSeconds = 50 + (10 - remainingSeconds)
 
     const clockText =
@@ -662,7 +671,7 @@ export default function IntroScreen({ onNext }) {
 
             <AnimatePresence mode="wait">
 
-                {/* STEP 0 — MIDNIGHT COUNTDOWN */}
+                {/* STEP 0 — COUNTDOWN */}
 
                 {step === 0 && (
                     <motion.div
@@ -680,7 +689,6 @@ export default function IntroScreen({ onNext }) {
                         <TopDecoration />
 
                         <div className="relative z-20 flex min-h-screen w-full items-center justify-center px-4 py-8">
-
                             <motion.div
                                 initial={{ opacity: 0, y: 18 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -722,15 +730,12 @@ export default function IntroScreen({ onNext }) {
                                     </motion.div>
                                 </div>
 
-                                {/* VIDEO — পাশের জায়গাগুলো এখন কালো */}
-
                                 <div
                                     className="
                                         relative z-10 flex h-[250px] w-full
-                                        items-end justify-center
-                                        overflow-hidden rounded-[32px]
-                                        border border-[#d6b66f]/20
-                                        bg-black
+                                        items-end justify-center overflow-hidden
+                                        rounded-[32px] border border-[#d6b66f]/20
+                                        bg-[radial-gradient(circle_at_50%_45%,rgba(120,90,40,0.16),#050505_75%)]
                                         shadow-[inset_0_0_35px_rgba(218,170,95,0.05)]
                                         sm:h-[280px]
                                     "
@@ -742,7 +747,7 @@ export default function IntroScreen({ onNext }) {
                                         loop
                                         playsInline
                                         preload="auto"
-                                        className="h-full w-full bg-black object-contain"
+                                        className="h-full w-full object-contain"
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.7 }}
@@ -764,7 +769,6 @@ export default function IntroScreen({ onNext }) {
                                 </div>
 
                                 <div className="relative z-10 mt-8 min-h-[90px]">
-
                                     {!midnightReached ? (
                                         <div className="flex flex-col items-center">
                                             <p className="mb-4 text-[10px] uppercase tracking-[0.35em] text-[#d6b66f]/70">
@@ -774,9 +778,7 @@ export default function IntroScreen({ onNext }) {
                                             <div className="h-[8px] w-full max-w-[320px] overflow-hidden rounded-full bg-white/15">
                                                 <motion.div
                                                     className="h-full rounded-full bg-gradient-to-r from-amber-400 via-pink-400 to-fuchsia-500"
-                                                    style={{
-                                                        width: `${loadingProgress}%`,
-                                                    }}
+                                                    style={{ width: `${loadingProgress}%` }}
                                                     transition={{ duration: 0.15 }}
                                                 />
                                             </div>
@@ -787,32 +789,18 @@ export default function IntroScreen({ onNext }) {
                                         </div>
                                     ) : (
                                         <motion.div
-                                            initial={{
-                                                opacity: 0,
-                                                y: 20,
-                                                scale: 0.9,
-                                            }}
-                                            animate={{
-                                                opacity: 1,
-                                                y: 0,
-                                                scale: 1,
-                                            }}
-                                            transition={{
-                                                duration: 0.65,
-                                                ease: "backOut",
-                                            }}
+                                            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            transition={{ duration: 0.65, ease: "backOut" }}
                                             className="flex justify-center"
                                         >
                                             <Button
                                                 onClick={handleOpenIt}
                                                 className="
-                                                    w-full max-w-[320px]
-                                                    justify-center rounded-full
-                                                    border border-[#f5d58b]/40
-                                                    bg-gradient-to-r
-                                                    from-[#b98736] via-[#f0c875] to-[#b98736]
-                                                    text-black
-                                                    shadow-[0_8px_35px_rgba(218,170,95,0.30)]
+                                                    w-full max-w-[320px] justify-center
+                                                    rounded-full border border-[#f5d58b]/40
+                                                    bg-gradient-to-r from-[#b98736] via-[#f0c875] to-[#b98736]
+                                                    text-black shadow-[0_8px_35px_rgba(218,170,95,0.30)]
                                                     transition-transform hover:scale-[1.03]
                                                 "
                                             >
@@ -833,7 +821,7 @@ export default function IntroScreen({ onNext }) {
                     </motion.div>
                 )}
 
-                {/* STEP 1 — BIRTHDAY FIREWORK + VIDEO OVERLAY */}
+                {/* STEP 1 — BIRTHDAY ANIMATION */}
 
                 {step === 1 && (
                     <motion.div
@@ -852,34 +840,84 @@ export default function IntroScreen({ onNext }) {
 
                         <BackgroundFireworks />
 
-                        {/* নতুন ভিডিও: পর্দার অ্যানিমেশনের জায়গায় full-screen overlay */}
-
+                        {/* প্রথম ভিডিও: পর্দার আড়াল থেকে মেয়েটি বের হবে */}
                         {showCurtainVideo && (
                             <motion.video
-                                key="birthday-overlay-video"
-                                src="/lv_0_20261030214702.mp4"
+                                key="curtain-video"
+                                src="/curtain.mp4"
                                 autoPlay
                                 muted
                                 playsInline
                                 preload="auto"
                                 onTimeUpdate={handleCurtainVideoTime}
-                                onEnded={() => setShowStartButton(true)}
+                                onEnded={handleCurtainVideoEnd}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
                                 className="
-                                    pointer-events-none
-                                    fixed inset-0
-                                    z-20
-                                    h-full w-full
-                                    bg-black
-                                    object-contain
+                                    pointer-events-none absolute inset-0
+                                    z-20 h-full w-full
+                                    object-contain mix-blend-screen
                                 "
                             />
                         )}
 
-                        {/* Birthday card */}
+                        {/* দ্বিতীয় ভিডিও: কার্ডের নিচের খালি জায়গায় */}
+                        <AnimatePresence>
+                            {showFinalVideo && (
+                                <motion.div
+                                    key="final-video-container"
+                                    initial={{
+                                        opacity: 0,
+                                        y: 70,
+                                    }}
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                    }}
+                                    exit={{
+                                        opacity: 0,
+                                        y: 40,
+                                    }}
+                                    transition={{
+                                        duration: 0.8,
+                                        ease: "easeOut",
+                                    }}
+                                    className="
+                                        pointer-events-none
+                                        absolute
+                                        left-0
+                                        right-0
+                                        top-[34%]
+                                        bottom-[8%]
+                                        z-20
+                                        flex
+                                        items-center
+                                        justify-center
+                                        overflow-hidden
+                                    "
+                                >
+                                    <video
+                                        src="/lv_0_20261030214702.mp4"
+                                        autoPlay
+                                        muted
+                                        playsInline
+                                        preload="auto"
+                                        className="
+                                            h-full
+                                            w-full
+                                            object-contain
+                                            object-center
+                                        "
+                                        onEnded={() => {
+                                            setShowStartButton(true)
+                                        }}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
+                        {/* Birthday card */}
                         <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
                             <motion.div
                                 initial={{
@@ -907,14 +945,12 @@ export default function IntroScreen({ onNext }) {
                                 <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
 
                                 {/* GIF */}
-
                                 <div
                                     className="
                                         relative z-10 flex h-[105px] w-full
-                                        items-center justify-center
-                                        overflow-hidden rounded-[30px]
-                                        bg-gradient-to-b from-pink-100 to-pink-200
-                                        shadow-inner
+                                        items-center justify-center overflow-hidden
+                                        rounded-[30px] bg-gradient-to-b
+                                        from-pink-100 to-pink-200 shadow-inner
                                     "
                                 >
                                     <motion.img
@@ -933,7 +969,6 @@ export default function IntroScreen({ onNext }) {
                                 </div>
 
                                 {/* Title */}
-
                                 <div className="relative z-10 mt-5 text-center">
                                     <h1 className="text-2xl font-semibold leading-tight text-primary md:text-3xl">
                                         Happy Birthday,
@@ -948,6 +983,7 @@ export default function IntroScreen({ onNext }) {
                             </motion.div>
                         </div>
 
+                        {/* Firework + letters */}
                         <BirthdayFireworkShow
                             onAllLettersShown={() => setShowSecondGif(true)}
                             onBalloonPhase={() => {
@@ -955,10 +991,11 @@ export default function IntroScreen({ onNext }) {
                             }}
                         />
 
+                        {/* A little surprise */}
                         <motion.div
                             className="
-                                absolute left-1/2 top-[27%]
-                                z-30 -translate-x-1/2 whitespace-nowrap
+                                absolute left-1/2 top-[27%] z-30
+                                -translate-x-1/2 whitespace-nowrap
                             "
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -970,7 +1007,6 @@ export default function IntroScreen({ onNext }) {
                         </motion.div>
 
                         {/* Start button */}
-
                         <AnimatePresence>
                             {showStartButton && (
                                 <motion.div
@@ -1012,6 +1048,7 @@ export default function IntroScreen({ onNext }) {
                             )}
                         </AnimatePresence>
 
+                        {/* Signature */}
                         <div className="fixed bottom-4 right-4 z-[150] text-sm text-white/30">
                             @Rafee🫶protiva
                         </div>
@@ -1057,8 +1094,8 @@ export default function IntroScreen({ onNext }) {
                         >
                             <div
                                 className="
-                                    relative flex h-44 w-full
-                                    items-end justify-center overflow-hidden
+                                    relative flex h-44 w-full items-end
+                                    justify-center overflow-hidden
                                     rounded-[40px] bg-gradient-to-b
                                     from-white/80 to-pink-200 shadow-inner
                                     md:h-52
