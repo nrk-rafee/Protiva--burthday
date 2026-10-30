@@ -1,4 +1,3 @@
-
 "use client"
 
 import {
@@ -574,6 +573,7 @@ export default function IntroScreen({ onNext }) {
     const audioRef = useRef(null)
     const audioStartedRef = useRef(false)
 
+    // এই ref দিয়ে নিশ্চিত করা হচ্ছে final video একবারই চালু হবে
     const buttonShownRef = useRef(false)
 
     const CURTAIN_REVEAL_TIME = 5.0
@@ -631,6 +631,7 @@ export default function IntroScreen({ onNext }) {
         setStep(1)
     }
 
+    // মেয়েটি পর্দার আড়ালে যাওয়ার মুহূর্তেই দ্বিতীয় ভিডিও চালু হবে
     const handleCurtainVideoTime = (event) => {
         const video = event.currentTarget
 
@@ -639,14 +640,20 @@ export default function IntroScreen({ onNext }) {
             !buttonShownRef.current
         ) {
             buttonShownRef.current = true
-            setShowStartButton(true)
+
+            // প্রথম ভিডিও সরিয়ে সঙ্গে সঙ্গেই দ্বিতীয় ভিডিও দেখানো
+            setShowCurtainVideo(false)
+            setShowFinalVideo(true)
         }
     }
 
-    // Curtain video শেষ হলে পরের ভিডিও চালু হবে
+    // প্রথম ভিডিও ৫ সেকেন্ডের আগেই শেষ হলেও দ্বিতীয় ভিডিও চালু হবে
     const handleCurtainVideoEnd = () => {
-        setShowCurtainVideo(false)
-        setShowFinalVideo(true)
+        if (!buttonShownRef.current) {
+            buttonShownRef.current = true
+            setShowCurtainVideo(false)
+            setShowFinalVideo(true)
+        }
     }
 
     const clockSeconds = 50 + (10 - remainingSeconds)
@@ -730,12 +737,13 @@ export default function IntroScreen({ onNext }) {
                                     </motion.div>
                                 </div>
 
+                                {/* VIDEO AREA — BLACK BACKGROUND */}
                                 <div
                                     className="
                                         relative z-10 flex h-[250px] w-full
                                         items-end justify-center overflow-hidden
                                         rounded-[32px] border border-[#d6b66f]/20
-                                        bg-[radial-gradient(circle_at_50%_45%,rgba(120,90,40,0.16),#050505_75%)]
+                                        bg-black
                                         shadow-[inset_0_0_35px_rgba(218,170,95,0.05)]
                                         sm:h-[280px]
                                     "
@@ -862,7 +870,7 @@ export default function IntroScreen({ onNext }) {
                             />
                         )}
 
-                        {/* দ্বিতীয় ভিডিও: কার্ডের নিচের খালি জায়গায় */}
+                        {/* দ্বিতীয় ভিডিও: পর্দার ভিডিওতে মেয়েটি আড়ালে গেলেই চালু হবে */}
                         <AnimatePresence>
                             {showFinalVideo && (
                                 <motion.div
@@ -908,6 +916,7 @@ export default function IntroScreen({ onNext }) {
                                             w-full
                                             object-contain
                                             object-center
+                                            mix-blend-screen
                                         "
                                         onEnded={() => {
                                             setShowStartButton(true)
