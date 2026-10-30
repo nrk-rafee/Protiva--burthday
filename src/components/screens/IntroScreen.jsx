@@ -9,19 +9,19 @@ import {
 } from "react"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Gift, Heart } from "lucide-react"
+import { Gift, Heart, Clock } from "lucide-react"
 import Button from "../Button"
 
-/* ======================================================
+/* =========================================
    TOP DECORATIONS
-====================================================== */
+========================================= */
 
 const hangingDecorations = [
-    { type: "moon", left: "5%", size: 70, length: 100, delay: 0 },
-    { type: "star", left: "28%", size: 38, length: 85, delay: 0.5 },
-    { type: "star", left: "52%", size: 34, length: 70, delay: 1 },
-    { type: "star", left: "74%", size: 42, length: 95, delay: 0.3 },
-    { type: "moon", left: "91%", size: 55, length: 80, delay: 1.2 },
+    { type: "moon", left: "5%", size: 70, length: 100 },
+    { type: "star", left: "28%", size: 38, length: 85 },
+    { type: "star", left: "52%", size: 34, length: 70 },
+    { type: "star", left: "74%", size: 42, length: 95 },
+    { type: "moon", left: "91%", size: 55, length: 80 },
 ]
 
 function TopDecoration() {
@@ -35,28 +35,27 @@ function TopDecoration() {
                     animate={{ rotate: [-3, 3, -3] }}
                     transition={{
                         duration: 4 + index * 0.3,
-                        delay: item.delay,
                         repeat: Infinity,
                         ease: "easeInOut",
                     }}
                 >
                     <div
-                        className="w-[2px] bg-[#d49b42]/40"
+                        className="w-[2px] bg-[#d49b42]/50"
                         style={{ height: item.length }}
                     />
 
                     {item.type === "star" ? (
                         <motion.div
-                            animate={{ scale: [1, 1.08, 1] }}
+                            animate={{ scale: [1, 1.12, 1] }}
                             transition={{
-                                duration: 2.5,
+                                duration: 2,
                                 repeat: Infinity,
                             }}
                             style={{
                                 fontSize: item.size,
                                 lineHeight: 1,
                                 color: "#e7ad59",
-                                textShadow: "0 0 20px rgba(231,173,89,0.4)",
+                                textShadow: "0 0 20px rgba(231,173,89,0.6)",
                             }}
                         >
                             ★
@@ -67,15 +66,9 @@ function TopDecoration() {
                             style={{
                                 width: item.size,
                                 height: item.size,
+                                background: "linear-gradient(135deg,#ffe19b,#d99238)",
                             }}
                         >
-                            <div
-                                className="absolute inset-0 rounded-full"
-                                style={{
-                                    background: "linear-gradient(135deg,#ffd98a,#d99238)",
-                                }}
-                            />
-
                             <div
                                 className="absolute rounded-full"
                                 style={{
@@ -83,7 +76,7 @@ function TopDecoration() {
                                     height: item.size * 0.8,
                                     top: -item.size * 0.08,
                                     right: -item.size * 0.1,
-                                    background: "#070d2b",
+                                    background: "#000000",
                                 }}
                             />
                         </div>
@@ -94,11 +87,11 @@ function TopDecoration() {
     )
 }
 
-/* ======================================================
+/* =========================================
    BOTTOM BALLOONS
-====================================================== */
+========================================= */
 
-const bottomBalloons = [
+const balloonColors = [
     "#e9a44f",
     "#27374d",
     "#e9a44f",
@@ -110,7 +103,7 @@ const bottomBalloons = [
 function BottomBalloons() {
     return (
         <div className="pointer-events-none fixed bottom-[-25px] left-0 right-0 z-30 h-[120px] overflow-hidden">
-            {bottomBalloons.map((color, index) => (
+            {balloonColors.map((color, index) => (
                 <motion.div
                     key={index}
                     className="absolute bottom-0"
@@ -121,7 +114,6 @@ function BottomBalloons() {
                     }}
                     transition={{
                         duration: 4 + index * 0.3,
-                        delay: index * 0.3,
                         repeat: Infinity,
                         ease: "easeInOut",
                     }}
@@ -131,8 +123,8 @@ function BottomBalloons() {
                         style={{
                             width: 70,
                             height: 82,
-                            background: `linear-gradient(145deg, ${color}, rgba(0,0,0,0.55))`,
-                            boxShadow: "inset -10px -12px 20px rgba(0,0,0,0.2)",
+                            background: `linear-gradient(145deg, ${color}, rgba(0,0,0,0.65))`,
+                            boxShadow: "inset -10px -12px 20px rgba(0,0,0,0.3)",
                         }}
                     >
                         <div className="absolute left-[16px] top-[12px] h-5 w-3 rotate-[-25deg] rounded-full bg-white/40 blur-[2px]" />
@@ -144,84 +136,123 @@ function BottomBalloons() {
     )
 }
 
-/* ======================================================
-   FIREWORK BACKGROUND
-====================================================== */
+/* =========================================
+   CONTINUOUS FIREWORKS
+========================================= */
 
-const backgroundFireworks = [
-    { left: "10%", top: "18%", color: "#ff6fae", delay: 0 },
-    { left: "32%", top: "24%", color: "#ffd166", delay: 1.3 },
-    { left: "78%", top: "18%", color: "#c7a0ff", delay: 2 },
-    { left: "20%", top: "58%", color: "#8be9fd", delay: 2.8 },
-    { left: "82%", top: "50%", color: "#fff0a6", delay: 3.5 },
-]
+function CelebrationFireworks() {
+    const colors = [
+        "#ff6fae",
+        "#ffd166",
+        "#c7a0ff",
+        "#8be9fd",
+        "#fff0a6",
+    ]
 
-function BackgroundFireworks() {
     return (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            {backgroundFireworks.map((item, index) => (
-                <motion.div
-                    key={index}
-                    className="absolute"
-                    style={{
-                        left: item.left,
-                        top: item.top,
-                    }}
-                >
+        <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+            {Array.from({ length: 9 }).map((_, index) => {
+                const left = `${(index * 37 + 8) % 95}%`
+                const top = `${(index * 23 + 12) % 75}%`
+                const color = colors[index % colors.length]
+
+                return (
                     <motion.div
-                        className="h-2 w-2 rounded-full"
-                        style={{
-                            background: item.color,
-                            boxShadow: `0 0 25px 8px ${item.color}`,
-                        }}
+                        key={index}
+                        className="absolute"
+                        style={{ left, top }}
                         animate={{
-                            scale: [0, 1.8, 0],
+                            scale: [0, 1.5, 0],
                             opacity: [0, 1, 0],
                         }}
                         transition={{
-                            duration: 1.5,
-                            delay: item.delay,
+                            duration: 1.3,
+                            delay: index * 0.7,
                             repeat: Infinity,
-                            repeatDelay: 3,
+                            repeatDelay: 1.5,
                         }}
-                    />
+                    >
+                        {Array.from({ length: 12 }).map((_, ray) => {
+                            const angle = ray * 30
 
-                    {Array.from({ length: 12 }).map((_, ray) => {
-                        const angle = (360 / 12) * ray
+                            return (
+                                <motion.span
+                                    key={ray}
+                                    className="absolute left-1/2 top-1/2 h-8 w-[2px] origin-bottom rounded-full"
+                                    style={{
+                                        background: color,
+                                        boxShadow: `0 0 8px ${color}`,
+                                        transform: `translate(-50%, -100%) rotate(${angle}deg)`,
+                                    }}
+                                    animate={{
+                                        scaleY: [0, 1, 0],
+                                        opacity: [0, 1, 0],
+                                    }}
+                                    transition={{
+                                        duration: 1.2,
+                                        delay: index * 0.7,
+                                        repeat: Infinity,
+                                        repeatDelay: 1.5,
+                                    }}
+                                />
+                            )
+                        })}
+                    </motion.div>
+                )
+            })}
+        </div>
+    )
+}
 
-                        return (
-                            <motion.span
-                                key={ray}
-                                className="absolute left-1/2 top-1/2 h-8 w-[2px] origin-bottom rounded-full"
-                                style={{
-                                    background: item.color,
-                                    boxShadow: `0 0 7px ${item.color}`,
-                                    transform: `translate(-50%, -100%) rotate(${angle}deg)`,
-                                }}
-                                animate={{
-                                    scaleY: [0, 1, 0],
-                                    opacity: [0, 1, 0],
-                                }}
-                                transition={{
-                                    duration: 1.4,
-                                    delay: item.delay,
-                                    repeat: Infinity,
-                                    repeatDelay: 3,
-                                }}
-                            />
-                        )
-                    })}
-                </motion.div>
+/* =========================================
+   FALLING GLITTER / CONFETTI
+========================================= */
+
+function FallingGlitter() {
+    const colors = [
+        "#ffd166",
+        "#ff6fae",
+        "#ffffff",
+        "#c7a0ff",
+        "#8be9fd",
+    ]
+
+    return (
+        <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+            {Array.from({ length: 65 }).map((_, index) => (
+                <motion.span
+                    key={index}
+                    className="absolute top-[-20px] rounded-full"
+                    style={{
+                        left: `${(index * 37) % 100}%`,
+                        width: index % 3 === 0 ? 5 : 3,
+                        height: index % 3 === 0 ? 8 : 4,
+                        background: colors[index % colors.length],
+                        boxShadow: `0 0 8px ${colors[index % colors.length]}`,
+                    }}
+                    animate={{
+                        y: ["0vh", "110vh"],
+                        x: [0, index % 2 === 0 ? 35 : -35, 0],
+                        rotate: [0, 180, 360],
+                        opacity: [0, 1, 1, 0],
+                    }}
+                    transition={{
+                        duration: 4 + (index % 5),
+                        delay: (index % 13) * 0.35,
+                        repeat: Infinity,
+                        ease: "linear",
+                    }}
+                />
             ))}
         </div>
     )
 }
 
-/* ======================================================
-   LETTER DATA
-====================================================== */
+/* =========================================
+   BIRTHDAY LETTERS
+========================================= */
 
-const words = ["HAPPY", "BIRTHDAY", "CUTIE"]
+const birthdayWords = ["HAPPY", "BIRTHDAY", "CUTIE"]
 
 const letterColors = [
     "#ff4fa3",
@@ -234,492 +265,300 @@ const letterColors = [
     "#8be9fd",
     "#c7a0ff",
     "#ffd166",
-    "#ff8fab",
-    "#ff6fae",
-    "#8be9fd",
-    "#ffd166",
-    "#ff9de2",
-    "#c7a0ff",
-    "#ff6fae",
 ]
 
-function createLetters() {
-    let counter = 0
-
-    return words.map((word, wordIndex) =>
-        [...word].map((letter, letterIndex) => {
-            const current = {
+function BirthdayLetters() {
+    const letters = useMemo(
+        () => birthdayWords.flatMap((word, wordIndex) =>
+            [...word].map((letter, letterIndex) => ({
                 id: `${wordIndex}-${letterIndex}`,
                 letter,
                 wordIndex,
                 letterIndex,
-                index: counter,
-                color: letterColors[counter % letterColors.length],
-            }
-
-            counter++
-            return current
-        })
+            }))
+        ),
+        []
     )
-}
 
-/* ======================================================
-   ONE FIREWORK LETTER
-====================================================== */
-
-function FireworkLetter({ item, visible, balloonPhase }) {
-    const wordPositions = {
-        0: { top: "8%", left: "50%" },
-        1: { top: "42%", left: "50%" },
-        2: { top: "76%", left: "50%" },
-    }
-
-    const position = wordPositions[item.wordIndex]
-
-    const wordLengths = {
-        0: 5,
-        1: 8,
-        2: 4,
-    }
-
-    const wordLength = wordLengths[item.wordIndex]
-    const spacing = 42
-
-    const offset =
-        (item.letterIndex - (wordLength - 1) / 2) * spacing
-
-    return (
-        <div
-            className="absolute"
-            style={{
-                top: position.top,
-                left: `calc(50% + ${offset}px)`,
-                transform: "translate(-50%, -50%)",
-            }}
-        >
-            {visible && (
-                <motion.div
-                    className="pointer-events-none absolute left-1/2 top-1/2"
-                    initial={{ y: 230, opacity: 1 }}
-                    animate={{ y: 0, opacity: [1, 1, 0] }}
-                    transition={{
-                        duration: 0.62,
-                        ease: "easeOut",
-                    }}
-                >
-                    <div
-                        className="h-2 w-2 rounded-full"
-                        style={{
-                            background: item.color,
-                            boxShadow: `0 0 8px ${item.color}, 0 0 20px ${item.color}`,
-                        }}
-                    />
-                </motion.div>
-            )}
-
-            {visible && (
-                <motion.div
-                    className="pointer-events-none absolute left-1/2 top-1/2"
-                    initial={{ scale: 0, opacity: 1 }}
-                    animate={{
-                        scale: [0, 1.2, 1.8, 0],
-                        opacity: [1, 1, 0.5, 0],
-                    }}
-                    transition={{
-                        duration: 0.7,
-                        delay: 0.55,
-                        ease: "easeOut",
-                    }}
-                >
-                    {Array.from({ length: 16 }).map((_, rayIndex) => {
-                        const angle = (360 / 16) * rayIndex
-                        const radians = (angle * Math.PI) / 180
-                        const distance = 25 + (rayIndex % 4) * 9
-                        const x = Math.cos(radians) * distance
-                        const y = Math.sin(radians) * distance
-
-                        return (
-                            <motion.span
-                                key={rayIndex}
-                                className="absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full"
-                                style={{
-                                    background: item.color,
-                                    boxShadow: `0 0 8px ${item.color}`,
-                                }}
-                                initial={{
-                                    x: 0,
-                                    y: 0,
-                                    opacity: 1,
-                                    scale: 1,
-                                }}
-                                animate={{
-                                    x,
-                                    y,
-                                    opacity: 0,
-                                    scale: 0,
-                                }}
-                                transition={{
-                                    duration: 0.65,
-                                    delay: 0.55,
-                                    ease: "easeOut",
-                                }}
-                            />
-                        )
-                    })}
-                </motion.div>
-            )}
-
-            <AnimatePresence>
-                {visible && (
-                    <motion.div
-                        initial={{
-                            opacity: 0,
-                            scale: 0,
-                        }}
-                        animate={
-                            balloonPhase
-                                ? {
-                                      opacity: 0,
-                                      y: -230,
-                                      scale: 0.85,
-                                  }
-                                : {
-                                      opacity: 1,
-                                      y: 0,
-                                      scale: [0, 1.25, 0.92, 1],
-                                  }
-                        }
-                        transition={
-                            balloonPhase
-                                ? {
-                                      duration: 1.8,
-                                      delay: item.index * 0.12,
-                                      ease: "easeInOut",
-                                  }
-                                : {
-                                      duration: 0.6,
-                                      delay: 0.6,
-                                      ease: "backOut",
-                                  }
-                        }
-                        className="relative"
-                    >
-                        {balloonPhase && (
-                            <motion.div
-                                className="absolute bottom-full left-1/2 -translate-x-1/2"
-                                initial={{
-                                    opacity: 0,
-                                    scale: 0,
-                                    y: 20,
-                                }}
-                                animate={{
-                                    opacity: 1,
-                                    scale: 1,
-                                    y: 0,
-                                }}
-                                transition={{
-                                    duration: 0.45,
-                                    delay: item.index * 0.12,
-                                    ease: "backOut",
-                                }}
-                            >
-                                <div
-                                    className="relative h-11 w-9 rounded-[50%]"
-                                    style={{
-                                        background: `
-                                            radial-gradient(circle at 30% 25%, rgba(255,255,255,0.9), transparent 18%),
-                                            linear-gradient(145deg, ${item.color}, rgba(90,30,140,0.95))
-                                        `,
-                                        boxShadow: `0 0 18px ${item.color}`,
-                                    }}
-                                >
-                                    <div className="absolute left-1/2 top-full h-24 w-px -translate-x-1/2 bg-white/45" />
-
-                                    <div
-                                        className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 bg-white/50"
-                                        style={{
-                                            clipPath: "polygon(0 0,100% 0,50% 100%)",
-                                        }}
-                                    />
-                                </div>
-                            </motion.div>
-                        )}
-
-                        <span
-                            className="block text-3xl font-black uppercase md:text-4xl"
-                            style={{
-                                color: item.color,
-                                textShadow: `
-                                    0 0 8px ${item.color},
-                                    0 0 20px ${item.color},
-                                    0 0 35px ${item.color}
-                                `,
-                            }}
-                        >
-                            {item.letter}
-                        </span>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-    )
-}
-
-/* ======================================================
-   BIRTHDAY FIREWORK SHOW
-====================================================== */
-
-function BirthdayFireworkShow({
-    onAllLettersShown,
-    onBalloonPhase,
-}) {
     const [visibleCount, setVisibleCount] = useState(0)
-    const [balloonPhase, setBalloonPhase] = useState(false)
-
-    const letters = useMemo(() => createLetters().flat(), [])
-
-    const onAllLettersShownRef = useRef(onAllLettersShown)
-    const onBalloonPhaseRef = useRef(onBalloonPhase)
 
     useEffect(() => {
-        onAllLettersShownRef.current = onAllLettersShown
-        onBalloonPhaseRef.current = onBalloonPhase
-    }, [onAllLettersShown, onBalloonPhase])
-
-    useEffect(() => {
-        const revealTimers = []
+        const timers = []
 
         letters.forEach((_, index) => {
             const timer = setTimeout(() => {
                 setVisibleCount(index + 1)
+            }, 400 + index * 180)
 
-                if (index === letters.length - 1) {
-                    onAllLettersShownRef.current?.()
-                }
-            }, 700 + index * 650)
-
-            revealTimers.push(timer)
+            timers.push(timer)
         })
 
-        const balloonTimer = setTimeout(() => {
-            setBalloonPhase(true)
-            onBalloonPhaseRef.current?.()
-        }, 700 + letters.length * 650 + 1500)
-
-        return () => {
-            revealTimers.forEach(clearTimeout)
-            clearTimeout(balloonTimer)
-        }
+        return () => timers.forEach(clearTimeout)
     }, [letters])
 
     return (
-        <div className="absolute inset-x-0 bottom-0 top-[38%] z-10 overflow-hidden">
-            {Array.from({ length: 35 }).map((_, index) => (
-                <motion.span
-                    key={index}
-                    className="absolute h-[2px] w-[2px] rounded-full bg-white"
-                    style={{
-                        left: `${(index * 37) % 100}%`,
-                        top: `${(index * 47) % 95}%`,
-                    }}
-                    animate={{
-                        opacity: [0.15, 0.8, 0.15],
-                        scale: [0.6, 1.4, 0.6],
-                    }}
-                    transition={{
-                        duration: 2 + (index % 4) * 0.4,
-                        delay: (index % 6) * 0.2,
-                        repeat: Infinity,
-                    }}
-                />
-            ))}
+        <div className="relative z-30 flex w-full flex-col items-center justify-center gap-3 px-2 text-center">
+            {birthdayWords.map((word, wordIndex) => {
+                const wordLetters = letters.filter(
+                    item => item.wordIndex === wordIndex
+                )
 
-            {letters.map((item, index) => (
-                <FireworkLetter
-                    key={item.id}
-                    item={item}
-                    visible={index < visibleCount}
-                    balloonPhase={balloonPhase}
-                />
-            ))}
+                return (
+                    <div
+                        key={word}
+                        className="flex items-center justify-center gap-[2px] sm:gap-2"
+                    >
+                        {wordLetters.map(item => {
+                            const index = letters.findIndex(
+                                letter => letter.id === item.id
+                            )
 
-            {!balloonPhase &&
-                Array.from({ length: 12 }).map((_, index) => (
-                    <motion.span
-                        key={`launch-${index}`}
-                        className="absolute bottom-0 h-1 w-1 rounded-full bg-white"
-                        style={{
-                            left: `${5 + (index * 19) % 90}%`,
-                        }}
-                        animate={{
-                            y: [0, -80, -180],
-                            opacity: [0, 1, 0],
-                        }}
-                        transition={{
-                            duration: 2,
-                            delay: index * 0.3,
-                            repeat: Infinity,
-                            ease: "easeOut",
-                        }}
-                    />
-                ))}
+                            const visible = index < visibleCount
+
+                            return (
+                                <motion.span
+                                    key={item.id}
+                                    initial={{
+                                        opacity: 0,
+                                        y: 80,
+                                        scale: 0,
+                                        rotate: -90,
+                                    }}
+                                    animate={
+                                        visible
+                                            ? {
+                                                opacity: 1,
+                                                y: [80, -12, 0],
+                                                scale: [0, 1.4, 1],
+                                                rotate: 0,
+                                            }
+                                            : {}
+                                    }
+                                    transition={{
+                                        duration: 0.65,
+                                        ease: "backOut",
+                                    }}
+                                    className="text-2xl font-black uppercase sm:text-4xl md:text-5xl"
+                                    style={{
+                                        color: letterColors[index % letterColors.length],
+                                        textShadow: `
+                                            0 0 8px currentColor,
+                                            0 0 20px currentColor,
+                                            0 0 35px currentColor
+                                        `,
+                                    }}
+                                >
+                                    {item.letter}
+                                </motion.span>
+                            )
+                        })}
+                    </div>
+                )
+            })}
         </div>
     )
 }
 
-/* ======================================================
+/* =========================================
    MAIN INTRO SCREEN
-====================================================== */
+========================================= */
 
 export default function IntroScreen({ onNext }) {
     const [step, setStep] = useState(0)
 
-    const [showStartButton, setShowStartButton] = useState(false)
-    const [showSecondGif, setShowSecondGif] = useState(false)
+    // Countdown: 11:59:00 → 12:00:00
+    const [seconds, setSeconds] = useState(0)
+    const [midnightReached, setMidnightReached] = useState(false)
+
+    const [musicBlocked, setMusicBlocked] = useState(false)
     const [showCurtainVideo, setShowCurtainVideo] = useState(false)
+    const [showStartButton, setShowStartButton] = useState(false)
 
-    const buttonShownRef = useRef(false)
+    const audioRef = useRef(null)
+    const startedRef = useRef(false)
 
-    const CURTAIN_REVEAL_TIME = 5.0
+    /* =====================================
+       COUNTDOWN
+       100ms = 1 displayed second
+       Total countdown = about 6 seconds
+    ===================================== */
 
-    const handleCurtainVideoTime = (event) => {
-        const video = event.currentTarget
+    useEffect(() => {
+        if (midnightReached) return
 
-        if (
-            video.currentTime >= CURTAIN_REVEAL_TIME &&
-            !buttonShownRef.current
-        ) {
-            buttonShownRef.current = true
+        const timer = setInterval(() => {
+            setSeconds(previous => {
+                if (previous >= 59) {
+                    clearInterval(timer)
+                    setMidnightReached(true)
+                    return 60
+                }
+
+                return previous + 1
+            })
+        }, 100)
+
+        return () => clearInterval(timer)
+    }, [midnightReached])
+
+    /* =====================================
+       MIDNIGHT: BIRTHDAY + MUSIC
+    ===================================== */
+
+    useEffect(() => {
+        if (!midnightReached || startedRef.current) return
+
+        startedRef.current = true
+
+        // Birthday celebration starts
+        setStep(1)
+
+        // Start music at midnight
+        const audio = audioRef.current
+
+        if (audio) {
+            audio.currentTime = 0
+            audio.play()
+                .then(() => setMusicBlocked(false))
+                .catch(() => setMusicBlocked(true))
+        }
+
+        // Curtain video starts later
+        const curtainTimer = setTimeout(() => {
+            setShowCurtainVideo(true)
+        }, 12000)
+
+        return () => clearTimeout(curtainTimer)
+    }, [midnightReached])
+
+    /* =====================================
+       CURTAIN VIDEO BUTTON
+    ===================================== */
+
+    const handleCurtainTime = (event) => {
+        if (event.currentTarget.currentTime >= 5) {
             setShowStartButton(true)
         }
     }
 
+    const enableMusic = () => {
+        const audio = audioRef.current
+
+        if (audio) {
+            audio.play()
+                .then(() => setMusicBlocked(false))
+                .catch(() => setMusicBlocked(true))
+        }
+    }
+
     return (
-        <AnimatePresence mode="wait">
+        <>
+            {/* Music: put music.mp3 inside public folder */}
+            <audio
+                ref={audioRef}
+                src="/music.mp3"
+                preload="auto"
+                loop
+            />
 
-            {/* ==================================================
-                STEP 0 — LUXURY BLACK INTRO
-            ================================================== */}
+            <AnimatePresence mode="wait">
 
-            {step === 0 && (
-                <motion.div
-                    key="step0"
-                    initial={{
-                        opacity: 0,
-                        scale: 0.985,
-                    }}
-                    animate={{
-                        opacity: 1,
-                        scale: 1,
-                    }}
-                    exit={{
-                        opacity: 0,
-                        scale: 1.015,
-                    }}
-                    transition={{ duration: 0.4 }}
-                    className="fixed inset-0 overflow-hidden bg-[#070d2b]"
-                >
-                    <div className="absolute inset-0 bg-[#070d2b]" />
+                {/* =====================================
+                    STEP 0 — COUNTDOWN SCREEN
+                ===================================== */}
 
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(90,90,180,0.22),transparent_55%)]" />
+                {step === 0 && (
+                    <motion.div
+                        key="step0"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 overflow-hidden bg-black"
+                    >
+                        {/* Pure black background */}
+                        <div className="absolute inset-0 bg-black" />
 
-                    <TopDecoration />
+                        <TopDecoration />
 
-                    <div className="relative z-20 flex min-h-screen w-full items-center justify-center px-4 py-8">
+                        {/* Main card */}
+                        <div className="relative z-20 flex min-h-screen w-full items-center justify-center px-4 py-8">
 
-                        <motion.div
-                            initial={{
-                                opacity: 0,
-                                y: 18,
-                            }}
-                            animate={{
-                                opacity: 1,
-                                y: 0,
-                            }}
-                            transition={{ duration: 0.45 }}
-                            className="
-                                relative
-                                mx-auto
-                                w-full
-                                max-w-[440px]
-                                overflow-hidden
-                                rounded-[42px]
-                                border
-                                border-[#d6ad68]/50
-                                bg-black
-                                p-6
-                                shadow-[0_25px_90px_rgba(0,0,0,0.85),0_0_35px_rgba(218,170,95,0.16)]
-                                md:p-8
-                            "
-                        >
-                            {/* Luxury golden border glow */}
-
-                            <div className="pointer-events-none absolute inset-0 rounded-[42px] border border-[#f4d69a]/15" />
-
-                            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-pink-500/10 blur-3xl" />
-
-                            <div className="pointer-events-none absolute -bottom-20 -left-16 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
-
-                            {/* ==================================================
-                                GIFT + ANIME VIDEO
-                                Video file: public/1.2.mp4
-                            ================================================== */}
-
-                            <div
+                            <motion.div
+                                initial={{ opacity: 0, y: 25, scale: 0.96 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{ duration: 0.7 }}
                                 className="
                                     relative
-                                    z-10
-                                    flex
-                                    h-44
+                                    mx-auto
                                     w-full
-                                    items-center
-                                    justify-center
-                                    gap-2
+                                    max-w-[440px]
                                     overflow-hidden
-                                    rounded-[30px]
+                                    rounded-[42px]
                                     border
-                                    border-[#d6ad68]/30
+                                    border-[#d8ad62]/40
                                     bg-black
-                                    shadow-[inset_0_0_25px_rgba(255,255,255,0.04),0_8px_30px_rgba(0,0,0,0.5)]
-                                    sm:gap-3
+                                    p-5
+                                    shadow-[0_20px_80px_rgba(0,0,0,0.9),0_0_35px_rgba(218,170,95,0.12)]
+                                    sm:p-7
                                 "
                             >
-                                {/* Golden glow */}
+                                {/* Golden border shine */}
+                                <div className="pointer-events-none absolute inset-0 rounded-[42px] border border-white/10" />
 
-                                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(218,170,95,0.10),transparent_70%)]" />
+                                <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-amber-400/10 blur-3xl" />
 
-                                {/* Gift box */}
+                                {/* Countdown clock */}
+                                <div className="relative z-10 mb-5 flex flex-col items-center">
+                                    <div className="mb-2 flex items-center gap-2 text-[#e9bd70]">
+                                        <Clock size={17} />
+                                        <span className="text-[10px] font-semibold uppercase tracking-[0.35em]">
+                                            Midnight surprise
+                                        </span>
+                                    </div>
 
-                                <motion.div
+                                    <motion.div
+                                        animate={{
+                                            textShadow: [
+                                                "0 0 8px rgba(255,190,90,0.3)",
+                                                "0 0 22px rgba(255,190,90,0.8)",
+                                                "0 0 8px rgba(255,190,90,0.3)",
+                                            ],
+                                        }}
+                                        transition={{
+                                            duration: 1,
+                                            repeat: Infinity,
+                                        }}
+                                        className="rounded-2xl border border-[#d8ad62]/40 bg-[#100d08] px-6 py-3"
+                                    >
+                                        <span className="font-mono text-3xl font-bold tracking-[0.12em] text-[#ffd98a] sm:text-4xl">
+                                            {seconds >= 60
+                                                ? "12:00:00"
+                                                : `11:59:${String(seconds).padStart(2, "0")}`}
+                                        </span>
+                                    </motion.div>
+                                </div>
+
+                                {/* Anime video — gift removed */}
+                                <div
                                     className="
                                         relative
                                         z-10
                                         flex
-                                        h-full
-                                        w-[42%]
-                                        shrink-0
+                                        h-[290px]
+                                        w-full
                                         items-center
                                         justify-center
+                                        overflow-hidden
+                                        rounded-[30px]
+                                        border
+                                        border-[#d8ad62]/25
+                                        bg-black
+                                        sm:h-[340px]
                                     "
-                                    animate={{
-                                        y: [0, -5, 0],
-                                        rotate: [-2, 2, -2],
-                                    }}
-                                    transition={{
-                                        duration: 3,
-                                        repeat: Infinity,
-                                        ease: "easeInOut",
-                                    }}
                                 >
-                                    <span className="text-[66px] drop-shadow-[0_8px_15px_rgba(255,180,50,0.25)] sm:text-7xl">
-                                        🎁
-                                    </span>
-                                </motion.div>
+                                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(218,170,95,0.12),transparent_70%)]" />
 
-                                {/* Anime video */}
-
-                                <div className="relative z-10 flex h-full w-[42%] shrink-0 items-center justify-center overflow-hidden bg-black">
-                                    <video
+                                    <motion.video
                                         src="/1.2.mp4"
                                         autoPlay
                                         muted
@@ -727,404 +566,348 @@ export default function IntroScreen({ onNext }) {
                                         playsInline
                                         preload="auto"
                                         className="
+                                            relative
+                                            z-10
                                             h-full
                                             w-full
                                             object-contain
                                             mix-blend-screen
                                         "
+                                        animate={{
+                                            scale: [1, 1.035, 1],
+                                        }}
+                                        transition={{
+                                            duration: 4,
+                                            repeat: Infinity,
+                                            ease: "easeInOut",
+                                        }}
                                     />
                                 </div>
-                            </div>
 
-                            {/* Title */}
+                                {/* Title */}
+                                <div className="relative z-10 mt-7 text-center">
+                                    <motion.h1
+                                        animate={{
+                                            textShadow: [
+                                                "0 0 10px rgba(255,120,190,0.15)",
+                                                "0 0 25px rgba(255,120,190,0.45)",
+                                                "0 0 10px rgba(255,120,190,0.15)",
+                                            ],
+                                        }}
+                                        transition={{
+                                            duration: 2.5,
+                                            repeat: Infinity,
+                                        }}
+                                        className="text-3xl font-semibold italic leading-tight text-pink-200 sm:text-4xl"
+                                    >
+                                        Something special
+                                        <br />
+                                        is waiting...
+                                    </motion.h1>
 
-                            <div className="relative z-10 mt-8 text-center">
-                                <h1 className="text-3xl font-semibold italic leading-tight text-pink-200 drop-shadow-[0_2px_12px_rgba(255,150,220,0.25)] md:text-4xl">
-                                    Something special
-                                    <br />
-                                    is waiting...
-                                </h1>
+                                    <p className="mt-4 text-sm text-gray-300 sm:text-base">
+                                        A beautiful moment is coming ✨
+                                    </p>
+                                </div>
 
-                                <p className="mt-5 text-base text-[#d5d8f0] md:text-lg">
-                                    Tap the button to open it ✨
-                                </p>
-                            </div>
+                                {/* Countdown message */}
+                                <div className="relative z-10 mt-6 text-center">
+                                    <p className="text-[10px] uppercase tracking-[0.3em] text-[#d8ad62]/70">
+                                        Get ready to celebrate
+                                    </p>
 
-                            {/* Open button */}
+                                    <motion.div
+                                        className="mx-auto mt-3 h-1.5 max-w-[220px] overflow-hidden rounded-full bg-white/10"
+                                    >
+                                        <motion.div
+                                            className="h-full rounded-full bg-gradient-to-r from-amber-400 to-pink-400"
+                                            initial={{ width: "0%" }}
+                                            animate={{
+                                                width: `${Math.min((seconds / 60) * 100, 100)}%`,
+                                            }}
+                                            transition={{ duration: 0.1 }}
+                                        />
+                                    </motion.div>
+                                </div>
+                            </motion.div>
+                        </div>
 
-                            <div className="relative z-10 mt-8 flex justify-center">
-                                <Button
-                                    onClick={() => setStep(1)}
-                                    className="
-                                        w-full
-                                        max-w-[320px]
-                                        justify-center
-                                        rounded-full
-                                        border
-                                        border-pink-200/30
-                                        bg-gradient-to-r
-                                        from-pink-500
-                                        via-fuchsia-500
-                                        to-purple-500
-                                        text-white
-                                        shadow-[0_8px_30px_rgba(255,20,147,0.30)]
-                                        transition-transform
-                                        hover:scale-[1.03]
-                                    "
-                                >
-                                    <Gift size={21} />
-                                    <span>Open It!</span>
-                                </Button>
-                            </div>
-                        </motion.div>
-                    </div>
+                        <BottomBalloons />
 
-                    <BottomBalloons />
+                        <div className="fixed bottom-5 right-5 z-40 text-xs text-white/35">
+                            @Rafee🫶protiva
+                        </div>
+                    </motion.div>
+                )}
 
-                    <div className="fixed bottom-5 right-5 z-40 text-sm text-white/35">
-                        @Rafee🫶protiva
-                    </div>
-                </motion.div>
-            )}
+                {/* =====================================
+                    STEP 1 — MIDNIGHT BIRTHDAY CELEBRATION
+                ===================================== */}
 
-            {/* ==================================================
-                STEP 1 — BIRTHDAY FIREWORK + CURTAIN VIDEO
-            ================================================== */}
+                {step === 1 && (
+                    <motion.div
+                        key="step1"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.7 }}
+                        className="fixed inset-0 overflow-hidden bg-black"
+                    >
+                        <div className="absolute inset-0 bg-black" />
 
-            {step === 1 && (
-                <motion.div
-                    key="step1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="fixed inset-0 overflow-hidden bg-[#03050f]"
-                >
-                    <div className="absolute inset-0 bg-[#03050f]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(75,35,100,0.22),transparent_65%)]" />
 
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(80,50,180,0.27),transparent_62%)]" />
+                        {/* Continuous celebration effects */}
+                        <CelebrationFireworks />
+                        <FallingGlitter />
 
-                    <div className="absolute inset-x-0 bottom-0 h-[55%] bg-[radial-gradient(circle_at_50%_100%,rgba(255,70,180,0.15),transparent_65%)]" />
+                        {/* Top decoration */}
+                        <TopDecoration />
 
-                    <BackgroundFireworks />
+                        {/* Birthday heading */}
+                        <div className="absolute inset-x-0 top-[22%] z-30 flex justify-center px-3">
+                            <BirthdayLetters />
+                        </div>
 
-                    {/* Curtain video */}
-
-                    {showCurtainVideo && (
-                        <motion.video
-                            key="curtain-video"
-                            src="/curtain.mp4"
-                            autoPlay
-                            muted
-                            playsInline
-                            preload="auto"
-                            onTimeUpdate={handleCurtainVideoTime}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className="
-                                pointer-events-none
-                                absolute
-                                inset-0
-                                z-20
-                                h-full
-                                w-full
-                                object-contain
-                                mix-blend-screen
-                            "
-                        />
-                    )}
-
-                    {/* Birthday card */}
-
-                    <div className="absolute inset-x-0 top-[5%] z-30 flex justify-center px-4">
+                        {/* Birthday subtitle */}
                         <motion.div
-                            initial={{
-                                opacity: 0,
-                                y: 20,
-                                scale: 0.95,
-                            }}
-                            animate={{
-                                opacity: 1,
-                                y: 0,
-                                scale: 1,
-                            }}
-                            transition={{
-                                duration: 0.6,
-                                ease: "easeOut",
-                            }}
+                            className="absolute inset-x-0 top-[48%] z-30 text-center"
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 3, duration: 1 }}
+                        >
+                            <p className="text-sm font-medium tracking-[0.2em] text-pink-200 sm:text-lg">
+                                HAPPY BIRTHDAY, CUTIE ❤️
+                            </p>
+
+                            <p className="mt-3 text-xs text-white/60 sm:text-sm">
+                                Today is your special day ✨
+                            </p>
+                        </motion.div>
+
+                        {/* Curtain video */}
+                        {showCurtainVideo && (
+                            <motion.video
+                                key="curtain-video"
+                                src="/curtain.mp4"
+                                autoPlay
+                                muted
+                                playsInline
+                                preload="auto"
+                                onTimeUpdate={handleCurtainTime}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.6 }}
+                                className="
+                                    pointer-events-none
+                                    absolute
+                                    inset-0
+                                    z-40
+                                    h-full
+                                    w-full
+                                    object-contain
+                                    mix-blend-screen
+                                "
+                            />
+                        )}
+
+                        {/* Start surprise button */}
+                        <AnimatePresence>
+                            {showStartButton && (
+                                <motion.div
+                                    initial={{
+                                        opacity: 0,
+                                        y: 35,
+                                        scale: 0.8,
+                                    }}
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                        scale: 1,
+                                    }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    transition={{
+                                        duration: 0.7,
+                                        ease: "backOut",
+                                    }}
+                                    className="fixed bottom-10 left-1/2 z-[100] -translate-x-1/2 px-4"
+                                >
+                                    <Button
+                                        onClick={() => onNext?.()}
+                                        className="
+                                            min-w-[230px]
+                                            justify-center
+                                            rounded-full
+                                            border
+                                            border-pink-200/30
+                                            bg-gradient-to-r
+                                            from-pink-500
+                                            to-purple-500
+                                            text-white
+                                            shadow-[0_10px_40px_rgba(255,120,210,0.4)]
+                                        "
+                                    >
+                                        <Heart size={20} />
+                                        <span>Start the surprise</span>
+                                    </Button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Music fallback if browser blocks autoplay */}
+                        {musicBlocked && (
+                            <motion.button
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                onClick={enableMusic}
+                                className="
+                                    fixed
+                                    bottom-24
+                                    left-1/2
+                                    z-[110]
+                                    -translate-x-1/2
+                                    whitespace-nowrap
+                                    rounded-full
+                                    border
+                                    border-[#e9bd70]/50
+                                    bg-black/90
+                                    px-5
+                                    py-3
+                                    text-sm
+                                    text-[#ffd98a]
+                                    shadow-lg
+                                "
+                            >
+                                ♫ Tap to play birthday music
+                            </motion.button>
+                        )}
+
+                        <BottomBalloons />
+
+                        <div className="fixed bottom-5 right-5 z-[150] text-xs text-white/35">
+                            @Rafee🫶protiva
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* =====================================
+                    STEP 2 — ORIGINAL CUTIEPIE SCREEN
+                ===================================== */}
+
+                {step === 2 && (
+                    <motion.div
+                        key="step2"
+                        initial={{
+                            opacity: 0,
+                            scale: 0.96,
+                            y: 20,
+                        }}
+                        animate={{
+                            opacity: 1,
+                            scale: 1,
+                            y: 0,
+                        }}
+                        exit={{
+                            opacity: 0,
+                            scale: 1.03,
+                        }}
+                        transition={{ duration: 0.5 }}
+                        className="
+                            fixed
+                            inset-0
+                            flex
+                            min-h-screen
+                            items-center
+                            justify-center
+                            overflow-y-auto
+                            bg-black
+                            px-4
+                            py-6
+                        "
+                    >
+                        <div
                             className="
-                                relative
+                                mx-auto
+                                flex
                                 w-full
-                                max-w-[420px]
-                                rounded-[42px]
+                                max-w-[440px]
+                                flex-col
+                                items-center
+                                gap-4
+                                rounded-[45px]
                                 border
-                                border-white/25
-                                bg-white/[0.90]
-                                p-5
-                                shadow-[0_25px_80px_rgba(0,0,0,0.45)]
-                                backdrop-blur-xl
+                                border-[#d8ad62]/30
+                                bg-[#090909]
+                                p-7
+                                shadow-2xl
                             "
                         >
-                            <div className="pointer-events-none absolute inset-0 rounded-[42px] bg-gradient-to-b from-white/50 to-transparent" />
-
-                            {/* GIF */}
-
                             <div
                                 className="
                                     relative
-                                    z-10
                                     flex
-                                    h-[105px]
+                                    h-44
                                     w-full
                                     items-center
                                     justify-center
                                     overflow-hidden
                                     rounded-[30px]
-                                    bg-gradient-to-b
-                                    from-pink-100
-                                    to-pink-200
+                                    border
+                                    border-[#d8ad62]/20
+                                    bg-black
                                     shadow-inner
+                                    md:h-52
                                 "
                             >
-                                <motion.img
-                                    key={showSecondGif ? "gif-5" : "gif-121"}
-                                    src={
-                                        showSecondGif
-                                            ? "/gifs/5.webp"
-                                            : "/gifs/121.webp"
-                                    }
-                                    alt="Birthday animation"
+                                <img
+                                    loading="lazy"
+                                    src="/gifs/intro.gif"
+                                    alt="Cute"
                                     className="h-full w-full object-contain"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.35 }}
                                 />
                             </div>
 
-                            {/* Title */}
-
-                            <div className="relative z-10 mt-5 text-center">
-                                <h1 className="text-2xl font-semibold leading-tight text-primary md:text-3xl">
-                                    Happy Birthday,
+                            <div className="text-center">
+                                <h1
+                                    className="
+                                        text-2xl
+                                        font-semibold
+                                        leading-tight
+                                        text-pink-200
+                                        md:text-3xl
+                                    "
+                                >
+                                    A Cutiepie was born today,
                                     <br />
-                                    Cutie ❤️
+                                    16 years ago!
                                 </h1>
 
-                                <p className="mt-2 text-sm text-primary/65 md:text-base">
-                                    Today is all about you ✨
+                                <p className="mt-4 text-gray-300">
+                                    Yes, it’s YOU! A little surprise awaits...
                                 </p>
                             </div>
-                        </motion.div>
-                    </div>
 
-                    {/* Firework + letters */}
-
-                    <BirthdayFireworkShow
-                        onAllLettersShown={() => setShowSecondGif(true)}
-                        onBalloonPhase={() => {
-                            setShowCurtainVideo(true)
-                        }}
-                    />
-
-                    {/* A little surprise */}
-
-                    <motion.div
-                        className="
-                            absolute
-                            left-1/2
-                            top-[27%]
-                            z-30
-                            -translate-x-1/2
-                            whitespace-nowrap
-                        "
-                        initial={{
-                            opacity: 0,
-                            y: -10,
-                        }}
-                        animate={{
-                            opacity: 1,
-                            y: 0,
-                        }}
-                        transition={{ duration: 0.7 }}
-                    >
-                        <p className="text-[10px] uppercase tracking-[0.32em] text-white/45">
-                            A little surprise
-                        </p>
-                    </motion.div>
-
-                    {/* Start button */}
-
-                    <AnimatePresence>
-                        {showStartButton && (
-                            <motion.div
-                                initial={{
-                                    opacity: 0,
-                                    y: 35,
-                                    scale: 0.9,
-                                }}
-                                animate={{
-                                    opacity: 1,
-                                    y: 0,
-                                    scale: 1,
-                                }}
-                                exit={{
-                                    opacity: 0,
-                                    y: 20,
-                                }}
-                                transition={{
-                                    duration: 0.6,
-                                    ease: "backOut",
-                                }}
-                                className="
-                                    fixed
-                                    bottom-8
-                                    left-1/2
-                                    z-[200]
-                                    -translate-x-1/2
-                                    px-4
-                                "
-                            >
+                            <div className="mt-4">
                                 <Button
                                     onClick={() => onNext?.()}
                                     className="
-                                        min-w-[230px]
                                         justify-center
-                                        bg-[#f1caeb]
-                                        text-primary
-                                        shadow-[0_10px_40px_rgba(255,120,210,0.35)]
+                                        rounded-full
+                                        bg-gradient-to-r
+                                        from-pink-500
+                                        to-purple-500
+                                        text-white
                                     "
                                 >
-                                    <Heart size={20} />
+                                    <Gift size={20} />
                                     <span>Start the surprise</span>
                                 </Button>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Signature */}
-
-                    <div className="fixed bottom-4 right-4 z-[150] text-sm text-white/30">
-                        @Rafee🫶protiva
-                    </div>
-                </motion.div>
-            )}
-
-            {/* ==================================================
-                STEP 2 — ORIGINAL CUTIEPIE SCREEN
-            ================================================== */}
-
-            {step === 2 && (
-                <motion.div
-                    key="step2"
-                    initial={{
-                        opacity: 0,
-                        scale: 0.96,
-                        y: 20,
-                    }}
-                    animate={{
-                        opacity: 1,
-                        scale: 1,
-                        y: 0,
-                    }}
-                    exit={{
-                        opacity: 0,
-                        scale: 1.03,
-                    }}
-                    transition={{
-                        duration: 0.5,
-                        ease: "easeOut",
-                    }}
-                    className="
-                        fixed
-                        inset-0
-                        flex
-                        min-h-screen
-                        items-center
-                        justify-center
-                        overflow-y-auto
-                        px-4
-                        py-6
-                    "
-                >
-                    <div
-                        className="
-                            mx-auto
-                            flex
-                            w-full
-                            max-w-[440px]
-                            flex-col
-                            items-center
-                            gap-4
-                            rounded-[60px]
-                            bg-[#fff8fc]
-                            p-7
-                            drop-shadow-2xl
-                        "
-                    >
-                        <div
-                            className="
-                                relative
-                                flex
-                                h-44
-                                w-full
-                                items-end
-                                justify-center
-                                overflow-hidden
-                                rounded-[40px]
-                                bg-gradient-to-b
-                                from-white/80
-                                to-pink-200
-                                shadow-inner
-                                md:h-52
-                            "
-                        >
-                            <img
-                                loading="lazy"
-                                src="/gifs/intro.gif"
-                                alt="Cute"
-                                className="w-26 md:w-32"
-                            />
+                            </div>
                         </div>
+                    </motion.div>
+                )}
 
-                        <div className="text-center">
-                            <h1
-                                className="
-                                    text-2xl
-                                    font-semibold
-                                    leading-tight
-                                    text-primary
-                                    drop-shadow
-                                    md:text-3xl
-                                "
-                            >
-                                A Cutiepie was born today,
-                                <br />
-                                16 years ago!
-                            </h1>
-
-                            <p className="mt-4 text-foreground">
-                                Yes, it’s YOU! A little surprise awaits...
-                            </p>
-                        </div>
-
-                        <div className="mt-4">
-                            <Button
-                                onClick={() => onNext?.()}
-                                className="
-                                    justify-center
-                                    bg-[#f1caeb]
-                                    text-primary
-                                "
-                            >
-                                <Gift size={20} />
-                                <span>Start the surprise</span>
-                            </Button>
-                        </div>
-                    </div>
-                </motion.div>
-            )}
-
-        </AnimatePresence>
+            </AnimatePresence>
+        </>
     )
 }
