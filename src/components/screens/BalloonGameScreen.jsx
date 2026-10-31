@@ -383,7 +383,7 @@ function Balloon({ item, popped, onPop }) {
 }
 
 // ======================================================
-// CONFETTI CELEBRATION
+// CELEBRATION CONFETTI
 // ======================================================
 
 function CelebrationConfetti() {
@@ -443,6 +443,58 @@ function CelebrationConfetti() {
 }
 
 // ======================================================
+// BOTTOM CHARACTER VIDEOS
+// ======================================================
+
+function CharacterVideos() {
+    return (
+        <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-30 h-[43vh] max-h-[500px] w-full overflow-hidden">
+
+            {/* LEFT VIDEO */}
+            <video
+                src="/ballon%20left%20.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                className="
+                    absolute
+                    bottom-0
+                    left-0
+                    h-full
+                    w-[52%]
+                    object-contain
+                    object-bottom
+                    mix-blend-screen
+                "
+            />
+
+            {/* RIGHT VIDEO */}
+            <video
+                src="/ballon%20right%20.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                className="
+                    absolute
+                    bottom-0
+                    right-0
+                    h-full
+                    w-[52%]
+                    object-contain
+                    object-bottom
+                    mix-blend-screen
+                "
+            />
+
+        </div>
+    )
+}
+
+// ======================================================
 // MAIN BALLOON SCREEN
 // ======================================================
 
@@ -476,10 +528,10 @@ export default function BalloonGameScreen({ onNext }) {
             <BalloonBackground />
             <TopBunting />
 
-            {/* Main content */}
+            {/* MAIN CONTENT */}
             <div className="relative z-20 flex min-h-screen w-full flex-col items-center px-4 pb-16 pt-40">
 
-                {/* Heading */}
+                {/* HEADING */}
                 <motion.h1
                     initial={{ opacity: 0, y: -15 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -494,7 +546,7 @@ export default function BalloonGameScreen({ onNext }) {
                         : "You found them all! 💗"}
                 </motion.h1>
 
-                {/* Balloon card */}
+                {/* BALLOON CARD */}
                 <motion.div
                     initial={{
                         opacity: 0,
@@ -518,42 +570,11 @@ export default function BalloonGameScreen({ onNext }) {
                             "0 15px 55px rgba(120,0,70,0.16), inset 0 0 45px rgba(0,0,0,0.12)",
                     }}
                 >
-                    {/* Subtle card glow */}
                     <div
                         className="pointer-events-none absolute inset-0"
                         style={{
                             background:
                                 "linear-gradient(180deg, rgba(255,100,190,0.025), transparent 45%, rgba(100,0,70,0.08))",
-                        }}
-                    />
-
-                    {/* LEFT CHARACTER VIDEO */}
-                    <video
-                        src="/ballon%20left%20.mp4"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        preload="auto"
-                        className="pointer-events-none absolute bottom-0 left-0 z-[15] h-[43%] w-[43%] object-contain object-bottom"
-                        style={{
-                            mixBlendMode: "screen",
-                            filter: "drop-shadow(0 0 10px rgba(255,150,220,0.12))",
-                        }}
-                    />
-
-                    {/* RIGHT CHARACTER VIDEO */}
-                    <video
-                        src="/ballon%20right%20.mp4"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        preload="auto"
-                        className="pointer-events-none absolute bottom-0 right-0 z-[15] h-[43%] w-[43%] object-contain object-bottom"
-                        style={{
-                            mixBlendMode: "screen",
-                            filter: "drop-shadow(0 0 10px rgba(255,150,220,0.12))",
                         }}
                     />
 
@@ -624,7 +645,7 @@ export default function BalloonGameScreen({ onNext }) {
                         />
                     </svg>
 
-                    {/* Balloons */}
+                    {/* BALLOONS */}
                     {balloonData.map((item) => (
                         <Balloon
                             key={item.id}
@@ -634,30 +655,30 @@ export default function BalloonGameScreen({ onNext }) {
                         />
                     ))}
 
-                    {/* Hint */}
+                    {/* HINT */}
                     {popped.length < 4 && (
                         <motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="absolute bottom-7 left-0 right-0 z-20 px-2 text-center font-serif text-sm tracking-wide text-white/70 sm:text-base"
+                            className="absolute bottom-7 left-0 right-0 z-40 px-2 text-center font-serif text-sm tracking-wide text-white/70 sm:text-base"
                         >
                             Tap the balloons one by one 🎈
                         </motion.p>
                     )}
 
-                    {/* Completed hint */}
+                    {/* COMPLETED HINT */}
                     {popped.length === 4 && (
                         <motion.p
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="absolute bottom-7 left-0 right-0 z-20 text-center font-serif text-sm italic text-pink-200/80"
+                            className="absolute bottom-7 left-0 right-0 z-40 text-center font-serif text-sm italic text-pink-200/90"
                         >
                             A little surprise for you! 💗
                         </motion.p>
                     )}
                 </motion.div>
 
-                {/* Next button */}
+                {/* NEXT BUTTON */}
                 <AnimatePresence>
                     {popped.length === 4 && (
                         <motion.div
@@ -693,12 +714,15 @@ export default function BalloonGameScreen({ onNext }) {
                 </AnimatePresence>
             </div>
 
-            {/* Celebration */}
+            {/* CHARACTER VIDEOS — BOTTOM LAYER */}
+            <CharacterVideos />
+
+            {/* CELEBRATION */}
             <AnimatePresence>
                 {celebration && <CelebrationConfetti />}
             </AnimatePresence>
 
-            {/* Signature */}
+            {/* SIGNATURE */}
             <div className="pointer-events-none fixed bottom-3 right-4 z-[300] text-sm text-white/40">
                 @Rafee🫶protiva
             </div>
