@@ -7,6 +7,9 @@ import { motion } from "framer-motion"
 export default function HugScreen() {
   const [progress, setProgress] = useState(0)
   const [holding, setHolding] = useState(false)
+  const [videoSrc, setVideoSrc] = useState(
+    "/Iv_0_20261030155231~2.mp4"
+  )
 
   const intervalRef = useRef(null)
   const startTimeRef = useRef(0)
@@ -41,6 +44,12 @@ export default function HugScreen() {
         intervalRef.current = null
       }
     }, 25)
+  }
+
+  const handleVideoError = () => {
+    if (videoSrc === "/Iv_0_20261030155231~2.mp4") {
+      setVideoSrc("/lv_0_20261030155231~2.mp4")
+    }
   }
 
   useEffect(() => {
@@ -85,20 +94,23 @@ export default function HugScreen() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative mb-4 flex h-[180px] w-full items-center justify-center overflow-hidden"
         >
+
           {/* Video - Default */}
           <video
-            src="/lv_0_20261030155231~2.mp4"
+            key={videoSrc}
+            src={videoSrc}
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
+            onError={handleVideoError}
             className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-200 ${
               holding ? "opacity-0" : "opacity-100"
             }`}
           />
 
-          {/* Dance GIF - Only while holding */}
+          {/* Dance GIF - While holding */}
           <img
             src="/gifs/dance.webp"
             alt="Cute dancing animation"
@@ -110,6 +122,7 @@ export default function HugScreen() {
               holding ? "opacity-100" : "opacity-0"
             }`}
           />
+
         </motion.div>
 
         {/* Heading */}
