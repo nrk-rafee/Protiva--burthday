@@ -69,7 +69,7 @@ const confettiColors = [
 
 function BalloonBackground() {
     return (
-        <div className="fixed inset-0 overflow-hidden bg-[#050307]">
+        <div className="fixed inset-0 z-0 overflow-hidden bg-[#050307]">
             <div
                 className="absolute inset-0"
                 style={{
@@ -160,7 +160,7 @@ function TopBunting() {
     ]
 
     return (
-        <div className="pointer-events-none fixed left-0 right-0 top-0 z-10">
+        <div className="pointer-events-none fixed left-0 right-0 top-0 z-50">
             <svg
                 className="h-32 w-full"
                 viewBox="0 0 400 125"
@@ -443,14 +443,14 @@ function CelebrationConfetti() {
 }
 
 // ======================================================
-// BOTTOM CHARACTER VIDEOS
+// CHARACTER VIDEOS — OVERLAY LAYER
 // ======================================================
 
 function CharacterVideos() {
     return (
-        <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-30 h-[43vh] max-h-[500px] w-full overflow-hidden">
+        <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-30 h-[48vh] max-h-[560px] w-full overflow-hidden">
 
-            {/* LEFT VIDEO */}
+            {/* LEFT CHARACTER */}
             <video
                 src="/ballon%20left%20.mp4"
                 autoPlay
@@ -458,19 +458,15 @@ function CharacterVideos() {
                 muted
                 playsInline
                 preload="auto"
-                className="
-                    absolute
-                    bottom-0
-                    left-0
-                    h-full
-                    w-[52%]
-                    object-contain
-                    object-bottom
-                    mix-blend-screen
-                "
+                className="absolute bottom-0 left-0 h-full w-[56%] object-contain object-bottom"
+                style={{
+                    mixBlendMode: "screen",
+                    WebkitMixBlendMode: "screen",
+                    background: "transparent",
+                }}
             />
 
-            {/* RIGHT VIDEO */}
+            {/* RIGHT CHARACTER */}
             <video
                 src="/ballon%20right%20.mp4"
                 autoPlay
@@ -478,18 +474,13 @@ function CharacterVideos() {
                 muted
                 playsInline
                 preload="auto"
-                className="
-                    absolute
-                    bottom-0
-                    right-0
-                    h-full
-                    w-[52%]
-                    object-contain
-                    object-bottom
-                    mix-blend-screen
-                "
+                className="absolute bottom-0 right-0 h-full w-[56%] object-contain object-bottom"
+                style={{
+                    mixBlendMode: "screen",
+                    WebkitMixBlendMode: "screen",
+                    background: "transparent",
+                }}
             />
-
         </div>
     )
 }
@@ -526,17 +517,21 @@ export default function BalloonGameScreen({ onNext }) {
             className="fixed inset-0 overflow-x-hidden overflow-y-auto bg-[#050307] text-white"
         >
             <BalloonBackground />
+
+            {/* VIDEOS BEHIND THE TEXT AND BUTTONS */}
+            <CharacterVideos />
+
             <TopBunting />
 
             {/* MAIN CONTENT */}
-            <div className="relative z-20 flex min-h-screen w-full flex-col items-center px-4 pb-16 pt-40">
+            <div className="relative z-40 flex min-h-screen w-full flex-col items-center px-4 pb-16 pt-40">
 
                 {/* HEADING */}
                 <motion.h1
                     initial={{ opacity: 0, y: -15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="relative z-20 text-center font-serif text-2xl italic text-[#f1d8ef] sm:text-3xl"
+                    className="relative z-50 text-center font-serif text-2xl italic text-[#f1d8ef] sm:text-3xl"
                     style={{
                         textShadow: "0 2px 15px rgba(255,150,220,0.12)",
                     }}
@@ -565,16 +560,16 @@ export default function BalloonGameScreen({ onNext }) {
                     className="relative mt-7 h-[55vh] min-h-[520px] max-h-[820px] w-full max-w-[630px] overflow-hidden rounded-[36px] border border-[#5a153e]/30"
                     style={{
                         background:
-                            "radial-gradient(ellipse at 50% 35%, #310020 0%, #260019 55%, #1b0014 100%)",
+                            "linear-gradient(180deg, rgba(49,0,32,0.98) 0%, rgba(38,0,25,0.92) 48%, rgba(27,0,20,0.12) 100%)",
                         boxShadow:
                             "0 15px 55px rgba(120,0,70,0.16), inset 0 0 45px rgba(0,0,0,0.12)",
                     }}
                 >
                     <div
-                        className="pointer-events-none absolute inset-0"
+                        className="pointer-events-none absolute inset-0 z-0"
                         style={{
                             background:
-                                "linear-gradient(180deg, rgba(255,100,190,0.025), transparent 45%, rgba(100,0,70,0.08))",
+                                "linear-gradient(180deg, rgba(255,100,190,0.025), transparent 45%, rgba(100,0,70,0.02))",
                         }}
                     />
 
@@ -655,30 +650,30 @@ export default function BalloonGameScreen({ onNext }) {
                         />
                     ))}
 
-                    {/* HINT */}
+                    {/* HINT — ABOVE VIDEO */}
                     {popped.length < 4 && (
                         <motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="absolute bottom-7 left-0 right-0 z-40 px-2 text-center font-serif text-sm tracking-wide text-white/70 sm:text-base"
+                            className="absolute bottom-7 left-0 right-0 z-[60] px-2 text-center font-serif text-sm tracking-wide text-white/90 drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)] sm:text-base"
                         >
                             Tap the balloons one by one 🎈
                         </motion.p>
                     )}
 
-                    {/* COMPLETED HINT */}
+                    {/* COMPLETED HINT — ABOVE VIDEO */}
                     {popped.length === 4 && (
                         <motion.p
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="absolute bottom-7 left-0 right-0 z-40 text-center font-serif text-sm italic text-pink-200/90"
+                            className="absolute bottom-7 left-0 right-0 z-[60] text-center font-serif text-sm italic text-pink-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]"
                         >
                             A little surprise for you! 💗
                         </motion.p>
                     )}
                 </motion.div>
 
-                {/* NEXT BUTTON */}
+                {/* NEXT BUTTON — ALWAYS ABOVE VIDEO */}
                 <AnimatePresence>
                     {popped.length === 4 && (
                         <motion.div
@@ -700,7 +695,7 @@ export default function BalloonGameScreen({ onNext }) {
                                 duration: 0.55,
                                 delay: 0.5,
                             }}
-                            className="relative z-[250] mt-7"
+                            className="relative z-[100] mt-7"
                         >
                             <Button
                                 onClick={onNext}
@@ -714,16 +709,13 @@ export default function BalloonGameScreen({ onNext }) {
                 </AnimatePresence>
             </div>
 
-            {/* CHARACTER VIDEOS — BOTTOM LAYER */}
-            <CharacterVideos />
-
             {/* CELEBRATION */}
             <AnimatePresence>
                 {celebration && <CelebrationConfetti />}
             </AnimatePresence>
 
             {/* SIGNATURE */}
-            <div className="pointer-events-none fixed bottom-3 right-4 z-[300] text-sm text-white/40">
+            <div className="pointer-events-none fixed bottom-3 right-4 z-[300] text-sm text-white/50">
                 @Rafee🫶protiva
             </div>
         </motion.div>
