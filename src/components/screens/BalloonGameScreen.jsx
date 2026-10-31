@@ -64,13 +64,12 @@ const confettiColors = [
 ]
 
 // ======================================================
-// BACKGROUND — REFERENCE STYLE
+// BACKGROUND
 // ======================================================
 
 function BalloonBackground() {
     return (
         <div className="fixed inset-0 overflow-hidden bg-[#050307]">
-            {/* Dark burgundy glow */}
             <div
                 className="absolute inset-0"
                 style={{
@@ -79,7 +78,6 @@ function BalloonBackground() {
                 }}
             />
 
-            {/* Subtle grid */}
             <div
                 className="absolute inset-0 opacity-25"
                 style={{
@@ -91,7 +89,6 @@ function BalloonBackground() {
                 }}
             />
 
-            {/* Pink glow at the bottom */}
             <div
                 className="absolute bottom-0 left-0 h-1/2 w-full"
                 style={{
@@ -100,7 +97,6 @@ function BalloonBackground() {
                 }}
             />
 
-            {/* Left star */}
             <motion.div
                 className="absolute left-6 top-48 text-5xl text-pink-500/20"
                 animate={{
@@ -117,7 +113,6 @@ function BalloonBackground() {
                 ✦
             </motion.div>
 
-            {/* Right star */}
             <motion.div
                 className="absolute right-6 top-[42%] text-4xl text-purple-400/20"
                 animate={{
@@ -134,7 +129,6 @@ function BalloonBackground() {
                 ✦
             </motion.div>
 
-            {/* Bottom decorations */}
             <div className="absolute bottom-20 -left-5 text-7xl text-pink-600/20">
                 ★
             </div>
@@ -172,7 +166,6 @@ function TopBunting() {
                 viewBox="0 0 400 125"
                 preserveAspectRatio="none"
             >
-                {/* Curved rope */}
                 <path
                     d="M0 0 Q100 150 200 0 Q300 150 400 0"
                     fill="none"
@@ -180,7 +173,6 @@ function TopBunting() {
                     strokeWidth="2"
                 />
 
-                {/* Colorful flags */}
                 {colors.map((color, index) => {
                     const x = index * 38 - 5
 
@@ -318,7 +310,6 @@ function Balloon({ item, popped, onPop }) {
                         }}
                         whileTap={{ scale: 0.9 }}
                     >
-                        {/* Balloon body */}
                         <div
                             className="relative h-[88px] w-[74px] rounded-[50%]"
                             style={{
@@ -342,12 +333,8 @@ function Balloon({ item, popped, onPop }) {
                                 `,
                             }}
                         >
-                            {/* Soft shine */}
-                            <div
-                                className="absolute left-[18px] top-[14px] h-7 w-4 rotate-[-25deg] rounded-full bg-white/35 blur-[1px]"
-                            />
+                            <div className="absolute left-[18px] top-[14px] h-7 w-4 rotate-[-25deg] rounded-full bg-white/35 blur-[1px]" />
 
-                            {/* Balloon knot — string attaches here */}
                             <div
                                 className="absolute -bottom-[7px] left-1/2 -translate-x-1/2"
                                 style={{
@@ -491,6 +478,7 @@ export default function BalloonGameScreen({ onNext }) {
 
             {/* Main content */}
             <div className="relative z-20 flex min-h-screen w-full flex-col items-center px-4 pb-16 pt-40">
+
                 {/* Heading */}
                 <motion.h1
                     initial={{ opacity: 0, y: -15 }}
@@ -539,7 +527,37 @@ export default function BalloonGameScreen({ onNext }) {
                         }}
                     />
 
-                    {/* STRINGS: behind the balloons, all join at one point */}
+                    {/* LEFT CHARACTER VIDEO */}
+                    <video
+                        src="/ballon%20left%20.mp4"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        className="pointer-events-none absolute bottom-0 left-0 z-[15] h-[43%] w-[43%] object-contain object-bottom"
+                        style={{
+                            mixBlendMode: "screen",
+                            filter: "drop-shadow(0 0 10px rgba(255,150,220,0.12))",
+                        }}
+                    />
+
+                    {/* RIGHT CHARACTER VIDEO */}
+                    <video
+                        src="/ballon%20right%20.mp4"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        className="pointer-events-none absolute bottom-0 right-0 z-[15] h-[43%] w-[43%] object-contain object-bottom"
+                        style={{
+                            mixBlendMode: "screen",
+                            filter: "drop-shadow(0 0 10px rgba(255,150,220,0.12))",
+                        }}
+                    />
+
+                    {/* STRINGS */}
                     <svg
                         className="pointer-events-none absolute inset-0 z-10 h-full w-full"
                         viewBox="0 0 100 100"
@@ -566,7 +584,6 @@ export default function BalloonGameScreen({ onNext }) {
                             </linearGradient>
                         </defs>
 
-                        {/* Each line starts directly below its balloon knot */}
                         <path
                             d="M18 27 Q26 60 50 96"
                             fill="none"
@@ -599,7 +616,6 @@ export default function BalloonGameScreen({ onNext }) {
                             vectorEffect="non-scaling-stroke"
                         />
 
-                        {/* Shared knot at the bottom */}
                         <circle
                             cx="50"
                             cy="96"
@@ -623,7 +639,7 @@ export default function BalloonGameScreen({ onNext }) {
                         <motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="absolute bottom-7 left-0 right-0 z-20 px-2 text-center font-serif text-sm tracking-wide text-white/50 sm:text-base"
+                            className="absolute bottom-7 left-0 right-0 z-20 px-2 text-center font-serif text-sm tracking-wide text-white/70 sm:text-base"
                         >
                             Tap the balloons one by one 🎈
                         </motion.p>
@@ -641,7 +657,7 @@ export default function BalloonGameScreen({ onNext }) {
                     )}
                 </motion.div>
 
-                {/* Next button appears after all balloons pop */}
+                {/* Next button */}
                 <AnimatePresence>
                     {popped.length === 4 && (
                         <motion.div
