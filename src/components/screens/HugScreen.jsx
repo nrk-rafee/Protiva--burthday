@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useRef, useState } from "react"
@@ -5,12 +6,10 @@ import { motion } from "framer-motion"
 
 export default function HugScreen() {
   const [progress, setProgress] = useState(0)
-  const [received, setReceived] = useState(false)
   const [holding, setHolding] = useState(false)
 
   const intervalRef = useRef(null)
   const startTimeRef = useRef(0)
-  const receivedRef = useRef(false)
 
   const stopHolding = () => {
     if (intervalRef.current) {
@@ -19,16 +18,13 @@ export default function HugScreen() {
     }
 
     setHolding(false)
-
-    if (!receivedRef.current) {
-      setProgress(0)
-    }
+    setProgress(0)
   }
 
   const startHolding = (event) => {
     event.preventDefault()
 
-    if (receivedRef.current || intervalRef.current) return
+    if (intervalRef.current) return
 
     startTimeRef.current = Date.now()
     setProgress(0)
@@ -43,11 +39,6 @@ export default function HugScreen() {
       if (nextProgress >= 100) {
         clearInterval(intervalRef.current)
         intervalRef.current = null
-
-        receivedRef.current = true
-        setReceived(true)
-        setHolding(false)
-        setProgress(100)
       }
     }, 25)
   }
@@ -86,128 +77,101 @@ export default function HugScreen() {
         transition={{ duration: 0.65 }}
         className="relative z-10 w-full max-w-[440px] rounded-[42px] bg-[#fffef6]/95 px-6 py-8 text-center shadow-[0_25px_70px_rgba(70,80,40,0.20)] sm:px-10 sm:py-10"
       >
-        {!received ? (
-          <>
-            {/* Dance GIF - Heading er upore */}
-            <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="mb-4 flex w-full items-center justify-center"
-            >
-              <img
-                src="/gifs/dance.webp"
-                alt="Cute dancing animation"
-                width="220"
-                height="180"
-                loading="eager"
-                decoding="async"
-                className="h-auto max-h-[180px] w-full max-w-[220px] object-contain"
-              />
-            </motion.div>
 
-            {/* Heading */}
-            <h1 className="font-serif text-3xl font-bold italic leading-tight text-slate-800 sm:text-4xl">
-              Sending You a
-              <br />
-              Virtual Hug!
-            </h1>
+        {/* Video / Dance GIF */}
+        <motion.div
+          initial={{ opacity: 0, y: 12, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="relative mb-4 flex h-[180px] w-full items-center justify-center overflow-hidden"
+        >
+          {/* Video - Default */}
+          <video
+            src="/lv_0_20261030155231~2.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-200 ${
+              holding ? "opacity-0" : "opacity-100"
+            }`}
+          />
 
-            <p className="mt-4 text-sm text-slate-500">
-              A little hug, made just for you 💗
-            </p>
+          {/* Dance GIF - Only while holding */}
+          <img
+            src="/gifs/dance.webp"
+            alt="Cute dancing animation"
+            width="220"
+            height="180"
+            loading="eager"
+            decoding="async"
+            className={`absolute inset-0 m-auto h-auto max-h-[180px] w-full max-w-[220px] object-contain transition-opacity duration-200 ${
+              holding ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        </motion.div>
 
-            {/* Progress bar */}
-            <div
-              className="mt-8 h-4 w-full overflow-hidden rounded-full bg-slate-100 shadow-inner"
-              role="progressbar"
-              aria-label="Hug progress"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(progress)}
-            >
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-pink-400 via-rose-500 to-pink-600 transition-none"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+        {/* Heading */}
+        <h1 className="font-serif text-3xl font-bold italic leading-tight text-slate-800 sm:text-4xl">
+          Sending You a
+          <br />
+          Virtual Hug!
+        </h1>
 
-            {/* Hold button */}
-            <button
-              type="button"
-              onPointerDown={startHolding}
-              onPointerUp={stopHolding}
-              onPointerLeave={stopHolding}
-              onPointerCancel={stopHolding}
-              onContextMenu={(event) => event.preventDefault()}
-              style={{
-                touchAction: "none",
-                userSelect: "none",
-                WebkitUserSelect: "none",
-              }}
-              className={`mt-8 flex min-h-[82px] w-full select-none items-center justify-center gap-3 rounded-[23px] border-2 border-pink-300 bg-pink-100 px-4 py-4 text-lg font-bold text-rose-600 shadow-sm transition-transform ${
-                holding
-                  ? "scale-[0.98] bg-pink-200"
-                  : "active:scale-[0.98]"
-              }`}
-            >
-              <span className="text-2xl">❤️</span>
+        <p className="mt-4 text-sm text-slate-500">
+          A little hug, made just for you 💗
+        </p>
 
-              <span>
-                {holding
-                  ? "Keep Holding..."
-                  : "Press & Hold to Receive"}
-              </span>
-            </button>
+        {/* Progress bar */}
+        <div
+          className="mt-8 h-4 w-full overflow-hidden rounded-full bg-slate-100 shadow-inner"
+          role="progressbar"
+          aria-label="Hug progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress)}
+        >
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-pink-400 via-rose-500 to-pink-600 transition-none"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
 
-            <p className="mt-6 text-sm font-medium text-slate-400">
-              {holding
-                ? "Almost there... 💗"
-                : "Hold until the hug is received 💕"}
-            </p>
-          </>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="py-5"
-          >
-            {/* Received hug GIF */}
-            <div className="mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-gradient-to-br from-teal-200 to-cyan-300 shadow-xl">
-              <img
-                src="/gifs/12%20(1).webp"
-                alt="A warm virtual hug"
-                width="128"
-                height="128"
-                loading="eager"
-                decoding="async"
-                className="h-full w-full object-contain"
-              />
-            </div>
+        {/* Hold button */}
+        <button
+          type="button"
+          onPointerDown={startHolding}
+          onPointerUp={stopHolding}
+          onPointerLeave={stopHolding}
+          onPointerCancel={stopHolding}
+          onContextMenu={(event) => event.preventDefault()}
+          style={{
+            touchAction: "none",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+          }}
+          className={`mt-8 flex min-h-[82px] w-full select-none items-center justify-center gap-3 rounded-[23px] border-2 border-pink-300 bg-pink-100 px-4 py-4 text-lg font-bold text-rose-600 shadow-sm transition-transform ${
+            holding
+              ? "scale-[0.98] bg-pink-200"
+              : "active:scale-[0.98]"
+          }`}
+        >
+          <span className="text-2xl">❤️</span>
 
-            <h1 className="mt-8 font-serif text-3xl font-bold italic text-slate-800 sm:text-4xl">
-              Hug Received!
-            </h1>
+          <span>
+            {holding
+              ? "Keep Holding..."
+              : "Press & Hold to Receive"}
+          </span>
+        </button>
 
-            <p className="mt-5 text-lg leading-relaxed text-slate-600">
-              Many many happy returns of the day
-            </p>
+        <p className="mt-6 text-sm font-medium text-slate-400">
+          {holding
+            ? "Almost there... 💗"
+            : "Hold until the hug is received 💕"}
+        </p>
 
-            <p className="mt-3 text-2xl">
-              💝🌸🥀
-            </p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="mt-6 text-sm text-pink-500"
-            >
-              Sending you lots of happiness and love 💗
-            </motion.div>
-          </motion.div>
-        )}
       </motion.section>
     </main>
   )
